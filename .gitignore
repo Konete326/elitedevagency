@@ -35,6 +35,9 @@ release/
 # Skills folder (internal agent tooling - not part of deployable source)
 docs/skills/
 
+# Internal agent configuration (not part of deployable source)
+docs/.agents/
+
 # TailAdmin template (third-party, not part of this project)
 tailadmin-free-tailwind-dashboard-template/
 

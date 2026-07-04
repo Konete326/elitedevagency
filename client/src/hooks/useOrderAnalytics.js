@@ -1,7 +1,27 @@
 import { useState, useEffect } from 'react';
 import { getDatabase } from '../db/database';
 
-export const useOrderAnalytics = () => {
+const getStartDate = (range) => {
+  const now = new Date();
+  if (range === 'today') {
+    const d = new Date(now);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  if (range === 'week') {
+    const d = new Date(now);
+    d.setDate(d.getDate() - 6);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  if (range === 'month') {
+    const d = new Date(now.getFullYear(), now.getMonth(), 1);
+    return d;
+  }
+  return null;
+};
+
+export const useOrderAnalytics = (dateRange = 'all') => {
   const [analytics, setAnalytics] = useState({
     totalRevenue: 0,
     totalOrders: 0,
@@ -14,8 +34,13 @@ export const useOrderAnalytics = () => {
     let sub;
 
     getDatabase().then((db) => {
+      const startDate = getStartDate(dateRange);
+      const selector = startDate
+        ? { isDeleted: false, updatedAt: { $gte: startDate.toISOString() } }
+        : { isDeleted: false };
+
       sub = db.orders
-        .find({ selector: { isDeleted: false } })
+        .find({ selector })
         .$.subscribe((docs) => {
           let revenue = 0;
           const productMap = {};
@@ -53,7 +78,7 @@ export const useOrderAnalytics = () => {
     return () => {
       if (sub) sub.unsubscribe();
     };
-  }, []);
+  }, [dateRange]);
 
   return analytics;
 };
