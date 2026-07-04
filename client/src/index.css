@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent-niche: var(--accent-niche);
+}
+
+:root {
+  --background: #faf8f5;
+  --foreground: #2c2824;
+  --card: #ffffff;
+  --card-foreground: #2c2824;
+  --border: #f0ece6;
+  --input: #f0ece6;
+  --ring: #2c2824;
+  --muted: #f5f2eb;
+  --muted-foreground: #7c7267;
+  --radius: 0.5rem;
+  --accent-niche: #d97706;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --card: #0a0a0c;
+  --card-foreground: #ffffff;
+  --border: #1a1a1e;
+  --input: #1a1a1e;
+  --ring: #d4d4d8;
+  --muted: #0f0f12;
+  --muted-foreground: #71717a;
+  --accent-niche: #f59e0b;
+}
+
+.theme-gym {
+  --accent-niche: #059669;
+  --ring: #059669;
+}
+.dark.theme-gym,
+.dark .theme-gym {
+  --accent-niche: #10b981;
+  --ring: #10b981;
+}
+
+.theme-restaurant {
+  --accent-niche: #ea580c;
+  --ring: #ea580c;
+}
+.dark.theme-restaurant,
+.dark .theme-restaurant {
+  --accent-niche: #f97316;
+  --ring: #f97316;
+}
+
+.theme-garments {
+  --accent-niche: #ca8a04;
+  --ring: #ca8a04;
+}
+.dark.theme-garments,
+.dark .theme-garments {
+  --accent-niche: #eab308;
+  --ring: #eab308;
+}
+
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
