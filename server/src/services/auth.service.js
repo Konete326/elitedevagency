@@ -11,7 +11,7 @@ const loginUser = async (email, password, deviceFingerprint) => {
     password === process.env.SUPERADMIN_PASSWORD
   ) {
     const token = jwt.sign(
-      { id: 'superadmin_id', role: 'SUPER_ADMIN' },
+      { id: 'superadmin_id', role: 'SUPER_ADMIN', tenantId: 'superadmin' },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
     );
@@ -21,7 +21,13 @@ const loginUser = async (email, password, deviceFingerprint) => {
         id: 'superadmin_id',
         name: 'Super Admin',
         role: 'SUPER_ADMIN',
-        email: process.env.SUPERADMIN_EMAIL
+        email: process.env.SUPERADMIN_EMAIL,
+        tenantId: 'superadmin'
+      },
+      tenant: {
+        _id: 'superadmin',
+        name: 'Elite Super Admin',
+        dbURI: 'main'
       }
     };
   }
@@ -38,11 +44,25 @@ const loginUser = async (email, password, deviceFingerprint) => {
 
   if (user.role === 'SUPER_ADMIN') {
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, tenantId: 'superadmin' },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
     );
-    return { token, user: { id: user._id, name: user.name, role: user.role, email: user.email } };
+    return {
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+        email: user.email,
+        tenantId: 'superadmin'
+      },
+      tenant: {
+        _id: 'superadmin',
+        name: 'Elite Super Admin',
+        dbURI: 'main'
+      }
+    };
   }
 
   const tenant = await Tenant.findById(user.tenantId);

@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['SUPER_ADMIN', 'OWNER', 'MANAGER', 'CASHIER'], required: true },
+  permissions: [{ type: String }],
+  dataVisibility: { type: String, enum: ['ALL', 'RESTRICTED'], default: 'ALL' },
   isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 

@@ -18,6 +18,7 @@ import { ProductManager } from './features/inventory/pages/ProductManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
+import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
 
 const queryClient = new QueryClient();
 
@@ -193,6 +194,22 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <ReturnsPage />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/employees" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <EmployeeManagement />
                 ) : (
                   <POSPage />
                 )
