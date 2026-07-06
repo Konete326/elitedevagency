@@ -182,6 +182,128 @@ const dealSchema = {
   required: ['_id', 'tenantId', 'name', 'price', 'items', 'isDeleted', 'updatedAt']
 };
 
+const planSchema = {
+  title: 'plan schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    price: { type: 'number' },
+    durationInDays: { type: 'number' },
+    description: { type: 'string' },
+    isActive: { type: 'boolean' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'price', 'durationInDays', 'isDeleted', 'updatedAt']
+};
+
+const memberSchema = {
+  title: 'member schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    phone: { type: 'string' },
+    rfidCard: { type: 'string' },
+    activePlanId: { type: 'string' },
+    planExpiryDate: { type: 'string' },
+    status: { type: 'string' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'phone', 'activePlanId', 'planExpiryDate', 'status', 'isDeleted', 'updatedAt']
+};
+
+const paymentSchema = {
+  title: 'payment schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    memberId: { type: 'string' },
+    amountReceived: { type: 'number' },
+    paymentMethod: { type: 'string' },
+    monthPaidFor: { type: 'string' },
+    receiptNo: { type: 'string' },
+    notes: { type: 'string' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'memberId', 'amountReceived', 'paymentMethod', 'monthPaidFor', 'isDeleted', 'updatedAt']
+};
+
+const trainerSchema = {
+  title: 'trainer schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    phone: { type: 'string' },
+    baseSalary: { type: 'number' },
+    advanceBalance: { type: 'number' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'phone', 'baseSalary', 'advanceBalance', 'isDeleted', 'updatedAt']
+};
+
+const trainerLedgerSchema = {
+  title: 'trainer ledger schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    trainerId: { type: 'string' },
+    type: { type: 'string' },
+    amount: { type: 'number' },
+    date: { type: 'string' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'trainerId', 'type', 'amount', 'date', 'isDeleted', 'updatedAt']
+};
+
+const measurementSchema = {
+  title: 'measurement schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    memberId: { type: 'string' },
+    weight: { type: 'number' },
+    height: { type: 'number' },
+    bmi: { type: 'number' },
+    bicep: { type: 'number' },
+    chest: { type: 'number' },
+    waist: { type: 'number' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'memberId', 'weight', 'height', 'bmi', 'isDeleted', 'updatedAt']
+};
+
 let dbPromise = null;
 
 export const getDatabase = async () => {
@@ -197,7 +319,13 @@ export const getDatabase = async () => {
       orders: { schema: orderSchema },
       categories: { schema: categorySchema },
       tables: { schema: tableSchema },
-      deals: { schema: dealSchema }
+      deals: { schema: dealSchema },
+      plans: { schema: planSchema },
+      members: { schema: memberSchema },
+      payments: { schema: paymentSchema },
+      trainers: { schema: trainerSchema },
+      trainer_ledgers: { schema: trainerLedgerSchema },
+      measurements: { schema: measurementSchema }
     });
     return db;
   });

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ProductGrid } from '../components/ProductGrid';
 import { Cart } from '../components/Cart';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid, Tag } from 'lucide-react';
+import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid, Tag, Award, UserCheck, CircleDollarSign, Activity } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../../hooks/usePwaInstall';
@@ -124,6 +124,45 @@ export const POSPage = () => {
 
           {(user?.role === 'OWNER' || user?.role === 'MANAGER') && (
             <div className="flex items-center gap-2">
+              {user?.niche === 'gym' && (
+                <>
+                  <button
+                    onClick={() => navigate('/plans')}
+                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                    title="Membership Plans"
+                  >
+                    <Award className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/members')}
+                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                    title="Members"
+                  >
+                    <UserCheck className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/payments')}
+                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                    title="12-Mo Fees"
+                  >
+                    <CircleDollarSign className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/trainers')}
+                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                    title="Trainers"
+                  >
+                    <Users className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => navigate('/measurements')}
+                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                    title="Metrics"
+                  >
+                    <Activity className="h-5 w-5" />
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => navigate('/inventory')}
                 className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"

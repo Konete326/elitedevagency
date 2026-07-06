@@ -24,6 +24,11 @@ import { ReturnsPage } from './features/billing/pages/ReturnsPage';
 import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
 import { OrderHistory } from './features/billing/pages/OrderHistory';
 import { FloorMap } from './features/restaurant/pages/FloorMap';
+import { PlanManager } from './features/gym/pages/PlanManager';
+import { MemberManager } from './features/gym/pages/MemberManager';
+import { PaymentGrid } from './features/gym/pages/PaymentGrid';
+import { TrainerPayroll } from './features/gym/pages/TrainerPayroll';
+import { MeasurementTracker } from './features/gym/pages/MeasurementTracker';
 
 const queryClient = new QueryClient();
 
@@ -100,6 +105,12 @@ function App() {
           startReplication(db, 'categories');
           startReplication(db, 'tables');
           startReplication(db, 'deals');
+          startReplication(db, 'plans');
+          startReplication(db, 'members');
+          startReplication(db, 'payments');
+          startReplication(db, 'trainers');
+          startReplication(db, 'trainer_ledgers');
+          startReplication(db, 'measurements');
           startImageSync();
         }
       });
@@ -169,6 +180,86 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <DealsManager />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/plans" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <PlanManager />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/members" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <MemberManager />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/payments" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <PaymentGrid />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/trainers" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TrainerPayroll />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/measurements" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <MeasurementTracker />
                 ) : (
                   <POSPage />
                 )

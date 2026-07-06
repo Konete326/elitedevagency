@@ -4,7 +4,13 @@ const getModel = (tenantConnection, collection) => {
     orders: 'Order',
     categories: 'Category',
     tables: 'Table',
-    deals: 'Deal'
+    deals: 'Deal',
+    plans: 'Plan',
+    members: 'Member',
+    payments: 'Payment',
+    trainers: 'Trainer',
+    trainer_ledgers: 'TrainerLedger',
+    measurements: 'Measurement'
   };
   const modelName = map[collection];
   if (!modelName) {

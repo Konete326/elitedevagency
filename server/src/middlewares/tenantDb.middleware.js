@@ -5,6 +5,12 @@ const Order = require('../models/Order');
 const Category = require('../models/Category');
 const Table = require('../models/Table');
 const Deal = require('../models/Deal');
+const Plan = require('../models/Plan');
+const Member = require('../models/Member');
+const Payment = require('../models/Payment');
+const Trainer = require('../models/Trainer');
+const TrainerLedger = require('../models/TrainerLedger');
+const Measurement = require('../models/Measurement');
 
 const connectionCache = {};
 
@@ -38,6 +44,12 @@ const tenantDbMiddleware = async (req, res, next) => {
       conn.model('Category', Category.schema);
       conn.model('Table', Table.schema);
       conn.model('Deal', Deal.schema);
+      conn.model('Plan', Plan.schema);
+      conn.model('Member', Member.schema);
+      conn.model('Payment', Payment.schema);
+      conn.model('Trainer', Trainer.schema);
+      conn.model('TrainerLedger', TrainerLedger.schema);
+      conn.model('Measurement', Measurement.schema);
 
       connectionCache[tenantId] = conn;
     }
