@@ -101,6 +101,7 @@ const orderSchema = {
           returnReason: { type: 'string' },
           variantSku: { type: 'string' },
           spiceLevel: { type: 'string' },
+          isDeal: { type: 'boolean' },
           selectedAddons: {
             type: 'array',
             items: {
@@ -147,6 +148,40 @@ const tableSchema = {
   required: ['_id', 'tenantId', 'tableNo', 'status', 'isDeleted', 'updatedAt']
 };
 
+const dealSchema = {
+  title: 'deal schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    price: { type: 'number' },
+    description: { type: 'string' },
+    image: { type: 'string' },
+    imageSynced: { type: 'boolean' },
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string' },
+          variantSku: { type: 'string' },
+          quantity: { type: 'number' },
+          name: { type: 'string' }
+        },
+        required: ['productId', 'quantity']
+      }
+    },
+    isActive: { type: 'boolean' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'price', 'items', 'isDeleted', 'updatedAt']
+};
+
 let dbPromise = null;
 
 export const getDatabase = async () => {
@@ -161,7 +196,8 @@ export const getDatabase = async () => {
       products: { schema: productSchema },
       orders: { schema: orderSchema },
       categories: { schema: categorySchema },
-      tables: { schema: tableSchema }
+      tables: { schema: tableSchema },
+      deals: { schema: dealSchema }
     });
     return db;
   });

@@ -61,9 +61,11 @@ export const Cart = () => {
         const payload = {
           kitchenSection: section,
           items: items.map(item => ({
-            name: item.selectedVariant 
-              ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
-              : item.name,
+            name: item.isDeal 
+              ? `${item.name} [Combo: ${(item.items || []).map(di => `${di.quantity}x ${di.name || 'Item'}`).join(', ')}]`
+              : (item.selectedVariant 
+                  ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+                  : item.name),
             quantity: item.quantity,
             spiceLevel: item.spiceLevel || '',
             addons: (item.selectedAddons || []).map(a => a.name)
@@ -86,9 +88,11 @@ export const Cart = () => {
         groups: Object.entries(kotGroups).map(([section, items]) => ({
           kitchenSection: section,
           items: items.map(item => ({
-            name: item.selectedVariant 
-              ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
-              : item.name,
+            name: item.isDeal 
+              ? `${item.name} [Combo: ${(item.items || []).map(di => `${di.quantity}x ${di.name || 'Item'}`).join(', ')}]`
+              : (item.selectedVariant 
+                  ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+                  : item.name),
             quantity: item.quantity,
             spiceLevel: item.spiceLevel || '',
             addons: (item.selectedAddons || []).map(a => a.name)
@@ -133,15 +137,14 @@ export const Cart = () => {
         tenantId: user?.tenantId || 'default',
         items: cartItems.map((item) => ({
           productId: item.id,
-          name: item.selectedVariant 
-            ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
-            : item.name,
+          name: item.name,
           price: getPromoPrice(item),
           quantity: item.quantity,
           returnedQty: 0,
           returnReason: '',
           variantSku: item.selectedVariant ? item.selectedVariant.sku : '',
           spiceLevel: item.spiceLevel || '',
+          isDeal: item.isDeal || false,
           selectedAddons: (item.selectedAddons || []).map(a => ({ name: a.name, price: a.price }))
         })),
         totalAmount: total,
@@ -204,15 +207,14 @@ export const Cart = () => {
         tenantId: user?.tenantId || 'default',
         items: cartItems.map((item) => ({
           productId: item.id,
-          name: item.selectedVariant 
-            ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
-            : item.name,
+          name: item.name,
           price: getPromoPrice(item),
           quantity: item.quantity,
           returnedQty: 0,
           returnReason: '',
           variantSku: item.selectedVariant ? item.selectedVariant.sku : '',
           spiceLevel: item.spiceLevel || '',
+          isDeal: item.isDeal || false,
           selectedAddons: (item.selectedAddons || []).map(a => ({ name: a.name, price: a.price }))
         })),
         totalAmount: total,
@@ -249,27 +251,56 @@ export const Cart = () => {
       }
 
       for (const item of cartItems) {
-        const productDoc = await db.products.findOne(item.id).exec();
-        if (productDoc) {
-          if (item.selectedVariant) {
-            const updatedVariants = (productDoc.variants || []).map((v) => {
-              if (v.sku === item.selectedVariant.sku) {
-                return { ...v, stock: Math.max(0, (v.stock || 0) - item.quantity) };
+        if (item.isDeal) {
+          for (const dealItem of (item.items || [])) {
+            const productDoc = await db.products.findOne(dealItem.productId).exec();
+            if (productDoc) {
+              const totalDecrement = dealItem.quantity * item.quantity;
+              if (dealItem.variantSku) {
+                const updatedVariants = (productDoc.variants || []).map((v) => {
+                  if (v.sku === dealItem.variantSku) {
+                    return { ...v, stock: Math.max(0, (v.stock || 0) - totalDecrement) };
+                  }
+                  return v;
+                });
+                await productDoc.patch({
+                  variants: updatedVariants,
+                  stock: Math.max(0, (productDoc.stock || 0) - totalDecrement),
+                  isSynced: false,
+                  updatedAt: new Date().toISOString()
+                });
+              } else {
+                await productDoc.patch({
+                  stock: Math.max(0, (productDoc.stock || 0) - totalDecrement),
+                  isSynced: false,
+                  updatedAt: new Date().toISOString()
+                });
               }
-              return v;
-            });
-            await productDoc.patch({
-              variants: updatedVariants,
-              stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
-              isSynced: false,
-              updatedAt: new Date().toISOString()
-            });
-          } else {
-            await productDoc.patch({
-              stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
-              isSynced: false,
-              updatedAt: new Date().toISOString()
-            });
+            }
+          }
+        } else {
+          const productDoc = await db.products.findOne(item.id).exec();
+          if (productDoc) {
+            if (item.selectedVariant) {
+              const updatedVariants = (productDoc.variants || []).map((v) => {
+                if (v.sku === item.selectedVariant.sku) {
+                  return { ...v, stock: Math.max(0, (v.stock || 0) - item.quantity) };
+                }
+                return v;
+              });
+              await productDoc.patch({
+                variants: updatedVariants,
+                stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
+                isSynced: false,
+                updatedAt: new Date().toISOString()
+              });
+            } else {
+              await productDoc.patch({
+                stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
+                isSynced: false,
+                updatedAt: new Date().toISOString()
+              });
+            }
           }
         }
       }
@@ -361,6 +392,13 @@ export const Cart = () => {
                     {item.selectedAddons && item.selectedAddons.length > 0 && (
                       <span>Addons: {item.selectedAddons.map(a => a.name).join(', ')}</span>
                     )}
+                  </div>
+                )}
+                {item.isDeal && item.items && item.items.length > 0 && (
+                  <div className="text-[10px] text-muted-foreground font-semibold font-mono space-y-0.5 mt-0.5">
+                    {item.items.map((di, idx) => (
+                      <div key={idx}>• {di.quantity}x {di.name || 'Item'}</div>
+                    ))}
                   </div>
                 )}
                 <div className="flex items-center gap-1.5 mt-0.5">

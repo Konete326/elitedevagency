@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema({
     returnReason: { type: String },
     variantSku: { type: String },
     spiceLevel: { type: String },
+    isDeal: { type: Boolean, default: false },
     selectedAddons: [{
       name: { type: String },
       price: { type: Number }

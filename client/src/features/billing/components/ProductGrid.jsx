@@ -1,25 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useCartStore } from '../../../store/useCartStore';
+import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { Plus, Tag, Inbox, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-const CATEGORIES = ['All', 'Membership', 'Supplements', 'Apparel', 'Accessories'];
-
 export const ProductGrid = () => {
+  const { user } = useAuthStore();
   const [products, setProducts] = useState([]);
+  const [deals, setDeals] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const addToCart = useCartStore((state) => state.addToCart);
   const [selectedProductForVariants, setSelectedProductForVariants] = useState(null);
-  
   const [selectedProductForModifiers, setSelectedProductForModifiers] = useState(null);
   const [spiceLevel, setSpiceLevel] = useState('Medium');
   const [activeAddons, setActiveAddons] = useState([]);
 
   useEffect(() => {
-    let sub;
+    let subProd, subDeals;
     getDatabase().then((db) => {
-      sub = db.products
+      subProd = db.products
         .find({
           selector: {
             isDeleted: false
@@ -48,15 +48,44 @@ export const ProductGrid = () => {
           }));
           setProducts(mapped);
         });
+
+      if (user?.niche === 'restaurant') {
+        subDeals = db.deals
+          .find({
+            selector: {
+              isDeleted: false,
+              isActive: true
+            }
+          })
+          .$.subscribe((docs) => {
+            const mapped = docs.map((doc) => ({
+              id: doc._id,
+              name: doc.name,
+              price: doc.price,
+              image: doc.image,
+              category: 'Deals',
+              isDeal: true,
+              items: doc.items || []
+            }));
+            setDeals(mapped);
+          });
+      }
     });
 
     return () => {
-      if (sub) sub.unsubscribe();
+      if (subProd) subProd.unsubscribe();
+      if (subDeals) subDeals.unsubscribe();
     };
-  }, []);
+  }, [user]);
 
-  const filteredProducts = selectedCategory === 'All'
-    ? products
+  const categoriesList = user?.niche === 'restaurant'
+    ? ['All', 'Deals']
+    : ['All', 'Membership', 'Supplements', 'Apparel', 'Accessories'];
+
+  const filteredProducts = selectedCategory === 'Deals'
+    ? deals
+    : selectedCategory === 'All'
+    ? [...products, ...deals]
     : products.filter((p) => p.category === selectedCategory);
 
   const handleAddonsToggle = (addon) => {
@@ -81,14 +110,14 @@ export const ProductGrid = () => {
   return (
     <div className="flex flex-col h-full space-y-6">
       <div className="flex flex-wrap gap-2 pb-2 overflow-x-auto no-scrollbar">
-        {CATEGORIES.map((category) => (
+        {categoriesList.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={`rounded-full px-4 py-2 text-xs font-bold transition-all border ${
               selectedCategory === category
                 ? 'bg-foreground text-background border-foreground shadow-sm'
-                : 'bg-card text-foreground border-border hover:bg-muted'
+                : 'bg-card text-foreground border-border hover:bg-muted dark:hover:bg-zinc-800'
             }`}
           >
             {category}
@@ -96,7 +125,7 @@ export const ProductGrid = () => {
         ))}
       </div>
 
-      {products.length === 0 ? (
+      {products.length === 0 && deals.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-2xl text-muted-foreground p-8 space-y-3">
           <Inbox className="h-10 w-10 text-muted-foreground/40" />
           <h3 className="font-extrabold text-base tracking-tight text-foreground">No products available</h3>
@@ -107,15 +136,18 @@ export const ProductGrid = () => {
       ) : filteredProducts.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 space-y-2">
           <Inbox className="h-8 w-8 text-muted-foreground/30" />
-          <p className="text-xs font-semibold">No products found matching "{selectedCategory}"</p>
+          <p className="text-xs font-semibold">No items found matching "{selectedCategory}"</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 overflow-y-auto pr-1">
           {filteredProducts.map((product) => (
             <div
-              key={product.id}
+              key={product.isDeal ? `deal-${product.id}` : `prod-${product.id}`}
               onClick={() => {
-                if (product.variants && product.variants.length > 0) {
+                if (product.isDeal) {
+                  addToCart(product);
+                  toast.success(`Added Deal: ${product.name}`);
+                } else if (product.variants && product.variants.length > 0) {
                   setSelectedProductForVariants(product);
                 } else if (product.addons?.length > 0 || product.hasSpiceLevel) {
                   setSpiceLevel('Medium');
@@ -147,12 +179,12 @@ export const ProductGrid = () => {
                   <Tag className="h-3 w-3" />
                   <span>{product.category}</span>
                 </div>
-                <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-zinc-900 dark:text-zinc-50 group-hover:text-accent-niche transition-colors">
+                <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-foreground group-hover:text-accent-niche transition-colors">
                   {product.name}
                 </h3>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
+              <div className="flex items-center justify-between pt-4 border-t border-border dark:border-zinc-700 mt-4">
                 <div className="flex flex-col">
                   {product.promotionalDiscount ? (
                     <>
@@ -169,7 +201,7 @@ export const ProductGrid = () => {
                     <span className="text-sm font-extrabold text-foreground">${product.price.toFixed(2)}</span>
                   )}
                 </div>
-                <div className="rounded-lg bg-muted border border-border group-hover:bg-foreground group-hover:text-background p-1.5 transition-colors">
+                <div className="rounded-lg bg-muted border border-border group-hover:bg-foreground group-hover:text-background p-1.5 transition-colors dark:group-hover:text-zinc-900">
                   <Plus className="h-4 w-4" />
                 </div>
               </div>
@@ -191,7 +223,7 @@ export const ProductGrid = () => {
               </button>
             </div>
             
-            <p className="text-sm font-black mb-1 text-zinc-950 dark:text-zinc-50">{selectedProductForVariants.name}</p>
+            <p className="text-sm font-black mb-1 text-foreground">{selectedProductForVariants.name}</p>
             <p className="text-xs text-muted-foreground font-semibold mb-4">Select size and color to add to cart</p>
 
             <div className="flex-1 overflow-y-auto grid gap-2.5 grid-cols-2 pr-1">
@@ -227,7 +259,7 @@ export const ProductGrid = () => {
 
       {selectedProductForModifiers && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-sm bg-card border border-border rounded-xl shadow-lg p-5 flex flex-col max-h-[85vh]">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg p-5 flex flex-col max-h-[80vh]">
             <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
               <h3 className="font-extrabold text-base tracking-tight text-foreground">Customize Item</h3>
               <button
@@ -238,32 +270,25 @@ export const ProductGrid = () => {
               </button>
             </div>
 
-            <div className="space-y-4 overflow-y-auto pr-1 flex-1">
-              <div>
-                <p className="text-sm font-black text-zinc-950 dark:text-zinc-50">{selectedProductForModifiers.name}</p>
-                {selectedProductForModifiers.selectedVariant && (
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wide mt-0.5">
-                    Portion: {selectedProductForModifiers.selectedVariant.size}
-                  </p>
-                )}
-              </div>
+            <p className="text-sm font-black mb-1 text-foreground">{selectedProductForModifiers.name}</p>
+            <p className="text-xs text-muted-foreground font-semibold mb-4">Customize spice level and select addons</p>
 
+            <div className="flex-1 overflow-y-auto space-y-4 pr-1">
               {selectedProductForModifiers.hasSpiceLevel && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">Spice Level</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['Mild', 'Medium', 'Spicy'].map((level) => (
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Spice Level</h4>
+                  <div className="grid grid-cols-4 gap-2">
+                    {['Mild', 'Medium', 'Hot', 'Extra Hot'].map((lvl) => (
                       <button
-                        key={level}
-                        type="button"
-                        onClick={() => setSpiceLevel(level)}
-                        className={`rounded-lg py-2 text-xs font-bold border transition-colors ${
-                          spiceLevel === level
-                            ? 'bg-foreground text-background border-foreground shadow-sm'
-                            : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                        key={lvl}
+                        onClick={() => setSpiceLevel(lvl)}
+                        className={`py-2 text-xs font-bold rounded-lg border transition-all ${
+                          spiceLevel === lvl
+                            ? 'bg-foreground text-background border-foreground'
+                            : 'bg-muted/30 border-border text-foreground hover:bg-muted'
                         }`}
                       >
-                        {level}
+                        {lvl}
                       </button>
                     ))}
                   </div>
@@ -271,24 +296,23 @@ export const ProductGrid = () => {
               )}
 
               {selectedProductForModifiers.addons?.length > 0 && (
-                <div className="space-y-1.5">
-                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">Available Addons</label>
-                  <div className="grid gap-2">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Addons</h4>
+                  <div className="grid grid-cols-2 gap-2.5">
                     {selectedProductForModifiers.addons.map((addon) => {
-                      const isSelected = activeAddons.some(a => a.name === addon.name);
+                      const isActive = activeAddons.some(a => a.name === addon.name);
                       return (
                         <button
                           key={addon.name}
-                          type="button"
                           onClick={() => handleAddonsToggle(addon)}
-                          className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold border transition-colors ${
-                            isSelected
-                              ? 'bg-foreground text-background border-foreground shadow-sm'
-                              : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                          className={`p-3 rounded-lg border text-left flex justify-between items-center transition-all ${
+                            isActive
+                              ? 'bg-foreground/5 border-foreground text-foreground font-bold'
+                              : 'bg-muted/30 border-border text-foreground'
                           }`}
                         >
-                          <span>{addon.name}</span>
-                          <span className="font-mono">${addon.price.toFixed(2)}</span>
+                          <span className="text-xs font-semibold">{addon.name}</span>
+                          <span className="text-xs font-bold text-accent-niche">+${addon.price.toFixed(2)}</span>
                         </button>
                       );
                     })}
@@ -299,9 +323,9 @@ export const ProductGrid = () => {
 
             <button
               onClick={handleAddWithModifiers}
-              className="w-full rounded-lg bg-foreground text-background font-bold py-2.5 text-xs transition-colors mt-6 shrink-0"
+              className="w-full rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold py-3 text-xs mt-6 transition-colors shadow-sm"
             >
-              Add to Basket
+              Add Custom Item to Cart
             </button>
           </div>
         </div>
@@ -309,4 +333,5 @@ export const ProductGrid = () => {
     </div>
   );
 };
+
 export default ProductGrid;

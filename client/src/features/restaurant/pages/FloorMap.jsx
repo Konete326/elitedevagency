@@ -83,15 +83,29 @@ export const FloorMap = () => {
         const db = await getDatabase();
         const orderDoc = await db.orders.findOne(table.currentOrderId).exec();
         if (orderDoc) {
-          const cartItems = (orderDoc.items || []).map((item) => ({
-            id: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            variantSku: item.variantSku || '',
-            spiceLevel: item.spiceLevel || '',
-            selectedAddons: item.selectedAddons || [],
-            cartItemId: `${item.productId}-${item.variantSku || ''}-${item.spiceLevel || ''}-${(item.selectedAddons || []).map((a) => a.name).sort().join(',')}`
+          const cartItems = await Promise.all((orderDoc.items || []).map(async (item) => {
+            if (item.isDeal) {
+              const dealDoc = await db.deals.findOne(item.productId).exec();
+              return {
+                id: item.productId,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                isDeal: true,
+                items: dealDoc ? (dealDoc.items || []) : [],
+                cartItemId: `deal-${item.productId}`
+              };
+            }
+            return {
+              id: item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              variantSku: item.variantSku || '',
+              spiceLevel: item.spiceLevel || '',
+              selectedAddons: item.selectedAddons || [],
+              cartItemId: `${item.productId}-${item.variantSku || ''}-${item.spiceLevel || ''}-${(item.selectedAddons || []).map((a) => a.name).sort().join(',')}`
+            };
           }));
           loadOrderIntoCart(cartItems, table._id, table.tableNo, orderDoc._id);
           navigate('/');

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ProductGrid } from '../components/ProductGrid';
 import { Cart } from '../components/Cart';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid } from 'lucide-react';
+import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../../hooks/usePwaInstall';
@@ -127,8 +127,16 @@ export const POSPage = () => {
               <button
                 onClick={() => navigate('/inventory')}
                 className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                title="Product Catalog"
               >
                 <Package className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => navigate('/deals')}
+                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                title="Deals Catalog"
+              >
+                <Tag className="h-5 w-5" />
               </button>
               <button
                 onClick={() => navigate('/returns')}

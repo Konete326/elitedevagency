@@ -17,6 +17,7 @@ import { Dashboard } from './features/superadmin/pages/Dashboard';
 import { TenantOnboardForm } from './features/superadmin/components/TenantOnboardForm';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
 import { ProductManager } from './features/inventory/pages/ProductManager';
+import { DealsManager } from './features/inventory/pages/DealsManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
@@ -98,6 +99,7 @@ function App() {
           startReplication(db, 'orders');
           startReplication(db, 'categories');
           startReplication(db, 'tables');
+          startReplication(db, 'deals');
           startImageSync();
         }
       });
@@ -151,6 +153,22 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <ProductManager />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/deals" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <DealsManager />
                 ) : (
                   <POSPage />
                 )

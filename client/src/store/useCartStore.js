@@ -31,9 +31,9 @@ export const useCartStore = create((set, get) => ({
   },
   addToCart: (product, spiceLevel = '', selectedAddons = []) => {
     set((state) => {
-      const addonKeys = selectedAddons.map(a => a.name).sort().join(',');
-      const variantSku = product.selectedVariant?.sku || '';
-      const cartItemId = `${product.id}-${variantSku}-${spiceLevel}-${addonKeys}`;
+      const cartItemId = product.isDeal
+        ? `deal-${product.id}`
+        : `${product.id}-${product.selectedVariant?.sku || ''}-${spiceLevel}-${selectedAddons.map(a => a.name).sort().join(',')}`;
 
       const existingIndex = state.cartItems.findIndex((item) => item.cartItemId === cartItemId);
       if (existingIndex !== -1) {
