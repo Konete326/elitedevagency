@@ -11,6 +11,10 @@ export const ProductGrid = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const addToCart = useCartStore((state) => state.addToCart);
   const [selectedProductForVariants, setSelectedProductForVariants] = useState(null);
+  
+  const [selectedProductForModifiers, setSelectedProductForModifiers] = useState(null);
+  const [spiceLevel, setSpiceLevel] = useState('Medium');
+  const [activeAddons, setActiveAddons] = useState([]);
 
   useEffect(() => {
     let sub;
@@ -37,7 +41,10 @@ export const ProductGrid = () => {
             image: doc.image,
             category: getCategory(doc.name),
             variants: doc.variants || [],
-            promotionalDiscount: doc.promotionalDiscount || null
+            promotionalDiscount: doc.promotionalDiscount || null,
+            addons: doc.addons || [],
+            hasSpiceLevel: doc.hasSpiceLevel || false,
+            kitchenSection: doc.kitchenSection || 'Main Kitchen'
           }));
           setProducts(mapped);
         });
@@ -51,6 +58,25 @@ export const ProductGrid = () => {
   const filteredProducts = selectedCategory === 'All'
     ? products
     : products.filter((p) => p.category === selectedCategory);
+
+  const handleAddonsToggle = (addon) => {
+    setActiveAddons(prev =>
+      prev.some(a => a.name === addon.name)
+        ? prev.filter(a => a.name !== addon.name)
+        : [...prev, addon]
+    );
+  };
+
+  const handleAddWithModifiers = () => {
+    if (!selectedProductForModifiers) return;
+    addToCart(
+      selectedProductForModifiers,
+      selectedProductForModifiers.hasSpiceLevel ? spiceLevel : '',
+      activeAddons
+    );
+    toast.success(`Added: ${selectedProductForModifiers.name}`);
+    setSelectedProductForModifiers(null);
+  };
 
   return (
     <div className="flex flex-col h-full space-y-6">
@@ -91,6 +117,10 @@ export const ProductGrid = () => {
               onClick={() => {
                 if (product.variants && product.variants.length > 0) {
                   setSelectedProductForVariants(product);
+                } else if (product.addons?.length > 0 || product.hasSpiceLevel) {
+                  setSpiceLevel('Medium');
+                  setActiveAddons([]);
+                  setSelectedProductForModifiers(product);
                 } else {
                   addToCart(product);
                 }
@@ -169,12 +199,19 @@ export const ProductGrid = () => {
                 <button
                   key={v.sku}
                   onClick={() => {
-                    addToCart({
+                    const productWithVariant = {
                       ...selectedProductForVariants,
                       selectedVariant: v
-                    });
+                    };
                     setSelectedProductForVariants(null);
-                    toast.success(`Added: ${selectedProductForVariants.name} (${v.size}/${v.color})`);
+                    if (productWithVariant.addons?.length > 0 || productWithVariant.hasSpiceLevel) {
+                      setSpiceLevel('Medium');
+                      setActiveAddons([]);
+                      setSelectedProductForModifiers(productWithVariant);
+                    } else {
+                      addToCart(productWithVariant);
+                      toast.success(`Added: ${productWithVariant.name} (${v.size}/${v.color})`);
+                    }
                   }}
                   className="flex flex-col items-start p-3 rounded-lg border border-border bg-muted/30 hover:border-foreground/30 hover:bg-muted/70 transition-all text-left"
                 >
@@ -184,6 +221,88 @@ export const ProductGrid = () => {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {selectedProductForModifiers && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm bg-card border border-border rounded-xl shadow-lg p-5 flex flex-col max-h-[85vh]">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h3 className="font-extrabold text-base tracking-tight text-foreground">Customize Item</h3>
+              <button
+                onClick={() => setSelectedProductForModifiers(null)}
+                className="rounded-lg border border-border p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 overflow-y-auto pr-1 flex-1">
+              <div>
+                <p className="text-sm font-black text-zinc-950 dark:text-zinc-50">{selectedProductForModifiers.name}</p>
+                {selectedProductForModifiers.selectedVariant && (
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wide mt-0.5">
+                    Portion: {selectedProductForModifiers.selectedVariant.size}
+                  </p>
+                )}
+              </div>
+
+              {selectedProductForModifiers.hasSpiceLevel && (
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">Spice Level</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['Mild', 'Medium', 'Spicy'].map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => setSpiceLevel(level)}
+                        className={`rounded-lg py-2 text-xs font-bold border transition-colors ${
+                          spiceLevel === level
+                            ? 'bg-foreground text-background border-foreground shadow-sm'
+                            : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        {level}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedProductForModifiers.addons?.length > 0 && (
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider font-mono">Available Addons</label>
+                  <div className="grid gap-2">
+                    {selectedProductForModifiers.addons.map((addon) => {
+                      const isSelected = activeAddons.some(a => a.name === addon.name);
+                      return (
+                        <button
+                          key={addon.name}
+                          type="button"
+                          onClick={() => handleAddonsToggle(addon)}
+                          className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold border transition-colors ${
+                            isSelected
+                              ? 'bg-foreground text-background border-foreground shadow-sm'
+                              : 'bg-muted/50 border-border text-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <span>{addon.name}</span>
+                          <span className="font-mono">${addon.price.toFixed(2)}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={handleAddWithModifiers}
+              className="w-full rounded-lg bg-foreground text-background font-bold py-2.5 text-xs transition-colors mt-6 shrink-0"
+            >
+              Add to Basket
+            </button>
           </div>
         </div>
       )}

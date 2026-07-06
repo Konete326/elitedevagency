@@ -15,11 +15,11 @@ const getPromoPrice = (item) => {
 
 export const useCartStore = create((set, get) => ({
   cartItems: [],
-  addToCart: (product) => {
+  addToCart: (product, spiceLevel = '', selectedAddons = []) => {
     set((state) => {
-      const cartItemId = product.selectedVariant 
-        ? `${product.id}-${product.selectedVariant.sku}` 
-        : product.id;
+      const addonKeys = selectedAddons.map(a => a.name).sort().join(',');
+      const variantSku = product.selectedVariant?.sku || '';
+      const cartItemId = `${product.id}-${variantSku}-${spiceLevel}-${addonKeys}`;
 
       const existingIndex = state.cartItems.findIndex((item) => item.cartItemId === cartItemId);
       if (existingIndex !== -1) {
@@ -27,7 +27,15 @@ export const useCartStore = create((set, get) => ({
         newItems[existingIndex].quantity += 1;
         return { cartItems: newItems };
       }
-      return { cartItems: [...state.cartItems, { ...product, cartItemId, quantity: 1 }] };
+      return {
+        cartItems: [...state.cartItems, {
+          ...product,
+          cartItemId,
+          quantity: 1,
+          spiceLevel,
+          selectedAddons
+        }]
+      };
     });
   },
   removeFromCart: (cartItemId) => {
@@ -49,6 +57,10 @@ export const useCartStore = create((set, get) => ({
   },
   clearCart: () => set({ cartItems: [] }),
   getSubtotal: () => {
-    return get().cartItems.reduce((sum, item) => sum + getPromoPrice(item) * item.quantity, 0);
+    return get().cartItems.reduce((sum, item) => {
+      const basePrice = getPromoPrice(item);
+      const addonsPrice = (item.selectedAddons || []).reduce((s, a) => s + (a.price || 0), 0);
+      return sum + (basePrice + addonsPrice) * item.quantity;
+    }, 0);
   }
 }));

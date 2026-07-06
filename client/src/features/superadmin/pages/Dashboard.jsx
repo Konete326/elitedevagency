@@ -1,26 +1,31 @@
 import { useState } from 'react';
-import { usePendingDevices, useApproveDevice } from '../hooks/useSuperAdmin';
-import { TenantList } from '../components/TenantList';
+import { usePendingDevices, useTenants } from '../hooks/useSuperAdmin';
 import { TenantOnboardForm } from '../components/TenantOnboardForm';
+import { TenantManager } from '../components/TenantManager';
+import { HardwareApproval } from '../components/HardwareApproval';
 import { toast } from 'sonner';
-import { Users, AlertTriangle, Check, X, Key, Clipboard } from 'lucide-react';
+import { Users, X, Key, Clipboard, Building, DollarSign, Cpu, AlertCircle } from 'lucide-react';
 
 export const Dashboard = () => {
   const [credentials, setCredentials] = useState(null);
 
-  const { data: devices = [], isLoading } = usePendingDevices();
-  const approveDeviceMutation = useApproveDevice();
+  // Fetch pending devices to get the queue count
+  const { data: devices = [] } = usePendingDevices();
+  
+  // Fetch first 100 tenants to calculate total tenants count and estimate MRR
+  const { data: tenantsData } = useTenants(1, 100);
+  const tenants = tenantsData?.data || [];
+  const totalTenants = tenantsData?.meta?.total || 0;
+  const pendingCount = devices.length;
 
-  const handleApprove = (deviceId, approve) => {
-    approveDeviceMutation.mutate({ deviceId, approve }, {
-      onSuccess: () => {
-        toast.success(approve ? 'Device approved successfully!' : 'Device rejected');
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      }
-    });
-  };
+  // Calculate MRR based on plans of active tenants
+  const estimatedMRR = tenants.reduce((acc, tenant) => {
+    if (tenant.rentOverdue) return acc;
+    const plan = tenant.plan || 'STARTER';
+    if (plan === 'PRO') return acc + 199;
+    if (plan === 'GROWTH') return acc + 99;
+    return acc + 49; // STARTER
+  }, 0);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -28,13 +33,21 @@ export const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4">
-        <h1 className="text-3xl font-extrabold tracking-tight">SuperAdmin Engine</h1>
+    <div className="space-y-6">
+      
+      {/* Title Header */}
+      <div>
+        <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
+          System Overview
+        </h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Real-time metrics, active hardware approvals, and tenant provisioning
+        </p>
       </div>
 
+      {/* Default Owner Credentials Banner */}
       {credentials && (
-        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6 shadow-sm relative overflow-hidden animate-fade-in">
+        <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6 shadow-sm relative overflow-hidden animate-slide-in">
           <div className="absolute top-0 right-0 p-4">
             <button
               onClick={() => setCredentials(null)}
@@ -45,39 +58,42 @@ export const Dashboard = () => {
           </div>
 
           <div className="flex items-start gap-4 pr-8">
-            <div className="rounded-full bg-amber-500/10 p-3 text-amber-600 dark:text-amber-500 border border-amber-500/20">
+            <div className="rounded-full bg-amber-500/10 p-3 text-amber-600 dark:text-amber-500 border border-amber-500/20 shrink-0">
               <Key className="h-6 w-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-extrabold text-lg tracking-tight text-amber-800 dark:text-amber-400">Default Owner Credentials</h3>
-              <p className="text-sm text-amber-700/80 dark:text-amber-500/80 font-medium">
-                The Tenant Owner user account was seeded successfully. Share these temporary login details:
+              <h3 className="font-extrabold text-base tracking-tight text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+                <AlertCircle className="h-4 w-4 text-amber-500" />
+                <span>Tenant Provisioned Successfully</span>
+              </h3>
+              <p className="text-xs text-amber-700/80 dark:text-amber-500/80 font-medium">
+                Copy and share these default administrator login details with the tenant owner:
               </p>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div className="flex items-center justify-between p-3 rounded-lg bg-background border border-border">
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Email Address</p>
-                    <p className="text-sm font-bold truncate">{credentials.email}</p>
+                    <p className="text-xs font-bold truncate text-foreground">{credentials.email}</p>
                   </div>
                   <button
                     onClick={() => copyToClipboard(credentials.email)}
                     className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border"
                   >
-                    <Clipboard className="h-4 w-4" />
+                    <Clipboard className="h-3.5 w-3.5" />
                   </button>
                 </div>
 
                 <div className="flex items-center justify-between p-3 rounded-lg bg-background border border-border">
                   <div className="min-w-0">
                     <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Temporary Password</p>
-                    <p className="text-sm font-mono font-bold tracking-wider">{credentials.password}</p>
+                    <p className="text-xs font-mono font-bold tracking-wider text-foreground">{credentials.password}</p>
                   </div>
                   <button
                     onClick={() => copyToClipboard(credentials.password)}
                     className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border"
                   >
-                    <Clipboard className="h-4 w-4" />
+                    <Clipboard className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </div>
@@ -86,62 +102,82 @@ export const Dashboard = () => {
         </div>
       )}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <TenantOnboardForm onSuccess={setCredentials} />
-
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-full">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold tracking-tight">Device Approval Queue</h2>
-            <p className="text-sm text-muted-foreground">Approve pending client device fingerprints for login</p>
+      {/* KPI Cards Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Monthly Recurring Revenue */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Estimated Monthly MRR
+            </p>
+            <p className="text-2xl font-black tracking-tight text-foreground">
+              ${estimatedMRR.toLocaleString()}
+            </p>
+            <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold flex items-center gap-1">
+              <span>● Active subscriptions contribution</span>
+            </p>
           </div>
-
-          <div className="flex-1 overflow-y-auto max-h-[340px] space-y-4 pr-2">
-            {isLoading ? (
-              <p className="text-sm text-muted-foreground py-8 text-center">Loading queue...</p>
-            ) : devices.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border rounded-lg text-muted-foreground space-y-2">
-                <Users className="h-8 w-8 text-muted-foreground/50" />
-                <p className="text-sm font-medium">All device fingerprints cleared</p>
-              </div>
-            ) : (
-              devices.map((device) => (
-                <div
-                  key={device.deviceId}
-                  className="flex items-center justify-between p-4 rounded-lg bg-muted border border-border"
-                >
-                  <div className="space-y-1">
-                    <p className="text-sm font-bold">{device.businessName}</p>
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-semibold">
-                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                      <span className="truncate max-w-[180px]">{device.deviceId}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleApprove(device.deviceId, true)}
-                      disabled={approveDeviceMutation.isPending}
-                      className="rounded-lg bg-green-500/10 hover:bg-green-500/20 text-green-600 dark:text-green-400 p-2.5 transition-colors border border-green-500/20"
-                    >
-                      <Check className="h-4.5 w-4.5" />
-                    </button>
-                    <button
-                      onClick={() => handleApprove(device.deviceId, false)}
-                      disabled={approveDeviceMutation.isPending}
-                      className="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 p-2.5 transition-colors border border-red-500/20"
-                    >
-                      <X className="h-4.5 w-4.5" />
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
+          <div className="rounded-full bg-emerald-500/10 p-3.5 text-emerald-600 dark:text-emerald-500 border border-emerald-500/20 shrink-0 shadow-sm">
+            <DollarSign className="h-6 w-6" />
           </div>
         </div>
+
+        {/* Total Tenants Card */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Total Active Tenants
+            </p>
+            <p className="text-2xl font-black tracking-tight text-foreground">
+              {totalTenants}
+            </p>
+            <p className="text-[10px] text-amber-600 dark:text-amber-500 font-extrabold">
+              <span>● Gym / Restaurant / Garments</span>
+            </p>
+          </div>
+          <div className="rounded-full bg-amber-500/10 p-3.5 text-amber-600 dark:text-amber-500 border border-amber-500/20 shrink-0 shadow-sm">
+            <Building className="h-6 w-6" />
+          </div>
+        </div>
+
+        {/* Pending Devices Card */}
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Pending approvals
+            </p>
+            <p className="text-2xl font-black tracking-tight text-foreground">
+              {pendingCount}
+            </p>
+            <p className={`text-[10px] font-extrabold flex items-center gap-1 ${
+              pendingCount > 0 ? 'text-rose-500' : 'text-slate-500'
+            }`}>
+              <span>● {pendingCount > 0 ? 'Requires administrative action' : 'System whitelisted'}</span>
+            </p>
+          </div>
+          <div className={`rounded-full p-3.5 border shrink-0 shadow-sm transition-colors ${
+            pendingCount > 0 
+              ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20' 
+              : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 border-border'
+          }`}>
+            <Cpu className="h-6 w-6" />
+          </div>
+        </div>
+
       </div>
 
-      <TenantList />
+      {/* Main Operations Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TenantOnboardForm onSuccess={setCredentials} />
+        <HardwareApproval />
+      </div>
+
+      {/* Tenants Management Area */}
+      <TenantManager />
+
     </div>
   );
 };
+
 export default Dashboard;

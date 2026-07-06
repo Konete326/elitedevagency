@@ -29,7 +29,8 @@ const productSchema = new mongoose.Schema({
     name: { type: String },
     price: { type: Number }
   }],
-  hasSpiceLevel: { type: Boolean, default: false }
+  hasSpiceLevel: { type: Boolean, default: false },
+  kitchenSection: { type: String, default: 'Main Kitchen' }
 }, {
   timestamps: true
 });

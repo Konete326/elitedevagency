@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOnboardTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
+import { UserPlus, Settings, CheckSquare, Square, Palette, ShieldCheck } from 'lucide-react';
 
 const allModules = [
   { id: 'POS', label: 'Point of Sale' },
@@ -45,13 +46,13 @@ export const TenantOnboardForm = ({ onSuccess }) => {
   const handleOnboard = (e) => {
     e.preventDefault();
     if (!businessName || !ownerName || !ownerEmail) {
-      toast.error('All onboarding fields are required');
+      toast.error('Please fill in all required onboarding fields.');
       return;
     }
 
     const parsedDays = parseInt(trialDays, 10);
     if (isNaN(parsedDays) || parsedDays <= 0) {
-      toast.error('Please enter a positive number of trial days');
+      toast.error('Trial period must be a positive integer.');
       return;
     }
 
@@ -68,7 +69,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
       },
       {
         onSuccess: (response) => {
-          toast.success(`Tenant ${response.data.businessName} onboarded!`);
+          toast.success(`Tenant "${response.data.businessName}" successfully onboarded!`);
           onSuccess(response.credentials);
           setBusinessName('');
           setOwnerName('');
@@ -80,141 +81,160 @@ export const TenantOnboardForm = ({ onSuccess }) => {
           setDarkPrimary('#f59e0b');
         },
         onError: (error) => {
-          toast.error(error.message);
+          toast.error(error.message || 'Onboarding failed');
         }
       }
     );
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-      <div className="mb-6">
-        <h2 className="text-xl font-bold tracking-tight">Onboard New Tenant</h2>
-        <p className="text-sm text-muted-foreground">Provision a new business client and isolated database</p>
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden flex flex-col h-full">
+      <div className="p-6 border-b border-border bg-slate-50/50 dark:bg-zinc-800/10">
+        <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
+          <UserPlus className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+          <span>Onboard New Tenant</span>
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">Provision an isolated workspace and default administrator credentials</p>
       </div>
 
-      <form onSubmit={handleOnboard} className="space-y-5">
-        <div className="grid gap-4 grid-cols-2">
-          <div>
-            <label className="block text-sm font-semibold mb-1">Business Name</label>
-            <input
-              type="text"
-              value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="e.g. FitZone Center"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Trial Period (Days)</label>
-            <input
-              type="number"
-              value={trialDays}
-              onChange={(e) => setTrialDays(e.target.value)}
-              min="1"
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 grid-cols-2">
-          <div>
-            <label className="block text-sm font-semibold mb-1">Owner Name</label>
-            <input
-              type="text"
-              value={ownerName}
-              onChange={(e) => setOwnerName(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="e.g. John Doe"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Owner Email</label>
-            <input
-              type="email"
-              value={ownerEmail}
-              onChange={(e) => setOwnerEmail(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="owner@fitzone.com"
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-4 grid-cols-2">
-          <div>
-            <label className="block text-sm font-semibold mb-1">Business Niche</label>
-            <select
-              value={niche}
-              onChange={(e) => setNiche(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring font-semibold"
-            >
-              <option value="GYM">Gym / Fitness</option>
-              <option value="RESTAURANT">Restaurant / Cafe</option>
-              <option value="GARMENTS">Garments / Retail</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-semibold mb-1">Pricing Plan</label>
-            <select
-              value={plan}
-              onChange={(e) => setPlan(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring font-semibold"
-            >
-              <option value="STARTER">Starter</option>
-              <option value="GROWTH">Growth</option>
-              <option value="PRO">Pro</option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-2">Custom Modules</label>
-          <div className="grid grid-cols-2 gap-3 p-3 rounded-lg border border-border bg-background">
-            {allModules.map((mod) => (
-              <label
-                key={mod.id}
-                className="flex items-center gap-2.5 text-sm font-medium cursor-pointer py-1.5 select-none"
-              >
-                <input
-                  type="checkbox"
-                  checked={activeModules.includes(mod.id)}
-                  onChange={() => handleModuleToggle(mod.id)}
-                  className="rounded border-border text-foreground bg-background focus:ring-0 h-4 w-4"
-                />
-                <span>{mod.label}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold mb-2">Custom Brand Colors <span className="text-xs font-normal text-muted-foreground">(optional — overrides niche defaults)</span></label>
-          <div className="grid grid-cols-2 gap-4 p-4 rounded-lg border border-border bg-background">
-            <div className="flex items-center gap-3">
+      <form onSubmit={handleOnboard} className="p-6 space-y-6 flex-1 flex flex-col justify-between">
+        <div className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Business Name *</label>
               <input
-                type="color"
-                value={lightPrimary}
-                onChange={(e) => setLightPrimary(e.target.value)}
-                className="h-10 w-10 rounded-lg border border-border cursor-pointer bg-transparent"
+                type="text"
+                required
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                placeholder="e.g. FitZone Club"
               />
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-foreground">Light Mode</p>
-                <p className="text-xs text-muted-foreground font-mono">{lightPrimary}</p>
-              </div>
             </div>
-            <div className="flex items-center gap-3">
+
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Trial Period (Days) *</label>
               <input
-                type="color"
-                value={darkPrimary}
-                onChange={(e) => setDarkPrimary(e.target.value)}
-                className="h-10 w-10 rounded-lg border border-border cursor-pointer bg-transparent"
+                type="number"
+                required
+                min="1"
+                value={trialDays}
+                onChange={(e) => setTrialDays(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
               />
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-foreground">Dark Mode</p>
-                <p className="text-xs text-muted-foreground font-mono">{darkPrimary}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Owner Full Name *</label>
+              <input
+                type="text"
+                required
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                placeholder="e.g. John Doe"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Owner Email Address *</label>
+              <input
+                type="email"
+                required
+                value={ownerEmail}
+                onChange={(e) => setOwnerEmail(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                placeholder="owner@fitzone.com"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Niche Category</label>
+              <select
+                value={niche}
+                onChange={(e) => setNiche(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+              >
+                <option value="GYM">Gym & Fitness Center</option>
+                <option value="RESTAURANT">Restaurant & Cafe</option>
+                <option value="GARMENTS">Garments & Retail Boutique</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">pricing tier</label>
+              <select
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+                className="w-full rounded-lg border border-border bg-slate-50/50 dark:bg-zinc-800/20 px-3.5 py-2.5 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+              >
+                <option value="STARTER">Starter Tier</option>
+                <option value="GROWTH">Growth Tier</option>
+                <option value="PRO">Enterprise Pro Tier</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <CheckSquare className="h-4 w-4 text-slate-400" />
+              <span>Feature Permissions Module</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2 p-3.5 rounded-lg border border-border bg-slate-50/30 dark:bg-zinc-800/10">
+              {allModules.map((mod) => {
+                const isChecked = activeModules.includes(mod.id);
+                return (
+                  <button
+                    type="button"
+                    key={mod.id}
+                    onClick={() => handleModuleToggle(mod.id)}
+                    className="flex items-center gap-2 py-1 px-1.5 text-xs text-left hover:bg-muted/40 rounded transition-colors text-foreground select-none font-semibold"
+                  >
+                    {isChecked ? (
+                      <CheckSquare className="h-4 w-4 text-amber-600 dark:text-amber-500 shrink-0" />
+                    ) : (
+                      <Square className="h-4 w-4 text-slate-400 dark:text-zinc-600 shrink-0" />
+                    )}
+                    <span>{mod.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Palette className="h-4 w-4 text-slate-400" />
+              <span>Custom Core Branding Colors (Optional)</span>
+            </label>
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-lg border border-border bg-slate-50/30 dark:bg-zinc-800/10">
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={lightPrimary}
+                  onChange={(e) => setLightPrimary(e.target.value)}
+                  className="h-9 w-9 border-none cursor-pointer rounded-lg overflow-hidden bg-transparent"
+                />
+                <div>
+                  <p className="text-[10px] font-bold text-foreground">Light Accent</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">{lightPrimary}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={darkPrimary}
+                  onChange={(e) => setDarkPrimary(e.target.value)}
+                  className="h-9 w-9 border-none cursor-pointer rounded-lg overflow-hidden bg-transparent"
+                />
+                <div>
+                  <p className="text-[10px] font-bold text-foreground">Dark Accent</p>
+                  <p className="text-[10px] text-muted-foreground font-mono">{darkPrimary}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -223,11 +243,22 @@ export const TenantOnboardForm = ({ onSuccess }) => {
         <button
           type="submit"
           disabled={onboardTenantMutation.isPending}
-          className="w-full inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors disabled:opacity-50 disabled:pointer-events-none"
+          className="w-full mt-6 inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3.5 text-sm transition-colors shadow-sm disabled:opacity-50 disabled:pointer-events-none"
         >
-          {onboardTenantMutation.isPending ? 'Provisioning & Seeding...' : 'Onboard Business'}
+          {onboardTenantMutation.isPending ? (
+            <span className="flex items-center gap-2">
+              <span className="h-4 w-4 border-2 border-background border-t-transparent rounded-full animate-spin"></span>
+              <span>Deploying Tenant Database...</span>
+            </span>
+          ) : (
+            <span className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              <span>Deploy & Activate Tenant</span>
+            </span>
+          )}
         </button>
       </form>
     </div>
   );
 };
+export default TenantOnboardForm;

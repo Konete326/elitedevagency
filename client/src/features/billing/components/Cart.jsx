@@ -1,15 +1,86 @@
+import { useState } from 'react';
 import { useCartStore } from '../../../store/useCartStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { getDatabase } from '../../../db/database';
-import { printHardwareReceipt } from '../../../lib/device';
-import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react';
+import { printHardwareReceipt, printKOT } from '../../../lib/device';
+import { Minus, Plus, Trash2, ShoppingBag, Printer } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, getSubtotal } = useCartStore();
   const { user } = useAuthStore();
   const { selectedPrinter } = useSettingsStore();
+
+  const [isKotModalOpen, setIsKotModalOpen] = useState(false);
+  const [kotGroups, setKotGroups] = useState({});
+
+  const handleKotClick = () => {
+    if (cartItems.length === 0) {
+      toast.error('Cart is empty');
+      return;
+    }
+
+    const groups = {};
+    cartItems.forEach((item) => {
+      const section = item.kitchenSection || 'Main Kitchen';
+      if (!groups[section]) {
+        groups[section] = [];
+      }
+      groups[section].push(item);
+    });
+
+    setKotGroups(groups);
+    setIsKotModalOpen(true);
+  };
+
+  const handlePrintSeparate = async () => {
+    try {
+      for (const [section, items] of Object.entries(kotGroups)) {
+        const payload = {
+          kitchenSection: section,
+          items: items.map(item => ({
+            name: item.selectedVariant 
+              ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+              : item.name,
+            quantity: item.quantity,
+            spiceLevel: item.spiceLevel || '',
+            addons: (item.selectedAddons || []).map(a => a.name)
+          })),
+          timestamp: new Date().toISOString()
+        };
+        await printKOT(payload, 'SEPARATE');
+      }
+      toast.success('Separate KOTs sent to printer');
+      setIsKotModalOpen(false);
+    } catch {
+      toast.error('Failed to print separate KOTs');
+    }
+  };
+
+  const handlePrintAllInOne = async () => {
+    try {
+      const payload = {
+        groups: Object.entries(kotGroups).map(([section, items]) => ({
+          kitchenSection: section,
+          items: items.map(item => ({
+            name: item.selectedVariant 
+              ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+              : item.name,
+            quantity: item.quantity,
+            spiceLevel: item.spiceLevel || '',
+            addons: (item.selectedAddons || []).map(a => a.name)
+          }))
+        })),
+        timestamp: new Date().toISOString()
+      };
+      await printKOT(payload, 'ALL_IN_ONE');
+      toast.success('Combined KOT sent to printer');
+      setIsKotModalOpen(false);
+    } catch {
+      toast.error('Failed to print combined KOT');
+    }
+  };
 
   const subtotal = getSubtotal();
   const tax = subtotal * 0.05;
@@ -157,6 +228,14 @@ export const Cart = () => {
                     </span>
                   )}
                 </h4>
+                {(item.spiceLevel || (item.selectedAddons && item.selectedAddons.length > 0)) && (
+                  <div className="text-[10px] text-muted-foreground font-semibold font-mono space-x-1.5">
+                    {item.spiceLevel && <span>Spice: {item.spiceLevel}</span>}
+                    {item.selectedAddons && item.selectedAddons.length > 0 && (
+                      <span>Addons: {item.selectedAddons.map(a => a.name).join(', ')}</span>
+                    )}
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5 mt-0.5">
                   {item.promotionalDiscount ? (
                     <>
@@ -215,12 +294,52 @@ export const Cart = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleCheckout}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors"
-          >
-            Complete Order
-          </button>
+          <div className="flex gap-2">
+            {user?.niche === 'restaurant' && (
+              <button
+                onClick={handleKotClick}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card hover:bg-muted text-foreground font-bold px-4 py-3 text-sm transition-colors"
+              >
+                <Printer className="h-4 w-4" />
+                <span>Print KOT</span>
+              </button>
+            )}
+            <button
+              onClick={handleCheckout}
+              className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors`}
+            >
+              Complete Order
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isKotModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-black tracking-tight mb-2 text-foreground">Print Kitchen Ticket (KOT)</h3>
+            <p className="text-xs text-muted-foreground mb-6 font-semibold">Select the printing format for the kitchen staff:</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handlePrintSeparate}
+                className="w-full rounded-lg bg-foreground text-background py-2.5 text-xs font-bold transition-colors"
+              >
+                Print Separate KOTs (BBQ, Fast Food, etc.)
+              </button>
+              <button
+                onClick={handlePrintAllInOne}
+                className="w-full rounded-lg border border-border hover:bg-muted py-2.5 text-xs font-bold transition-colors text-foreground"
+              >
+                Print All-in-One KOT
+              </button>
+              <button
+                onClick={() => setIsKotModalOpen(false)}
+                className="w-full rounded-lg border border-transparent py-2.5 text-xs font-bold transition-colors text-muted-foreground hover:text-foreground mt-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

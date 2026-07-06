@@ -30,6 +30,7 @@ export const ProductManager = () => {
   const [promoPrice, setPromoPrice] = useState('');
   const [promoLabel, setPromoLabel] = useState('');
   const [variants, setVariants] = useState([]);
+  const [kitchenSection, setKitchenSection] = useState('Main Kitchen');
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
 
   useEffect(() => {
@@ -109,7 +110,8 @@ export const ProductManager = () => {
           price: parseFloat(promoPrice) || 0,
           label: promoLabel || 'Discount'
         } : null,
-        variants: variants
+        variants: variants,
+        kitchenSection: user?.niche === 'restaurant' ? kitchenSection : 'Main Kitchen'
       };
 
       await db.products.insert(newProduct);
@@ -129,6 +131,7 @@ export const ProductManager = () => {
       setPromoPrice('');
       setPromoLabel('');
       setVariants([]);
+      setKitchenSection('Main Kitchen');
     } catch {
       toast.error('Failed to create product');
     }
@@ -236,6 +239,22 @@ export const ProductManager = () => {
                   </select>
                 </div>
               </div>
+
+              {user?.niche === 'restaurant' && (
+                <div>
+                  <label className="block text-sm font-semibold mb-1">Kitchen Section</label>
+                  <select
+                    value={kitchenSection}
+                    onChange={(e) => setKitchenSection(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="Main Kitchen">Main Kitchen</option>
+                    <option value="BBQ">BBQ Section</option>
+                    <option value="Fast Food">Fast Food Section</option>
+                    <option value="Desserts">Desserts / Beverages</option>
+                  </select>
+                </div>
+              )}
 
               <div className="grid gap-4 grid-cols-2">
                 <div>

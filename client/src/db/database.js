@@ -74,7 +74,8 @@ const productSchema = {
         required: ['name', 'price']
       }
     },
-    hasSpiceLevel: { type: 'boolean' }
+    hasSpiceLevel: { type: 'boolean' },
+    kitchenSection: { type: 'string' }
   },
   required: ['_id', 'tenantId', 'name', 'price', 'isDeleted', 'updatedAt']
 };

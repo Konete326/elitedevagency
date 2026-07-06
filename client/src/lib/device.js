@@ -37,3 +37,11 @@ export const printHardwareBarcode = async (productName, variantDesc, price, barc
   console.log("Mock Barcode Print", { productName, variantDesc, price, barcode });
   return { success: true };
 };
+
+export const printKOT = async (orderData, mode) => {
+  if (window.electronAPI && window.electronAPI.printKOT) {
+    return await window.electronAPI.printKOT(orderData, mode);
+  }
+  console.log("Mock KOT Print", { orderData, mode });
+  return { success: true };
+};

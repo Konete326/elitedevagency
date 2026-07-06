@@ -37,4 +37,9 @@ app.whenReady().then(() => {
     console.log(payload);
     return { success: true };
   });
+
+  ipcMain.handle('print-kot', async (event, payload) => {
+    console.log(payload);
+    return { success: true };
+  });
 });
