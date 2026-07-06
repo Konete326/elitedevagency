@@ -16,8 +16,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
 
@@ -25,6 +25,7 @@ const authRoutes = require('./routes/auth.routes');
 const syncRoutes = require('./routes/sync.routes');
 const heartbeatRoutes = require('./routes/heartbeat.routes');
 const superadminRoutes = require('./routes/superadmin.routes');
+const mediaRoutes = require('./routes/media.routes');
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ success: true, message: 'API is running', timestamp: new Date() });
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/heartbeat', heartbeatRoutes);
 app.use('/api/superadmin', superadminRoutes);
+app.use('/api/media', mediaRoutes);
 
 app.use(errorHandler);
 

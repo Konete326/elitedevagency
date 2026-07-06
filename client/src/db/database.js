@@ -15,7 +15,9 @@ const productSchema = {
     stock: { type: 'number' },
     isSynced: { type: 'boolean' },
     isDeleted: { type: 'boolean' },
-    updatedAt: { type: 'string' }
+    updatedAt: { type: 'string' },
+    image: { type: 'string' },
+    imageSynced: { type: 'boolean' }
   },
   required: ['_id', 'tenantId', 'name', 'price', 'isDeleted', 'updatedAt']
 };

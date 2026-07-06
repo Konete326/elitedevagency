@@ -4,6 +4,7 @@ import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
 import { ArrowLeft, Trash2, Database, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { compressImageToBase64 } from '../../../lib/imageUtils';
 
 export const ProductManager = () => {
   const navigate = useNavigate();
@@ -15,6 +16,22 @@ export const ProductManager = () => {
   const [sku, setSku] = useState('');
   const [stock, setStock] = useState('0');
   const [category, setCategory] = useState('Supplements');
+  const [image, setImage] = useState('');
+  const [compressing, setCompressing] = useState(false);
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setCompressing(true);
+    try {
+      const base64 = await compressImageToBase64(file);
+      setImage(base64);
+    } catch {
+      toast.error('Failed to compress image');
+    } finally {
+      setCompressing(false);
+    }
+  };
 
   useEffect(() => {
     let sub;
@@ -69,7 +86,9 @@ export const ProductManager = () => {
         stock: parsedStock,
         isSynced: false,
         isDeleted: false,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        image: image || '',
+        imageSynced: image ? false : true
       };
 
       await db.products.insert(newProduct);
@@ -79,6 +98,7 @@ export const ProductManager = () => {
       setPrice('');
       setSku('');
       setStock('0');
+      setImage('');
     } catch {
       toast.error('Failed to create product');
     }
@@ -191,6 +211,32 @@ export const ProductManager = () => {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-semibold mb-1">Product Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80 cursor-pointer"
+                  disabled={compressing}
+                />
+                {compressing && (
+                  <p className="text-xs text-muted-foreground mt-1">Compressing image...</p>
+                )}
+                {image && (
+                  <div className="mt-3 relative inline-block">
+                    <img src={image} alt="Preview" className="h-20 w-20 object-cover rounded-lg border border-border" />
+                    <button
+                      type="button"
+                      onClick={() => setImage('')}
+                      className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90 shadow-sm transition-colors"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
                 type="submit"
                 className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors"
@@ -230,7 +276,18 @@ export const ProductManager = () => {
                             <span>{product.sku}</span>
                           </div>
                         </td>
-                        <td className="py-4 px-4 font-bold truncate max-w-[200px]">{product.name}</td>
+                        <td className="py-4 px-4 font-bold truncate max-w-[200px]">
+                          <div className="flex items-center gap-3">
+                            {product.image && (
+                              <img
+                                src={product.image}
+                                alt={product.name}
+                                className="h-10 w-10 object-cover rounded-lg border border-border shrink-0"
+                              />
+                            )}
+                            <span>{product.name}</span>
+                          </div>
+                        </td>
                         <td className="py-4 px-4 font-extrabold text-accent-niche">${product.price.toFixed(2)}</td>
                         <td className="py-4 px-4 font-medium">
                           {product.stock <= 5 ? (

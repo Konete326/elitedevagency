@@ -8,6 +8,7 @@ import { POSPage } from './features/billing/pages/POSPage';
 import { useAuthStore } from './store/useAuthStore';
 import { getDatabase } from './db/database';
 import { startReplication, stopAllReplications } from './lib/sync';
+import { startImageSync, stopImageSync } from './lib/imageSync';
 import { useLicenseStore } from './store/useLicenseStore';
 import { useHeartbeat } from './hooks/useHeartbeat';
 import { LockScreen } from './components/LockScreen';
@@ -89,14 +90,17 @@ function App() {
         if (active) {
           startReplication(db, 'products');
           startReplication(db, 'orders');
+          startImageSync();
         }
       });
     } else {
       stopAllReplications();
+      stopImageSync();
     }
     return () => {
       active = false;
       stopAllReplications();
+      stopImageSync();
     };
   }, [isAuthenticated, token, isLocked, user]);
 

@@ -32,6 +32,7 @@ export const ProductGrid = () => {
             id: doc._id,
             name: doc.name,
             price: doc.price,
+            image: doc.image,
             category: getCategory(doc.name)
           }));
           setProducts(mapped);
@@ -87,6 +88,15 @@ export const ProductGrid = () => {
               className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-md cursor-pointer transition-all duration-200 select-none animate-fade-in"
             >
               <div className="space-y-2">
+                {product.image && (
+                  <div className="w-full h-32 overflow-hidden rounded-lg border border-border mb-2 shrink-0">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-250 ease-out"
+                    />
+                  </div>
+                )}
                 <div className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   <Tag className="h-3 w-3" />
                   <span>{product.category}</span>
