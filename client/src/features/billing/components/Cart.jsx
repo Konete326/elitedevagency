@@ -44,7 +44,10 @@ export const Cart = () => {
             ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
             : item.name,
           price: getPromoPrice(item),
-          quantity: item.quantity
+          quantity: item.quantity,
+          returnedQty: 0,
+          returnReason: '',
+          variantSku: item.selectedVariant ? item.selectedVariant.sku : ''
         })),
         totalAmount: total,
         paymentMode: 'CASH',

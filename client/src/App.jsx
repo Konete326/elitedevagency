@@ -17,6 +17,7 @@ import { Dashboard } from './features/superadmin/pages/Dashboard';
 import { ProductManager } from './features/inventory/pages/ProductManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
+import { ReturnsPage } from './features/billing/pages/ReturnsPage';
 
 const queryClient = new QueryClient();
 
@@ -117,7 +118,7 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="top-right" closeButton />
           <Routes>
             <Route 
               path="/" 
@@ -176,6 +177,22 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <ReportsPage />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/returns" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <ReturnsPage />
                 ) : (
                   <POSPage />
                 )

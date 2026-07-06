@@ -8,6 +8,10 @@ const connectionCache = {};
 
 const tenantDbMiddleware = async (req, res, next) => {
   try {
+    if (req.user && req.user.role === 'SUPER_ADMIN') {
+      return next();
+    }
+
     if (!req.user || !req.user.tenantId) {
       return res.status(401).json({ success: false, error: 'Unauthorized: No tenant context' });
     }

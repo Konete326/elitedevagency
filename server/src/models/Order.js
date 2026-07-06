@@ -7,10 +7,14 @@ const orderSchema = new mongoose.Schema({
     productId: { type: String, required: true },
     name: { type: String, required: true },
     price: { type: Number, required: true },
-    quantity: { type: Number, required: true }
+    quantity: { type: Number, required: true },
+    returnedQty: { type: Number, default: 0 },
+    returnReason: { type: String },
+    variantSku: { type: String }
   }],
   totalAmount: { type: Number, required: true },
   paymentMode: { type: String, required: true },
+  returnStatus: { type: String, enum: ['NONE', 'PARTIAL', 'FULL'], default: 'NONE' },
   isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true

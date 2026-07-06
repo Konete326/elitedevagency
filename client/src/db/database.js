@@ -83,13 +83,17 @@ const orderSchema = {
           productId: { type: 'string' },
           name: { type: 'string' },
           price: { type: 'number' },
-          quantity: { type: 'number' }
+          quantity: { type: 'number' },
+          returnedQty: { type: 'number' },
+          returnReason: { type: 'string' },
+          variantSku: { type: 'string' }
         },
         required: ['productId', 'name', 'price', 'quantity']
       }
     },
     totalAmount: { type: 'number' },
     paymentMode: { type: 'string' },
+    returnStatus: { type: 'string' },
     isSynced: { type: 'boolean' },
     isDeleted: { type: 'boolean' },
     updatedAt: { type: 'string' }
