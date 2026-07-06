@@ -20,6 +20,7 @@ import { ReportsPage } from './features/analytics/pages/ReportsPage';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
 import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
 import { OrderHistory } from './features/billing/pages/OrderHistory';
+import { FloorMap } from './features/restaurant/pages/FloorMap';
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,7 @@ function App() {
           startReplication(db, 'products');
           startReplication(db, 'orders');
           startReplication(db, 'categories');
+          startReplication(db, 'tables');
           startImageSync();
         }
       });
@@ -227,6 +229,20 @@ function App() {
                   </SuperAdminLayout>
                 ) : (
                   <OrderHistory />
+                )
+              } 
+            />
+            <Route 
+              path="/floor-map" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <FloorMap />
                 )
               } 
             />

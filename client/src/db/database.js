@@ -62,7 +62,19 @@ const productSchema = {
         },
         required: ['sku', 'stock']
       }
-    }
+    },
+    addons: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          price: { type: 'number' }
+        },
+        required: ['name', 'price']
+      }
+    },
+    hasSpiceLevel: { type: 'boolean' }
   },
   required: ['_id', 'tenantId', 'name', 'price', 'isDeleted', 'updatedAt']
 };
@@ -101,6 +113,25 @@ const orderSchema = {
   required: ['_id', 'tenantId', 'items', 'totalAmount', 'paymentMode', 'isDeleted', 'updatedAt']
 };
 
+const tableSchema = {
+  title: 'table schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    tableNo: { type: 'string' },
+    capacity: { type: 'number' },
+    status: { type: 'string' },
+    currentOrderId: { type: 'string' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'tableNo', 'status', 'isDeleted', 'updatedAt']
+};
+
 let dbPromise = null;
 
 export const getDatabase = async () => {
@@ -114,7 +145,8 @@ export const getDatabase = async () => {
     await db.addCollections({
       products: { schema: productSchema },
       orders: { schema: orderSchema },
-      categories: { schema: categorySchema }
+      categories: { schema: categorySchema },
+      tables: { schema: tableSchema }
     });
     return db;
   });

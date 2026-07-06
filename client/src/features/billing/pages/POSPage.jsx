@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ProductGrid } from '../components/ProductGrid';
 import { Cart } from '../components/Cart';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History } from 'lucide-react';
+import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../../hooks/usePwaInstall';
@@ -105,6 +105,15 @@ export const POSPage = () => {
             >
               <Download className="h-3.5 w-3.5" />
               <span>Install App</span>
+            </button>
+          )}
+
+          {user?.niche === 'restaurant' && (
+            <button
+              onClick={() => navigate('/floor-map')}
+              className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+            >
+              <LayoutGrid className="h-5 w-5" />
             </button>
           )}
 

@@ -24,7 +24,12 @@ const productSchema = new mongoose.Schema({
     sku: { type: String },
     barcode: { type: String },
     stock: { type: Number, default: 0 }
-  }]
+  }],
+  addons: [{
+    name: { type: String },
+    price: { type: Number }
+  }],
+  hasSpiceLevel: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

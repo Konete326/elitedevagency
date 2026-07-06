@@ -12,7 +12,7 @@ router.use(tenantDbMiddleware);
 
 const pushSchema = z.object({
   body: z.object({
-    collection: z.enum(['products', 'orders']),
+    collection: z.enum(['products', 'orders', 'categories', 'tables']),
     changeRows: z.array(
       z.object({
         newDocumentState: z.object({
@@ -30,7 +30,7 @@ const pushSchema = z.object({
 
 const pullSchema = z.object({
   query: z.object({
-    collection: z.enum(['products', 'orders']),
+    collection: z.enum(['products', 'orders', 'categories', 'tables']),
     checkpoint: z.string().optional().refine((val) => {
       if (!val) return true;
       try {
