@@ -15,6 +15,20 @@ const getPromoPrice = (item) => {
 
 export const useCartStore = create((set, get) => ({
   cartItems: [],
+  activeTableId: null,
+  activeTableNo: null,
+  activeOrderId: null,
+  setTableContext: (tableId, tableNo = null, orderId = null) => {
+    set({ activeTableId: tableId, activeTableNo: tableNo, activeOrderId: orderId });
+  },
+  loadOrderIntoCart: (orderItems, tableId, tableNo = null, orderId = null) => {
+    set({
+      cartItems: orderItems,
+      activeTableId: tableId,
+      activeTableNo: tableNo,
+      activeOrderId: orderId
+    });
+  },
   addToCart: (product, spiceLevel = '', selectedAddons = []) => {
     set((state) => {
       const addonKeys = selectedAddons.map(a => a.name).sort().join(',');
@@ -55,7 +69,7 @@ export const useCartStore = create((set, get) => ({
       };
     });
   },
-  clearCart: () => set({ cartItems: [] }),
+  clearCart: () => set({ cartItems: [], activeTableId: null, activeTableNo: null, activeOrderId: null }),
   getSubtotal: () => {
     return get().cartItems.reduce((sum, item) => {
       const basePrice = getPromoPrice(item);

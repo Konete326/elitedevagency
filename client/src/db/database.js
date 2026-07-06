@@ -99,7 +99,19 @@ const orderSchema = {
           quantity: { type: 'number' },
           returnedQty: { type: 'number' },
           returnReason: { type: 'string' },
-          variantSku: { type: 'string' }
+          variantSku: { type: 'string' },
+          spiceLevel: { type: 'string' },
+          selectedAddons: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                price: { type: 'number' }
+              },
+              required: ['name', 'price']
+            }
+          }
         },
         required: ['productId', 'name', 'price', 'quantity']
       }
@@ -107,6 +119,8 @@ const orderSchema = {
     totalAmount: { type: 'number' },
     paymentMode: { type: 'string' },
     returnStatus: { type: 'string' },
+    status: { type: 'string' },
+    tableId: { type: 'string' },
     isSynced: { type: 'boolean' },
     isDeleted: { type: 'boolean' },
     updatedAt: { type: 'string' }

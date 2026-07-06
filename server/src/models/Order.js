@@ -10,11 +10,18 @@ const orderSchema = new mongoose.Schema({
     quantity: { type: Number, required: true },
     returnedQty: { type: Number, default: 0 },
     returnReason: { type: String },
-    variantSku: { type: String }
+    variantSku: { type: String },
+    spiceLevel: { type: String },
+    selectedAddons: [{
+      name: { type: String },
+      price: { type: Number }
+    }]
   }],
   totalAmount: { type: Number, required: true },
   paymentMode: { type: String, required: true },
   returnStatus: { type: String, enum: ['NONE', 'PARTIAL', 'FULL'], default: 'NONE' },
+  status: { type: String, enum: ['DRAFT', 'COMPLETED'], default: 'COMPLETED' },
+  tableId: { type: String },
   isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true

@@ -14,6 +14,8 @@ import { useHeartbeat } from './hooks/useHeartbeat';
 import { LockScreen } from './components/LockScreen';
 import { SuperAdminLayout } from './components/layout/SuperAdminLayout';
 import { Dashboard } from './features/superadmin/pages/Dashboard';
+import { TenantOnboardForm } from './features/superadmin/components/TenantOnboardForm';
+import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
 import { ProductManager } from './features/inventory/pages/ProductManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
@@ -243,6 +245,48 @@ function App() {
                   </SuperAdminLayout>
                 ) : (
                   <FloorMap />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin/tenants/new" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <TenantOnboardForm onSuccess={() => {}} />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin/hardware" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <HardwareApproval />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
                 )
               } 
             />

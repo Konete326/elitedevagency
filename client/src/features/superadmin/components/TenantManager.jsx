@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTenants, useToggleTenantLock } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
-import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Shield, Layers } from 'lucide-react';
+import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers } from 'lucide-react';
 
 export const TenantManager = () => {
   const [page, setPage] = useState(1);
@@ -39,9 +39,9 @@ export const TenantManager = () => {
       case 'STARTER':
         return 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300';
       case 'GROWTH':
-        return 'bg-blue-50 border-blue-100 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900/30 dark:text-blue-400';
+        return 'bg-blue-55 border-blue-100 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900/30 dark:text-blue-400';
       case 'PRO':
-        return 'bg-purple-50 border-purple-100 text-purple-700 dark:bg-purple-950/30 dark:border-purple-900/30 dark:text-purple-400';
+        return 'bg-purple-55 border-purple-100 text-purple-700 dark:bg-purple-950/30 dark:border-purple-900/30 dark:text-purple-400';
       default:
         return 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300';
     }
@@ -61,14 +61,14 @@ export const TenantManager = () => {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden flex flex-col">
-      <div className="p-6 border-b border-border bg-slate-50/50 dark:bg-zinc-800/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden flex flex-col transition-colors duration-300">
+      <div className="p-6 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
             <Layers className="h-5 w-5 text-amber-600 dark:text-amber-500" />
             <span>Onboarded Tenants</span>
             {!isLoading && meta.total > 0 && (
-              <span className="text-[11px] bg-slate-200/80 dark:bg-zinc-800 px-2 py-0.5 rounded-full font-extrabold text-slate-600 dark:text-zinc-400">
+              <span className="text-[11px] bg-slate-200/80 dark:bg-zinc-750 px-2 py-0.5 rounded-full font-extrabold text-slate-600 dark:text-zinc-300">
                 {meta.total} total
               </span>
             )}
@@ -90,7 +90,7 @@ export const TenantManager = () => {
         ) : (
           <table className="w-full text-left border-collapse min-w-[56rem]">
             <thead>
-              <tr className="border-b border-border bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+              <tr className="border-b border-border dark:border-zinc-700 bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 <th className="py-3 px-4">Business Name</th>
                 <th className="py-3 px-4">Niche</th>
                 <th className="py-3 px-4">Plan</th>
@@ -100,7 +100,7 @@ export const TenantManager = () => {
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border text-sm font-semibold">
+            <tbody className="divide-y divide-border dark:divide-zinc-700 text-sm font-semibold">
               {tenants.map((tenant) => (
                 <tr key={tenant._id} className="hover:bg-muted/40 transition-colors">
                   <td className="py-3.5 px-4 font-extrabold text-foreground">{tenant.businessName}</td>
@@ -142,8 +142,8 @@ export const TenantManager = () => {
                       disabled={toggleLockMutation.isPending}
                       className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-colors ${
                         tenant.rentOverdue
-                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/20'
-                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-600 border-red-500/20'
+                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/20 dark:border-green-550/20'
+                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-600 border-red-500/20 dark:border-red-550/20'
                       }`}
                     >
                       {tenant.rentOverdue ? (
@@ -167,7 +167,7 @@ export const TenantManager = () => {
       </div>
 
       {!isLoading && totalPages > 1 && (
-        <div className="p-4 border-t border-border bg-slate-50/50 dark:bg-zinc-800/10 flex items-center justify-between">
+        <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex items-center justify-between">
           <p className="text-xs text-muted-foreground font-semibold">
             Page <span className="font-bold text-foreground">{page}</span> of <span className="font-bold text-foreground">{totalPages}</span>
           </p>
@@ -175,7 +175,7 @@ export const TenantManager = () => {
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-bold hover:bg-muted disabled:opacity-50 disabled:pointer-events-none transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-3 py-1.5 text-xs font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
             >
               <ChevronLeft className="h-4 w-4" />
               <span>Prev</span>
@@ -183,7 +183,7 @@ export const TenantManager = () => {
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-bold hover:bg-muted disabled:opacity-50 disabled:pointer-events-none transition-colors"
+              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-3 py-1.5 text-xs font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
             >
               <span>Next</span>
               <ChevronRight className="h-4 w-4" />

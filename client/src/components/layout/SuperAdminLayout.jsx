@@ -1,20 +1,26 @@
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, User, Settings, HelpCircle } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, UserPlus, Cpu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../hooks/usePwaInstall';
 
 export const SuperAdminLayout = ({ children }) => {
-  const { sidebarOpen, toggleSidebar } = useUiStore();
+  const { sidebarOpen, setSidebarOpen, toggleSidebar } = useUiStore();
   const logout = useAuthStore((state) => state.logout);
   const isOnline = useNetworkStatus();
   const { isInstallable, promptInstall } = usePwaInstall();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const location = useLocation();
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('theme') === 'dark' || 
     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
   );
+
+  useEffect(() => {
+    setSidebarOpen(window.innerWidth >= 1024);
+  }, [setSidebarOpen]);
 
   useEffect(() => {
     if (darkMode) {
@@ -26,15 +32,19 @@ export const SuperAdminLayout = ({ children }) => {
     }
   }, [darkMode]);
 
+  const isDashboardActive = location.pathname === '/superadmin' || location.pathname === '/';
+  const isOnboardActive = location.pathname === '/superadmin/tenants/new';
+  const isHardwareActive = location.pathname === '/superadmin/hardware';
+
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
+    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
       
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#1C2434] text-slate-300 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#1C2434] text-slate-300 transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-20 items-center justify-between border-b border-[#2E3A4E] px-6 gap-3">
+        <div className="flex h-24 items-center justify-between border-b border-[#2E3A4E] px-6 gap-3 shrink-0">
           <div className="flex items-center gap-3">
             <Shield className="h-7 w-7 text-amber-500 shrink-0" />
             <span className="text-lg font-extrabold tracking-tight text-white uppercase">
@@ -55,25 +65,39 @@ export const SuperAdminLayout = ({ children }) => {
               Core Engine
             </p>
             <nav className="space-y-1">
-              <a
-                href="#"
-                className="flex items-center gap-3 rounded-lg bg-[#333A48] text-white px-4 py-3 text-sm font-bold transition-all shadow-sm"
+              <Link
+                to="/superadmin"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-all shadow-sm ${
+                  isDashboardActive 
+                    ? 'bg-[#333A48] text-white' 
+                    : 'text-slate-400 hover:bg-[#333A48] hover:text-white'
+                }`}
               >
                 <LayoutDashboard className="h-5 w-5 text-amber-500 shrink-0" />
                 <span>Super Dashboard</span>
-              </a>
-            </nav>
-          </div>
-          
-          <div>
-            <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">
-              Diagnostics
-            </p>
-            <nav className="space-y-1 text-slate-400">
-              <div className="flex items-center gap-3 rounded-lg px-4 py-2 text-xs font-semibold select-none cursor-default">
-                <Wifi className="h-4 w-4 shrink-0" />
-                <span>Node Connection Logs</span>
-              </div>
+              </Link>
+              <Link
+                to="/superadmin/tenants/new"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-all ${
+                  isOnboardActive 
+                    ? 'bg-[#333A48] text-white' 
+                    : 'text-slate-400 hover:bg-[#333A48] hover:text-white'
+                }`}
+              >
+                <UserPlus className="h-5 w-5 text-amber-500 shrink-0" />
+                <span>Onboard Tenant</span>
+              </Link>
+              <Link
+                to="/superadmin/hardware"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-all ${
+                  isHardwareActive 
+                    ? 'bg-[#333A48] text-white' 
+                    : 'text-slate-400 hover:bg-[#333A48] hover:text-white'
+                }`}
+              >
+                <Cpu className="h-5 w-5 text-amber-500 shrink-0" />
+                <span>Hardware approvals</span>
+              </Link>
             </nav>
           </div>
         </div>
@@ -96,14 +120,16 @@ export const SuperAdminLayout = ({ children }) => {
         />
       )}
 
-      <div className="flex flex-1 flex-col overflow-y-auto">
+      <div className={`flex flex-1 flex-col overflow-y-auto transition-all duration-300 ${
+        sidebarOpen ? 'lg:pl-72' : 'lg:pl-0'
+      }`}>
         
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-white dark:bg-zinc-900 px-6 shadow-sm">
+        <header className="sticky top-0 z-35 flex h-24 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0 text-slate-700 dark:text-slate-200">
           
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSidebar}
-              className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted lg:hidden"
+              className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -114,7 +140,7 @@ export const SuperAdminLayout = ({ children }) => {
                 type="text"
                 disabled
                 placeholder="Search metrics, tenants..."
-                className="w-64 rounded-full border border-border bg-slate-50 dark:bg-zinc-800/50 pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none cursor-not-allowed opacity-80"
+                className="w-64 rounded-full border border-border bg-slate-50 dark:bg-zinc-900/50 pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none cursor-not-allowed opacity-85"
               />
             </div>
           </div>
@@ -163,8 +189,8 @@ export const SuperAdminLayout = ({ children }) => {
                 className="flex items-center gap-3 text-left focus:outline-none"
               >
                 <div className="hidden text-right md:block">
-                  <p className="text-xs font-extrabold text-foreground">SaaS Administrator</p>
-                  <p className="text-[10px] text-muted-foreground font-semibold">operator@saas.com</p>
+                  <p className="text-xs font-extrabold text-slate-700 dark:text-slate-200">SaaS Administrator</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">operator@saas.com</p>
                 </div>
                 <div className="relative">
                   <div className="h-10 w-10 rounded-full bg-amber-600 dark:bg-amber-500 flex items-center justify-center font-bold text-white shadow-md border-2 border-white dark:border-zinc-800 hover:opacity-90 transition-opacity">
@@ -172,7 +198,7 @@ export const SuperAdminLayout = ({ children }) => {
                   </div>
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900" />
                 </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block shrink-0" />
+                <ChevronDown className="h-4 w-4 text-slate-500 dark:text-slate-400 hidden sm:block shrink-0" />
               </button>
 
               {profileDropdownOpen && (
@@ -183,15 +209,15 @@ export const SuperAdminLayout = ({ children }) => {
                   />
                   <div className="absolute right-0 mt-3.5 z-20 w-48 rounded-lg border border-border bg-card p-2 shadow-lg animate-slide-in">
                     <div className="flex items-center gap-2 p-2 rounded-md hover:bg-muted text-sm font-semibold cursor-not-allowed opacity-60 text-foreground">
-                      <User className="h-4 w-4" />
+                      <UserPlus className="h-4 w-4" />
                       <span>My Profile</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 rounded-md hover:bg-muted text-sm font-semibold cursor-not-allowed opacity-60 text-foreground">
-                      <Settings className="h-4 w-4" />
+                      <Cpu className="h-4 w-4" />
                       <span>Account Settings</span>
                     </div>
                     <div className="flex items-center gap-2 p-2 rounded-md hover:bg-muted text-sm font-semibold cursor-not-allowed opacity-60 text-foreground">
-                      <HelpCircle className="h-4 w-4" />
+                      <Cpu className="h-4 w-4" />
                       <span>Support Center</span>
                     </div>
                     <div className="h-px bg-border my-1" />
