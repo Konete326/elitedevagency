@@ -371,7 +371,13 @@ export const ProductManager = () => {
               </div>
 
               <div className="pt-2">
-                <VariantSection variants={variants} setVariants={setVariants} baseSku={sku} />
+                <VariantSection 
+                  variants={variants} 
+                  setVariants={setVariants} 
+                  baseSku={sku} 
+                  productName={name} 
+                  price={price} 
+                />
               </div>
 
               <button

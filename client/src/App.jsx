@@ -19,6 +19,7 @@ import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
 import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
+import { OrderHistory } from './features/billing/pages/OrderHistory';
 
 const queryClient = new QueryClient();
 
@@ -212,6 +213,20 @@ function App() {
                   <EmployeeManagement />
                 ) : (
                   <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/orders" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <OrderHistory />
                 )
               } 
             />

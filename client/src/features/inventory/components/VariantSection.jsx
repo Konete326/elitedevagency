@@ -1,7 +1,9 @@
-import { Plus, Trash2, Hash } from 'lucide-react';
+import { Plus, Trash2, Hash, Printer } from 'lucide-react';
 import { generateBarcode } from '../../../lib/barcodeUtils';
+import { printHardwareBarcode } from '../../../lib/device';
+import { toast } from 'sonner';
 
-export const VariantSection = ({ variants, setVariants, baseSku }) => {
+export const VariantSection = ({ variants, setVariants, baseSku, productName, price }) => {
   const addVariant = () => {
     const nextIndex = variants.length + 1;
     const variantSku = baseSku ? `${baseSku}-VAR-${nextIndex}` : `VAR-${Date.now().toString().slice(-4)}`;
@@ -27,6 +29,21 @@ export const VariantSection = ({ variants, setVariants, baseSku }) => {
 
   const handleAutoGenerateBarcode = (index) => {
     updateVariant(index, 'barcode', generateBarcode());
+  };
+
+  const handlePrintBarcode = async (variant) => {
+    if (!variant.barcode) return;
+    try {
+      await printHardwareBarcode(
+        productName || 'Unnamed Product',
+        `${variant.size || ''}/${variant.color || ''}`,
+        price || '0.00',
+        variant.barcode
+      );
+      toast.success('Sticker sent to printer');
+    } catch {
+      toast.error('Failed to print barcode sticker');
+    }
   };
 
   return (
@@ -116,10 +133,20 @@ export const VariantSection = ({ variants, setVariants, baseSku }) => {
                   </div>
                 </div>
 
+                {variant.barcode && (
+                  <button
+                    type="button"
+                    onClick={() => handlePrintBarcode(variant)}
+                    className="rounded-lg bg-muted hover:bg-muted/80 text-foreground p-1.5 border border-border transition-colors self-end h-[30px] flex items-center justify-center"
+                  >
+                    <Printer className="h-3.5 w-3.5" />
+                  </button>
+                )}
+
                 <button
                   type="button"
                   onClick={() => removeVariant(index)}
-                  className="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 p-1.5 border border-red-500/15"
+                  className="rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 p-1.5 border border-red-500/15 self-end h-[30px] flex items-center justify-center"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>

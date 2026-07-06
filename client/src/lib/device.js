@@ -29,3 +29,11 @@ export const printHardwareReceipt = async (payload) => {
   console.log(payload);
   return { success: true };
 };
+
+export const printHardwareBarcode = async (productName, variantDesc, price, barcode) => {
+  if (window.electronAPI && window.electronAPI.printBarcode) {
+    return await window.electronAPI.printBarcode({ productName, variantDesc, price, barcode });
+  }
+  console.log("Mock Barcode Print", { productName, variantDesc, price, barcode });
+  return { success: true };
+};
