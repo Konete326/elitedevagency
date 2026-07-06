@@ -4,6 +4,28 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const loginUser = async (email, password, deviceFingerprint) => {
+  if (
+    process.env.SUPERADMIN_EMAIL &&
+    process.env.SUPERADMIN_PASSWORD &&
+    email === process.env.SUPERADMIN_EMAIL &&
+    password === process.env.SUPERADMIN_PASSWORD
+  ) {
+    const token = jwt.sign(
+      { id: 'superadmin_id', role: 'SUPER_ADMIN' },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
+    );
+    return {
+      token,
+      user: {
+        id: 'superadmin_id',
+        name: 'Super Admin',
+        role: 'SUPER_ADMIN',
+        email: process.env.SUPERADMIN_EMAIL
+      }
+    };
+  }
+
   const user = await User.findOne({ email, isActive: true }).lean();
   if (!user) {
     throw new Error('Invalid credentials or inactive user');

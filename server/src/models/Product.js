@@ -9,7 +9,22 @@ const productSchema = new mongoose.Schema({
   stock: { type: Number, default: 0 },
   isDeleted: { type: Boolean, default: false },
   image: { type: String },
-  imageSynced: { type: Boolean }
+  imageSynced: { type: Boolean },
+  categoryId: { type: String },
+  costPrice: { type: Number },
+  alertLevel: { type: Number, default: 0 },
+  promotionalDiscount: {
+    rate: { type: Number },
+    price: { type: Number },
+    label: { type: String }
+  },
+  variants: [{
+    size: { type: String },
+    color: { type: String },
+    sku: { type: String },
+    barcode: { type: String },
+    stock: { type: Number, default: 0 }
+  }]
 }, {
   timestamps: true
 });

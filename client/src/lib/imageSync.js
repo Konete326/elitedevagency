@@ -14,48 +14,49 @@ export const startImageSync = () => {
     if (!token) return;
 
     try {
-      const db = await getDatabase();
-      const productsToSync = await db.products
-        .find({
-          selector: {
-            imageSynced: false
-          }
-        })
-        .exec();
-
-      if (productsToSync.length === 0) return;
-
       isSyncing = true;
+      const db = await getDatabase();
+      const collections = ['products', 'categories'];
       const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-      for (const doc of productsToSync) {
-        if (!doc.image || doc.image.startsWith('http')) {
-          await doc.patch({
-            imageSynced: true
-          });
-          continue;
-        }
+      for (const colName of collections) {
+        const docsToSync = await db[colName]
+          .find({
+            selector: {
+              imageSynced: false
+            }
+          })
+          .exec();
 
-        try {
-          const response = await fetch(`${apiURL}/media/upload`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ image: doc.image })
-          });
-
-          const result = await response.json();
-          if (response.ok && result.success && result.data?.url) {
+        for (const doc of docsToSync) {
+          if (!doc.image || doc.image.startsWith('http')) {
             await doc.patch({
-              image: result.data.url,
-              imageSynced: true,
-              isSynced: false,
-              updatedAt: new Date().toISOString()
+              imageSynced: true
             });
+            continue;
           }
-        } catch {
+
+          try {
+            const response = await fetch(`${apiURL}/media/upload`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ image: doc.image })
+            });
+
+            const result = await response.json();
+            if (response.ok && result.success && result.data?.url) {
+              await doc.patch({
+                image: result.data.url,
+                imageSynced: true,
+                isSynced: false,
+                updatedAt: new Date().toISOString()
+              });
+            }
+          } catch {
+          }
         }
       }
     } catch {

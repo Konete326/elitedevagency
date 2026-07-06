@@ -1,6 +1,26 @@
 import { createRxDatabase } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 
+const categorySchema = {
+  title: 'category schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    description: { type: 'string' },
+    parentCategoryId: { type: 'string' },
+    image: { type: 'string' },
+    imageSynced: { type: 'boolean' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'isDeleted', 'updatedAt']
+};
+
 const productSchema = {
   title: 'product schema',
   version: 0,
@@ -17,7 +37,32 @@ const productSchema = {
     isDeleted: { type: 'boolean' },
     updatedAt: { type: 'string' },
     image: { type: 'string' },
-    imageSynced: { type: 'boolean' }
+    imageSynced: { type: 'boolean' },
+    categoryId: { type: 'string' },
+    costPrice: { type: 'number' },
+    alertLevel: { type: 'number' },
+    promotionalDiscount: {
+      type: 'object',
+      properties: {
+        rate: { type: 'number' },
+        price: { type: 'number' },
+        label: { type: 'string' }
+      }
+    },
+    variants: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          size: { type: 'string' },
+          color: { type: 'string' },
+          sku: { type: 'string' },
+          barcode: { type: 'string' },
+          stock: { type: 'number' }
+        },
+        required: ['sku', 'stock']
+      }
+    }
   },
   required: ['_id', 'tenantId', 'name', 'price', 'isDeleted', 'updatedAt']
 };
@@ -64,7 +109,8 @@ export const getDatabase = async () => {
   }).then(async (db) => {
     await db.addCollections({
       products: { schema: productSchema },
-      orders: { schema: orderSchema }
+      orders: { schema: orderSchema },
+      categories: { schema: categorySchema }
     });
     return db;
   });

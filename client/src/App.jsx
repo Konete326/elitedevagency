@@ -90,6 +90,7 @@ function App() {
         if (active) {
           startReplication(db, 'products');
           startReplication(db, 'orders');
+          startReplication(db, 'categories');
           startImageSync();
         }
       });

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useCartStore } from '../../../store/useCartStore';
 import { getDatabase } from '../../../db/database';
-import { Plus, Tag, Inbox } from 'lucide-react';
+import { Plus, Tag, Inbox, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 const CATEGORIES = ['All', 'Membership', 'Supplements', 'Apparel', 'Accessories'];
 
@@ -9,6 +10,7 @@ export const ProductGrid = () => {
   const [products, setProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const addToCart = useCartStore((state) => state.addToCart);
+  const [selectedProductForVariants, setSelectedProductForVariants] = useState(null);
 
   useEffect(() => {
     let sub;
@@ -33,7 +35,9 @@ export const ProductGrid = () => {
             name: doc.name,
             price: doc.price,
             image: doc.image,
-            category: getCategory(doc.name)
+            category: getCategory(doc.name),
+            variants: doc.variants || [],
+            promotionalDiscount: doc.promotionalDiscount || null
           }));
           setProducts(mapped);
         });
@@ -84,9 +88,21 @@ export const ProductGrid = () => {
           {filteredProducts.map((product) => (
             <div
               key={product.id}
-              onClick={() => addToCart(product)}
+              onClick={() => {
+                if (product.variants && product.variants.length > 0) {
+                  setSelectedProductForVariants(product);
+                } else {
+                  addToCart(product);
+                }
+              }}
               className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 hover:border-foreground/30 hover:shadow-md cursor-pointer transition-all duration-200 select-none animate-fade-in"
             >
+              {product.promotionalDiscount && (
+                <div className="absolute top-2.5 right-2.5 z-10 rounded-full bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 shadow-sm tracking-wider uppercase">
+                  {product.promotionalDiscount.label || 'Sale'}
+                </div>
+              )}
+
               <div className="space-y-2">
                 {product.image && (
                   <div className="w-full h-32 overflow-hidden rounded-lg border border-border mb-2 shrink-0">
@@ -107,13 +123,68 @@ export const ProductGrid = () => {
               </div>
 
               <div className="flex items-center justify-between pt-4 border-t border-border mt-4">
-                <span className="text-sm font-extrabold text-foreground">${product.price.toFixed(2)}</span>
+                <div className="flex flex-col">
+                  {product.promotionalDiscount ? (
+                    <>
+                      <span className="text-sm font-extrabold text-red-500">
+                        ${(product.promotionalDiscount.rate 
+                          ? product.price * (1 - product.promotionalDiscount.rate / 100)
+                          : product.promotionalDiscount.price).toFixed(2)}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground line-through font-semibold font-mono">
+                        ${product.price.toFixed(2)}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-sm font-extrabold text-foreground">${product.price.toFixed(2)}</span>
+                  )}
+                </div>
                 <div className="rounded-lg bg-muted border border-border group-hover:bg-foreground group-hover:text-background p-1.5 transition-colors">
                   <Plus className="h-4 w-4" />
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {selectedProductForVariants && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-lg p-5 flex flex-col max-h-[80vh]">
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h3 className="font-extrabold text-base tracking-tight text-foreground">Select Variant</h3>
+              <button
+                onClick={() => setSelectedProductForVariants(null)}
+                className="rounded-lg border border-border p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            
+            <p className="text-sm font-black mb-1 text-zinc-950 dark:text-zinc-50">{selectedProductForVariants.name}</p>
+            <p className="text-xs text-muted-foreground font-semibold mb-4">Select size and color to add to cart</p>
+
+            <div className="flex-1 overflow-y-auto grid gap-2.5 grid-cols-2 pr-1">
+              {selectedProductForVariants.variants.map((v) => (
+                <button
+                  key={v.sku}
+                  onClick={() => {
+                    addToCart({
+                      ...selectedProductForVariants,
+                      selectedVariant: v
+                    });
+                    setSelectedProductForVariants(null);
+                    toast.success(`Added: ${selectedProductForVariants.name} (${v.size}/${v.color})`);
+                  }}
+                  className="flex flex-col items-start p-3 rounded-lg border border-border bg-muted/30 hover:border-foreground/30 hover:bg-muted/70 transition-all text-left"
+                >
+                  <span className="text-xs font-black uppercase tracking-wide">{v.size} / {v.color}</span>
+                  <span className="text-[10px] text-muted-foreground font-mono mt-1">{v.sku}</span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">{v.stock} Units left</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -15,6 +15,19 @@ export const Cart = () => {
   const tax = subtotal * 0.05;
   const total = subtotal + tax;
 
+  const getPromoPrice = (item) => {
+    if (item.promotionalDiscount) {
+      const { rate, price } = item.promotionalDiscount;
+      if (rate && rate > 0) {
+        return item.price * (1 - rate / 100);
+      }
+      if (price && price > 0) {
+        return price;
+      }
+    }
+    return item.price;
+  };
+
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
 
@@ -27,8 +40,10 @@ export const Cart = () => {
         tenantId: user?.tenantId || 'default',
         items: cartItems.map((item) => ({
           productId: item.id,
-          name: item.name,
-          price: item.price,
+          name: item.selectedVariant 
+            ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+            : item.name,
+          price: getPromoPrice(item),
           quantity: item.quantity
         })),
         totalAmount: total,
@@ -43,11 +58,26 @@ export const Cart = () => {
       for (const item of cartItems) {
         const productDoc = await db.products.findOne(item.id).exec();
         if (productDoc) {
-          await productDoc.patch({
-            stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
-            isSynced: false,
-            updatedAt: new Date().toISOString()
-          });
+          if (item.selectedVariant) {
+            const updatedVariants = (productDoc.variants || []).map((v) => {
+              if (v.sku === item.selectedVariant.sku) {
+                return { ...v, stock: Math.max(0, (v.stock || 0) - item.quantity) };
+              }
+              return v;
+            });
+            await productDoc.patch({
+              variants: updatedVariants,
+              stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+          } else {
+            await productDoc.patch({
+              stock: Math.max(0, (productDoc.stock || 0) - item.quantity),
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+          }
         }
       }
 
@@ -57,12 +87,17 @@ export const Cart = () => {
             printerName: selectedPrinter,
             data: {
               orderId,
-              items: cartItems.map((item) => ({
-                name: item.name,
-                price: item.price,
-                quantity: item.quantity,
-                total: item.price * item.quantity
-              })),
+              items: cartItems.map((item) => {
+                const itemPrice = getPromoPrice(item);
+                return {
+                  name: item.selectedVariant 
+                    ? `${item.name} (${item.selectedVariant.size}/${item.selectedVariant.color})`
+                    : item.name,
+                  price: itemPrice,
+                  quantity: item.quantity,
+                  total: itemPrice * item.quantity
+                };
+              }),
               subtotal,
               tax,
               total,
@@ -107,25 +142,41 @@ export const Cart = () => {
         ) : (
           cartItems.map((item) => (
             <div
-              key={item.id}
+              key={item.cartItemId}
               className="flex items-center justify-between p-3 rounded-lg bg-muted/65 border border-border"
             >
               <div className="flex-1 min-w-0 pr-3">
-                <h4 className="text-sm font-bold truncate text-zinc-950 dark:text-zinc-50">{item.name}</h4>
-                <p className="text-xs text-muted-foreground font-semibold">${item.price.toFixed(2)}</p>
+                <h4 className="text-sm font-bold truncate text-zinc-950 dark:text-zinc-50">
+                  {item.name}
+                  {item.selectedVariant && (
+                    <span className="text-[10px] text-muted-foreground font-semibold ml-1.5 uppercase tracking-wide">
+                      ({item.selectedVariant.size}/{item.selectedVariant.color})
+                    </span>
+                  )}
+                </h4>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {item.promotionalDiscount ? (
+                    <>
+                      <span className="text-xs text-red-500 font-extrabold">${getPromoPrice(item).toFixed(2)}</span>
+                      <span className="text-[10px] text-muted-foreground line-through font-semibold">${item.price.toFixed(2)}</span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground font-semibold">${item.price.toFixed(2)}</span>
+                  )}
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="flex items-center border border-border bg-card rounded-lg overflow-hidden">
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                    onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                     className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Minus className="h-3 w-3" />
                   </button>
                   <span className="w-8 text-center text-xs font-extrabold">{item.quantity}</span>
                   <button
-                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                     className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Plus className="h-3 w-3" />
@@ -133,7 +184,7 @@ export const Cart = () => {
                 </div>
 
                 <button
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => removeFromCart(item.cartItemId)}
                   className="p-2 hover:bg-red-500/10 text-red-500 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
                 >
                   <Trash2 className="h-4 w-4" />

@@ -1,7 +1,8 @@
 const getModel = (tenantConnection, collection) => {
   const map = {
     products: 'Product',
-    orders: 'Order'
+    orders: 'Order',
+    categories: 'Category'
   };
   const modelName = map[collection];
   if (!modelName) {
