@@ -1,11 +1,15 @@
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useNetworkStatus } from '../../hooks/useNetworkStatus';
+import { usePwaInstall } from '../../hooks/usePwaInstall';
 
 export const SuperAdminLayout = ({ children }) => {
   const { sidebarOpen, toggleSidebar } = useUiStore();
   const logout = useAuthStore((state) => state.logout);
+  const isOnline = useNetworkStatus();
+  const { isInstallable, promptInstall } = usePwaInstall();
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem('theme') === 'dark' || 
     (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -75,6 +79,25 @@ export const SuperAdminLayout = ({ children }) => {
           </div>
 
           <div className="flex items-center gap-4">
+            <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-bold border transition-colors ${
+              isOnline 
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
+                : 'bg-zinc-500/10 border-zinc-500/20 text-zinc-500'
+            }`}>
+              {isOnline ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
+              <span>{isOnline ? 'Online' : 'Offline'}</span>
+            </div>
+
+            {isInstallable && (
+              <button
+                onClick={promptInstall}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-foreground text-background hover:bg-foreground/90 font-bold text-xs transition-colors shrink-0 shadow-sm"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>Install App</span>
+              </button>
+            )}
+
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="rounded-lg border border-border p-2 hover:bg-muted transition-colors"
