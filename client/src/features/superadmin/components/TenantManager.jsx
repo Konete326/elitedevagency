@@ -88,7 +88,7 @@ export const TenantManager = () => {
             <p className="text-xs text-muted-foreground mt-1">Onboard your first customer to populate this table</p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse min-w-[900px]">
+          <table className="w-full text-left border-collapse min-w-[56rem]">
             <thead>
               <tr className="border-b border-border bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-4">Business Name</th>
@@ -117,7 +117,7 @@ export const TenantManager = () => {
                   <td className="py-3.5 px-4 text-xs font-mono text-muted-foreground">
                     <div className="flex items-center gap-1.5 font-semibold">
                       <Database className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
-                      <span className="max-w-[180px] truncate" title={tenant.databaseURI}>
+                      <span className="max-w-[11rem] truncate" title={tenant.databaseURI}>
                         {tenant.databaseURI}
                       </span>
                     </div>

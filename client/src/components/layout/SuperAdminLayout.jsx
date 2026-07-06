@@ -29,13 +29,11 @@ export const SuperAdminLayout = ({ children }) => {
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-950 text-foreground transition-colors duration-300">
       
-      {/* SIDEBAR COMPONENT (TailAdmin dark style) */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-[#1C2434] text-slate-300 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Sidebar Brand Header */}
         <div className="flex h-20 items-center justify-between border-b border-[#2E3A4E] px-6 gap-3">
           <div className="flex items-center gap-3">
             <Shield className="h-7 w-7 text-amber-500 shrink-0" />
@@ -43,7 +41,6 @@ export const SuperAdminLayout = ({ children }) => {
               Elite SaaS Admin
             </span>
           </div>
-          {/* Close button for mobile menu */}
           <button 
             onClick={toggleSidebar}
             className="lg:hidden p-1.5 hover:bg-[#333A48] rounded-md transition-colors"
@@ -52,7 +49,6 @@ export const SuperAdminLayout = ({ children }) => {
           </button>
         </div>
 
-        {/* Sidebar Menu Links */}
         <div className="flex-1 overflow-y-auto py-6 px-4 no-scrollbar space-y-6">
           <div>
             <p className="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">
@@ -82,7 +78,6 @@ export const SuperAdminLayout = ({ children }) => {
           </div>
         </div>
 
-        {/* Sidebar Footer */}
         <div className="border-t border-[#2E3A4E] p-6 bg-[#181F2C]">
           <button
             onClick={logout}
@@ -94,7 +89,6 @@ export const SuperAdminLayout = ({ children }) => {
         </div>
       </aside>
 
-      {/* Backdrop overlay for mobile sidebar */}
       {sidebarOpen && (
         <div
           onClick={toggleSidebar}
@@ -102,13 +96,10 @@ export const SuperAdminLayout = ({ children }) => {
         />
       )}
 
-      {/* MAIN CONTAINER */}
       <div className="flex flex-1 flex-col overflow-y-auto">
         
-        {/* Sleek Top Header (TailAdmin style) */}
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-white dark:bg-zinc-900 px-6 shadow-sm">
           
-          {/* Left Side Header (Hamburger menu or title) */}
           <div className="flex items-center gap-4">
             <button
               onClick={toggleSidebar}
@@ -117,7 +108,6 @@ export const SuperAdminLayout = ({ children }) => {
               <Menu className="h-5 w-5" />
             </button>
 
-            {/* Mock Search Input */}
             <div className="relative hidden md:block max-w-xs">
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
               <input 
@@ -129,10 +119,8 @@ export const SuperAdminLayout = ({ children }) => {
             </div>
           </div>
 
-          {/* Right Side Header Controls */}
           <div className="flex items-center gap-4">
             
-            {/* Online Status Pill */}
             <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold border transition-all ${
               isOnline 
                 ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
@@ -142,7 +130,6 @@ export const SuperAdminLayout = ({ children }) => {
               <span>{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
             </div>
 
-            {/* Install PWA Button */}
             {isInstallable && (
               <button
                 onClick={promptInstall}
@@ -153,7 +140,6 @@ export const SuperAdminLayout = ({ children }) => {
               </button>
             )}
 
-            {/* Notification Bell (Mock) */}
             <button 
               disabled
               className="relative rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted transition-colors cursor-not-allowed opacity-60"
@@ -162,7 +148,6 @@ export const SuperAdminLayout = ({ children }) => {
               <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
             </button>
 
-            {/* Dark Mode Toggler */}
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted transition-colors"
@@ -170,10 +155,8 @@ export const SuperAdminLayout = ({ children }) => {
               {darkMode ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
             </button>
 
-            {/* Divider */}
             <div className="h-8 w-px bg-border hidden sm:block" />
 
-            {/* Admin Profile Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
@@ -192,7 +175,6 @@ export const SuperAdminLayout = ({ children }) => {
                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block shrink-0" />
               </button>
 
-              {/* Dropdown Menu */}
               {profileDropdownOpen && (
                 <>
                   <div 
@@ -231,7 +213,6 @@ export const SuperAdminLayout = ({ children }) => {
           </div>
         </header>
 
-        {/* Content Area */}
         <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
           {children}
         </main>

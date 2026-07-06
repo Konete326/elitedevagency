@@ -9,22 +9,19 @@ import { Users, X, Key, Clipboard, Building, DollarSign, Cpu, AlertCircle } from
 export const Dashboard = () => {
   const [credentials, setCredentials] = useState(null);
 
-  // Fetch pending devices to get the queue count
   const { data: devices = [] } = usePendingDevices();
   
-  // Fetch first 100 tenants to calculate total tenants count and estimate MRR
   const { data: tenantsData } = useTenants(1, 100);
   const tenants = tenantsData?.data || [];
   const totalTenants = tenantsData?.meta?.total || 0;
   const pendingCount = devices.length;
 
-  // Calculate MRR based on plans of active tenants
   const estimatedMRR = tenants.reduce((acc, tenant) => {
     if (tenant.rentOverdue) return acc;
     const plan = tenant.plan || 'STARTER';
     if (plan === 'PRO') return acc + 199;
     if (plan === 'GROWTH') return acc + 99;
-    return acc + 49; // STARTER
+    return acc + 49;
   }, 0);
 
   const copyToClipboard = (text) => {
@@ -35,7 +32,6 @@ export const Dashboard = () => {
   return (
     <div className="space-y-6">
       
-      {/* Title Header */}
       <div>
         <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
           System Overview
@@ -45,7 +41,6 @@ export const Dashboard = () => {
         </p>
       </div>
 
-      {/* Default Owner Credentials Banner */}
       {credentials && (
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-6 shadow-sm relative overflow-hidden animate-slide-in">
           <div className="absolute top-0 right-0 p-4">
@@ -102,10 +97,8 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* KPI Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Monthly Recurring Revenue */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
           <div className="space-y-1.5">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -123,7 +116,6 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Total Tenants Card */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
           <div className="space-y-1.5">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -141,7 +133,6 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Pending Devices Card */}
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center justify-between">
           <div className="space-y-1.5">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
@@ -167,13 +158,11 @@ export const Dashboard = () => {
 
       </div>
 
-      {/* Main Operations Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TenantOnboardForm onSuccess={setCredentials} />
         <HardwareApproval />
       </div>
 
-      {/* Tenants Management Area */}
       <TenantManager />
 
     </div>

@@ -41,7 +41,7 @@ export const HardwareApproval = () => {
             <p className="text-xs text-muted-foreground text-center">All hardware login fingerprints have been processed</p>
           </div>
         ) : (
-          <table className="w-full text-left border-collapse min-w-[500px]">
+          <table className="w-full text-left border-collapse min-w-[32rem]">
             <thead>
               <tr className="border-b border-border bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-4">Business Name</th>
@@ -56,7 +56,7 @@ export const HardwareApproval = () => {
                   <td className="py-3.5 px-4">
                     <div className="inline-flex items-center gap-1.5 rounded bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 font-mono text-xs text-amber-600 dark:text-amber-500">
                       <ShieldAlert className="h-3.5 w-3.5 text-amber-500 shrink-0" />
-                      <span className="truncate max-w-[220px]" title={device.deviceId}>
+                      <span className="truncate max-w-[14rem]" title={device.deviceId}>
                         {device.deviceId}
                       </span>
                     </div>
