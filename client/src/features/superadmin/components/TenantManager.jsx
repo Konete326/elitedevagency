@@ -37,14 +37,21 @@ export const TenantManager = () => {
   const getPlanBadgeClass = (plan) => {
     switch (plan) {
       case 'STARTER':
-        return 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300';
+        return 'bg-blue-50 border-blue-100 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900/30 dark:text-blue-400';
       case 'GROWTH':
-        return 'bg-blue-55 border-blue-100 text-blue-700 dark:bg-blue-950/30 dark:border-blue-900/30 dark:text-blue-400';
+        return 'bg-purple-50 border-purple-100 text-purple-700 dark:bg-purple-950/30 dark:border-purple-900/30 dark:text-purple-400';
       case 'PRO':
-        return 'bg-purple-55 border-purple-100 text-purple-700 dark:bg-purple-950/30 dark:border-purple-900/30 dark:text-purple-400';
+        return 'bg-indigo-50 border-indigo-100 text-indigo-700 dark:bg-indigo-950/30 dark:border-indigo-900/30 dark:text-indigo-400';
+      case 'CUSTOM':
+        return 'bg-amber-50 border-amber-100 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/30 dark:text-amber-400';
       default:
-        return 'bg-slate-100 border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300';
+        return 'bg-zinc-50 border-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-400';
     }
+  };
+
+  const maskURI = (uri) => {
+    if (!uri) return '';
+    return uri.replace(/:([^:@]+)@/, ':***@');
   };
 
   const getNicheBadgeClass = (niche) => {
@@ -103,7 +110,18 @@ export const TenantManager = () => {
             <tbody className="divide-y divide-border dark:divide-zinc-700 text-sm font-semibold">
               {tenants.map((tenant) => (
                 <tr key={tenant._id} className="hover:bg-muted/40 transition-colors">
-                  <td className="py-3.5 px-4 font-extrabold text-foreground">{tenant.businessName}</td>
+                  <td className="py-3.5 px-4 font-extrabold text-foreground">
+                    <div>{tenant.businessName}</div>
+                    {tenant.features && tenant.features.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {tenant.features.map((f, i) => (
+                          <span key={i} className="inline-flex items-center rounded-full bg-slate-100 dark:bg-zinc-700 px-2 py-0.5 text-[9px] font-black uppercase text-slate-600 dark:text-zinc-300">
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
                   <td className="py-3.5 px-4">
                     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold ${getNicheBadgeClass(tenant.niche)}`}>
                       {tenant.niche}
@@ -111,14 +129,16 @@ export const TenantManager = () => {
                   </td>
                   <td className="py-3.5 px-4">
                     <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold ${getPlanBadgeClass(tenant.plan)}`}>
-                      {tenant.plan || 'STARTER'}
+                      {tenant.plan === 'CUSTOM' && tenant.customPlanName
+                        ? `${tenant.customPlanName} ($${tenant.customPlanPrice})`
+                        : (tenant.plan || 'STARTER')}
                     </span>
                   </td>
                   <td className="py-3.5 px-4 text-xs font-mono text-muted-foreground">
                     <div className="flex items-center gap-1.5 font-semibold">
                       <Database className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
-                      <span className="max-w-[11rem] truncate" title={tenant.databaseURI}>
-                        {tenant.databaseURI}
+                      <span className="max-w-[11rem] truncate" title={tenant.databaseURI || tenant.dbURI}>
+                        {maskURI(tenant.databaseURI || tenant.dbURI)}
                       </span>
                     </div>
                   </td>

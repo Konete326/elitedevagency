@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOnboardTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
-import { UserPlus, CheckSquare, Square, Palette, ShieldCheck, Key, Clipboard, X, AlertCircle } from 'lucide-react';
+import { UserPlus, CheckSquare, Square, ShieldCheck, Key, Clipboard, X, AlertCircle } from 'lucide-react';
 
 const allModules = [
   { id: 'POS', label: 'Point of Sale' },
@@ -15,8 +15,17 @@ const allModules = [
 const planDefaults = {
   STARTER: ['POS'],
   GROWTH: ['POS', 'INVENTORY', 'ANALYTICS'],
-  PRO: ['POS', 'INVENTORY', 'ANALYTICS', 'FINANCIALS', 'HR', 'PROMOTIONS']
+  PRO: ['POS', 'INVENTORY', 'ANALYTICS', 'FINANCIALS', 'HR', 'PROMOTIONS'],
+  CUSTOM: ['POS']
 };
+
+const nicheFeaturesMap = {
+  GYM: ['RFID Attendance', 'Diet Routines', 'Trainer Payroll'],
+  RESTAURANT: ['Multi-Kitchen KOT', 'Table Management', 'Recipe Costing'],
+  GARMENTS: ['Barcode Scanner', 'Variant Matrix', 'Stock Alerts']
+};
+
+const globalFeatures = ['Custom Brand Colors'];
 
 export const TenantOnboardForm = ({ onSuccess }) => {
   const [businessName, setBusinessName] = useState('');
@@ -26,6 +35,12 @@ export const TenantOnboardForm = ({ onSuccess }) => {
   const [trialDays, setTrialDays] = useState(30);
   const [ownerName, setOwnerName] = useState('');
   const [ownerEmail, setOwnerEmail] = useState('');
+  const [ownerPassword, setOwnerPassword] = useState('');
+  const [dbURI, setDbURI] = useState('');
+  const [customPlanName, setCustomPlanName] = useState('');
+  const [customPlanPrice, setCustomPlanPrice] = useState('');
+  const [selectedFeatures, setSelectedFeatures] = useState([]);
+  
   const [lightPrimary, setLightPrimary] = useState('#d97706');
   const [darkPrimary, setDarkPrimary] = useState('#f59e0b');
   const [credentials, setCredentials] = useState(null);
@@ -36,11 +51,23 @@ export const TenantOnboardForm = ({ onSuccess }) => {
     setActiveModules(planDefaults[plan] || ['POS']);
   }, [plan]);
 
+  useEffect(() => {
+    setSelectedFeatures([]);
+  }, [niche]);
+
   const handleModuleToggle = (moduleId) => {
     setActiveModules((prev) =>
       prev.includes(moduleId)
         ? prev.filter((id) => id !== moduleId)
         : [...prev, moduleId]
+    );
+  };
+
+  const handleFeatureToggle = (feature) => {
+    setSelectedFeatures((prev) =>
+      prev.includes(feature)
+        ? prev.filter((f) => f !== feature)
+        : [...prev, feature]
     );
   };
 
@@ -51,8 +78,13 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   const handleOnboard = (e) => {
     e.preventDefault();
-    if (!businessName || !ownerName || !ownerEmail) {
-      toast.error('Please fill in all required onboarding fields.');
+    if (!businessName || !ownerName || !ownerEmail || !ownerPassword || !dbURI) {
+      toast.error('All required fields must be completed.');
+      return;
+    }
+
+    if (plan === 'CUSTOM' && (!customPlanName || !customPlanPrice)) {
+      toast.error('Custom plan configurations are required.');
       return;
     }
 
@@ -71,7 +103,12 @@ export const TenantOnboardForm = ({ onSuccess }) => {
         trialDays: parsedDays,
         ownerName,
         ownerEmail,
-        customTheme: { lightPrimary, darkPrimary }
+        ownerPassword,
+        customTheme: { lightPrimary, darkPrimary },
+        dbURI,
+        features: selectedFeatures,
+        customPlanName: plan === 'CUSTOM' ? customPlanName : undefined,
+        customPlanPrice: plan === 'CUSTOM' ? parseFloat(customPlanPrice) : undefined
       },
       {
         onSuccess: (response) => {
@@ -81,6 +118,11 @@ export const TenantOnboardForm = ({ onSuccess }) => {
           setBusinessName('');
           setOwnerName('');
           setOwnerEmail('');
+          setOwnerPassword('');
+          setDbURI('');
+          setCustomPlanName('');
+          setCustomPlanPrice('');
+          setSelectedFeatures([]);
           setPlan('STARTER');
           setNiche('GYM');
           setTrialDays(30);
@@ -93,6 +135,9 @@ export const TenantOnboardForm = ({ onSuccess }) => {
       }
     );
   };
+
+  const currentNicheFeatures = nicheFeaturesMap[niche] || [];
+  const renderedFeaturesList = [...currentNicheFeatures, ...globalFeatures];
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -198,6 +243,32 @@ export const TenantOnboardForm = ({ onSuccess }) => {
               </div>
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="sm:col-span-2">
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-1">Database Connection String (URI) *</label>
+                <input
+                  type="text"
+                  required
+                  value={dbURI}
+                  onChange={(e) => setDbURI(e.target.value)}
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all font-mono"
+                  placeholder="mongodb://localhost:27017/pos_tenant_database"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider mb-1">Owner Password *</label>
+                <input
+                  type="password"
+                  required
+                  value={ownerPassword}
+                  onChange={(e) => setOwnerPassword(e.target.value)}
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                  placeholder="Secret password..."
+                />
+              </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-1">Owner Full Name *</label>
@@ -248,9 +319,38 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                   <option value="STARTER">Starter Tier</option>
                   <option value="GROWTH">Growth Tier</option>
                   <option value="PRO">Enterprise Pro Tier</option>
+                  <option value="CUSTOM">Custom pricing tier</option>
                 </select>
               </div>
             </div>
+
+            {plan === 'CUSTOM' && (
+              <div className="grid gap-4 sm:grid-cols-2 p-4 rounded-lg border border-border dark:border-zinc-700 bg-slate-50/30 dark:bg-zinc-900/10 animate-fade-in">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Custom Plan Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={customPlanName}
+                    onChange={(e) => setCustomPlanName(e.target.value)}
+                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                    placeholder="e.g. VIP Custom Plan"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Monthly Price ($) *</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={customPlanPrice}
+                    onChange={(e) => setCustomPlanPrice(e.target.value)}
+                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                    placeholder="e.g. 199.99"
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-2">Feature Permissions Module</label>
@@ -270,6 +370,30 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                         <Square className="h-4 w-4 text-slate-400 dark:text-zinc-650 shrink-0" />
                       )}
                       <span>{mod.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-2">Niche & Global Features</label>
+              <div className="grid grid-cols-2 gap-2 p-3.5 rounded-lg border border-border dark:border-zinc-700 bg-slate-50/30 dark:bg-zinc-900/10">
+                {renderedFeaturesList.map((feat) => {
+                  const isChecked = selectedFeatures.includes(feat);
+                  return (
+                    <button
+                      type="button"
+                      key={feat}
+                      onClick={() => handleFeatureToggle(feat)}
+                      className="flex items-center gap-2 py-1 px-1.5 text-xs text-left hover:bg-muted/40 rounded transition-colors text-foreground select-none font-semibold"
+                    >
+                      {isChecked ? (
+                        <CheckSquare className="h-4 w-4 text-amber-600 dark:text-amber-500 shrink-0" />
+                      ) : (
+                        <Square className="h-4 w-4 text-slate-400 dark:text-zinc-650 shrink-0" />
+                      )}
+                      <span>{feat}</span>
                     </button>
                   );
                 })}

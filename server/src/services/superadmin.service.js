@@ -3,7 +3,21 @@ const User = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const onboardTenant = async (businessName, niche, trialDays = 30, ownerName, ownerEmail, plan, activeModules, customTheme) => {
+const onboardTenant = async (
+  businessName,
+  niche,
+  trialDays = 30,
+  ownerName,
+  ownerEmail,
+  ownerPassword,
+  plan,
+  activeModules,
+  customTheme,
+  dbURI,
+  features,
+  customPlanName,
+  customPlanPrice
+) => {
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + trialDays);
 
@@ -25,16 +39,18 @@ const onboardTenant = async (businessName, niche, trialDays = 30, ownerName, own
     niche,
     plan,
     activeModules: finalModules,
-    databaseURI: 'temp',
+    databaseURI: dbURI,
+    dbURI,
+    features: features || [],
+    customPlanName: plan === 'CUSTOM' ? customPlanName : undefined,
+    customPlanPrice: plan === 'CUSTOM' ? customPlanPrice : undefined,
     subscriptionExpiry: expiryDate,
     customTheme: customTheme || { lightPrimary: null, darkPrimary: null }
   });
   
-  tenant.databaseURI = `mongodb://localhost:27017/pos_tenant_${tenant._id}`;
   await tenant.save();
 
-  const tempPassword = Math.random().toString(36).slice(-8);
-  const hashedPassword = await bcrypt.hash(tempPassword, 10);
+  const hashedPassword = await bcrypt.hash(ownerPassword, 10);
 
   const tenantConnection = mongoose.createConnection(tenant.databaseURI);
   try {
@@ -56,7 +72,7 @@ const onboardTenant = async (businessName, niche, trialDays = 30, ownerName, own
     tenant,
     credentials: {
       email: ownerEmail,
-      password: tempPassword
+      password: ownerPassword
     }
   };
 };

@@ -1,16 +1,36 @@
 const superadminService = require('../services/superadmin.service');
 
 const createTenant = async (req, res) => {
-  const { businessName, niche, trialDays, ownerName, ownerEmail, plan, activeModules, customTheme } = req.body;
+  const { 
+    businessName, 
+    niche, 
+    trialDays, 
+    ownerName, 
+    ownerEmail, 
+    ownerPassword, 
+    plan, 
+    activeModules, 
+    customTheme, 
+    dbURI, 
+    features, 
+    customPlanName, 
+    customPlanPrice 
+  } = req.body;
+
   const result = await superadminService.onboardTenant(
     businessName,
     niche,
     trialDays,
     ownerName,
     ownerEmail,
+    ownerPassword,
     plan,
     activeModules,
-    customTheme
+    customTheme,
+    dbURI,
+    features,
+    customPlanName,
+    customPlanPrice
   );
   
   res.status(201).json({
