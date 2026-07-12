@@ -35,15 +35,15 @@
 }
 
 .dark {
-  --background: #FAFAFA;
-  --foreground: #0F172A;
-  --border: #E2E8F0;
-  --card: #FFFFFF;
-  --card-foreground: #0F172A;
-  --input: #E2E8F0;
+  --background: #09090B;
+  --foreground: #F4F4F5;
+  --border: #27272A;
+  --card: #18181B;
+  --card-foreground: #F4F4F5;
+  --input: #27272A;
   --ring: #0052FF;
-  --muted: #F1F5F9;
-  --muted-foreground: #64748B;
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
   --radius: 0.5rem;
 }
 
@@ -53,6 +53,14 @@ h1, h2, h3, h4, h5, h6 {
 
 body, input, button, textarea, select {
   font-family: var(--font-sans);
+}
+
+button, [role="button"], select, input[type="button"], input[type="submit"] {
+  cursor: pointer;
+}
+
+button:disabled, [role="button"]:disabled, select:disabled, input[type="button"]:disabled, input[type="submit"]:disabled {
+  cursor: not-allowed;
 }
 
 * {

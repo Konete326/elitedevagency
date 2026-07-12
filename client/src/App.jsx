@@ -1,5 +1,5 @@
 import { useEffect, useState, Component } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { LoginPage } from './pages/LoginPage';
@@ -18,6 +18,8 @@ import { HardwareApproval } from './features/superadmin/components/HardwareAppro
 import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
 import { PricingTiersManager } from './features/superadmin/pages/PricingTiersManager';
 import { StyleWrapper } from './components/layout/StyleWrapper';
+import { ModalManager } from './components/ui/ModalManager';
+import { Agentation } from 'agentation';
 import { ProductManager } from './features/inventory/pages/ProductManager';
 import { DealsManager } from './features/inventory/pages/DealsManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
@@ -204,6 +206,7 @@ function App() {
           <StyleWrapper>
             <BrowserRouter>
             <Toaster richColors position="top-right" closeButton />
+            <ModalManager />
           <SuspensionGuard>
             <Routes>
             <Route 
@@ -212,9 +215,7 @@ function App() {
                 !isAuthenticated ? (
                   <LoginPage />
                 ) : user?.role === 'SUPER_ADMIN' ? (
-                  <SuperAdminLayout>
-                    <Dashboard />
-                  </SuperAdminLayout>
+                  <Navigate to="/superadmin" replace />
                 ) : (
                   <POSPage />
                 )
@@ -532,6 +533,7 @@ function App() {
           </SuspensionGuard>
           </BrowserRouter>
         </StyleWrapper>
+        {import.meta.env.DEV && <Agentation />}
         </MobileBlockerGuard>
       </QueryClientProvider>
     </ErrorBoundary>

@@ -94,118 +94,118 @@ export const TenantManager = () => {
 
   return (
     <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden flex flex-col transition-colors duration-300">
-      <div className="p-6 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="py-3 px-5 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-lg font-bold tracking-tight text-foreground flex items-center gap-2">
-            <Layers className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+          <h2 className="text-base font-bold tracking-tight text-foreground flex items-center gap-2">
+            <Layers className="h-4.5 w-4.5 text-amber-600 dark:text-amber-500" />
             <span>Onboarded Tenants</span>
             {!isLoading && meta.total > 0 && (
-              <span className="text-[11px] bg-slate-200/80 dark:bg-zinc-750 px-2 py-0.5 rounded-full font-extrabold text-slate-600 dark:text-zinc-300">
+              <span className="text-[10px] bg-slate-200/80 dark:bg-zinc-750 px-2 py-0.5 rounded-full font-extrabold text-slate-600 dark:text-zinc-300">
                 {meta.total} total
               </span>
             )}
           </h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Manage databases, trials, licenses, and locking state</p>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Manage databases, trials, licenses, and locking state</p>
         </div>
       </div>
 
       <div className="overflow-x-auto w-full">
         {isLoading ? (
-          <div className="flex items-center justify-center h-48">
-            <p className="text-sm text-muted-foreground font-medium animate-pulse">Loading onboarded tenants...</p>
+          <div className="flex items-center justify-center h-36">
+            <p className="text-xs text-muted-foreground font-medium animate-pulse">Loading onboarded tenants...</p>
           </div>
         ) : tenants.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-muted-foreground p-6">
-            <p className="text-sm font-semibold text-foreground">No Tenants Found</p>
-            <p className="text-xs text-muted-foreground mt-1">Onboard your first customer to populate this table</p>
+          <div className="flex flex-col items-center justify-center h-36 text-muted-foreground p-6">
+            <p className="text-xs font-semibold text-foreground">No Tenants Found</p>
+            <p className="text-[10px] text-muted-foreground mt-1">Onboard your first customer to populate this table</p>
           </div>
         ) : (
           <table className="w-full text-left border-collapse min-w-[56rem]">
             <thead>
-              <tr className="border-b border-border dark:border-zinc-700 bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <th className="py-3 px-4">Business Name</th>
-                <th className="py-3 px-4">Niche</th>
-                <th className="py-3 px-4">Plan</th>
-                <th className="py-3 px-4">Database Path</th>
-                <th className="py-3 px-4">Subscription End</th>
-                <th className="py-3 px-4">License Status</th>
-                <th className="py-3 px-4">Mobile Access</th>
-                <th className="py-3 px-4 text-right">Actions</th>
+              <tr className="border-b border-border dark:border-zinc-700 bg-slate-100/60 dark:bg-zinc-800/40 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <th className="py-2 px-3">Business Name</th>
+                <th className="py-2 px-3">Niche</th>
+                <th className="py-2 px-3">Plan</th>
+                <th className="py-2 px-3">Database Path</th>
+                <th className="py-2 px-3">Subscription End</th>
+                <th className="py-2 px-3">License Status</th>
+                <th className="py-2 px-3">Mobile Access</th>
+                <th className="py-2 px-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border dark:divide-zinc-700 text-sm font-semibold">
+            <tbody className="divide-y divide-border dark:divide-zinc-700 text-xs font-semibold">
               {tenants.map((tenant) => (
                 <tr key={tenant._id} className="hover:bg-muted/40 transition-colors">
-                  <td className="py-3.5 px-4 font-extrabold text-foreground">
+                  <td className="py-2 px-3 font-extrabold text-foreground">
                     <div>{tenant.businessName}</div>
                     {tenant.features && tenant.features.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
+                      <div className="flex flex-wrap gap-1 mt-1">
                         {tenant.features.map((f, i) => (
-                          <span key={i} className="inline-flex items-center rounded-full bg-slate-100 dark:bg-zinc-700 px-2 py-0.5 text-[9px] font-black uppercase text-slate-600 dark:text-zinc-300">
+                          <span key={i} className="inline-flex items-center rounded-full bg-slate-100 dark:bg-zinc-700 px-1.5 py-0.5 text-[8px] font-black uppercase text-slate-650 dark:text-zinc-300">
                             {f}
                           </span>
                         ))}
                       </div>
                     )}
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold ${getNicheBadgeClass(tenant.niche)}`}>
+                  <td className="py-2 px-3">
+                    <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${getNicheBadgeClass(tenant.niche)}`}>
                       {tenant.niche}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4">
-                    <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-bold ${getPlanBadgeClass(tenant.plan)}`}>
+                  <td className="py-2 px-3">
+                    <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${getPlanBadgeClass(tenant.plan)}`}>
                       {tenant.plan === 'CUSTOM' && tenant.customPlanName
                         ? `${tenant.customPlanName} ($${tenant.customPlanPrice})`
                         : (tenant.plan || 'STARTER')}
                     </span>
                   </td>
-                  <td className="py-3.5 px-4 text-xs font-mono text-muted-foreground">
-                    <div className="flex items-center gap-1.5 font-semibold">
-                      <Database className="h-3.5 w-3.5 text-muted-foreground/60 shrink-0" />
+                  <td className="py-2 px-3 text-[11px] font-mono text-muted-foreground">
+                    <div className="flex items-center gap-1 font-semibold">
+                      <Database className="h-3 w-3 text-muted-foreground/60 shrink-0" />
                       <span className="max-w-[11rem] truncate" title={tenant.databaseURI || tenant.dbURI}>
                         {maskURI(tenant.databaseURI || tenant.dbURI)}
                       </span>
                     </div>
                   </td>
-                  <td className="py-3.5 px-4 font-medium text-foreground/80">
+                  <td className="py-2 px-3 font-medium text-foreground/80">
                     {formatDate(tenant.subscriptionExpiry)}
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td className="py-2 px-3">
                     {tenant.rentOverdue ? (
-                      <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/20 px-2 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">
+                      <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-655 dark:text-red-400">
                         Locked
                       </span>
                     ) : (
-                      <span className="inline-flex items-center rounded-full bg-green-500/10 border border-green-500/20 px-2 py-0.5 text-xs font-bold text-green-600 dark:text-green-400">
+                      <span className="inline-flex items-center rounded-full bg-green-500/10 border border-green-500/20 px-1.5 py-0.5 text-[10px] font-bold text-green-650 dark:text-green-400">
                         Active
                       </span>
                     )}
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td className="py-2 px-3">
                     <button
                       onClick={() => handleToggleMobileAccess(tenant._id)}
                       disabled={toggleMobileAccessMutation.isPending}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                         tenant.blockMobileAccess ? 'bg-[var(--accent)]' : 'bg-slate-200 dark:bg-zinc-700'
                       }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                          tenant.blockMobileAccess ? 'translate-x-5' : 'translate-x-0'
+                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          tenant.blockMobileAccess ? 'translate-x-4' : 'translate-x-0'
                         }`}
                       />
                     </button>
                   </td>
-                  <td className="py-3.5 px-4 text-right">
+                  <td className="py-2 px-3 text-right">
                     <button
                       onClick={() => {
                         setSelectedTenantForFeatures(tenant);
                         setTempFeatures(tenant.features || []);
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2.5 py-1.5 text-xs font-bold mr-2 transition-colors"
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2 py-1 text-[11px] font-bold mr-1.5 transition-colors"
                     >
-                      <Layers className="h-3.5 w-3.5 text-amber-600 dark:text-amber-500" />
+                      <Layers className="h-3 w-3 text-amber-600 dark:text-amber-500" />
                       <span>Features</span>
                     </button>
                     <button
@@ -217,28 +217,28 @@ export const TenantManager = () => {
                           suspensionDescription: tenant.suspensionDescription || ''
                         });
                       }}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2.5 py-1.5 text-xs font-bold mr-2 transition-colors"
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2 py-1 text-[11px] font-bold mr-1.5 transition-colors"
                     >
-                      <Shield className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                      <Shield className="h-3 w-3 text-rose-600 dark:text-rose-455" />
                       <span>Status</span>
                     </button>
                     <button
                       onClick={() => handleToggleLock(tenant._id)}
                       disabled={toggleLockMutation.isPending}
-                      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-bold transition-colors ${
+                      className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-bold transition-colors ${
                         tenant.rentOverdue
                           ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/20 dark:border-green-550/20'
-                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-600 border-red-500/20 dark:border-red-550/20'
+                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-650 border-red-500/20 dark:border-red-550/20'
                       }`}
                     >
                       {tenant.rentOverdue ? (
                         <>
-                          <Unlock className="h-3.5 w-3.5" />
+                          <Unlock className="h-3 w-3" />
                           <span>Unlock</span>
                         </>
                       ) : (
                         <>
-                          <Lock className="h-3.5 w-3.5" />
+                          <Lock className="h-3 w-3" />
                           <span>Lock (Kill)</span>
                         </>
                       )}
@@ -252,26 +252,26 @@ export const TenantManager = () => {
       </div>
 
       {!isLoading && totalPages > 1 && (
-        <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground font-semibold">
+        <div className="py-2.5 px-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex items-center justify-between">
+          <p className="text-[11px] text-muted-foreground font-semibold">
             Page <span className="font-bold text-foreground">{page}</span> of <span className="font-bold text-foreground">{totalPages}</span>
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page === 1}
-              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-3 py-1.5 text-xs font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
+              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-2.5 py-1 text-[11px] font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-3.5 w-3.5" />
               <span>Prev</span>
             </button>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page === totalPages}
-              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-3 py-1.5 text-xs font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
+              className="inline-flex items-center gap-1 rounded-md border border-border dark:border-zinc-700 px-2.5 py-1 text-[11px] font-bold hover:bg-slate-100 dark:hover:bg-zinc-750 disabled:opacity-50 disabled:pointer-events-none transition-colors text-slate-700 dark:text-slate-200"
             >
               <span>Next</span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>

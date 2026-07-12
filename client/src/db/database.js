@@ -358,6 +358,7 @@ const pricingTierSchema = {
     price: { type: 'number' },
     description: { type: 'string' },
     isActive: { type: 'boolean' },
+    niche: { type: 'string' },
     features: {
       type: 'array',
       items: { type: 'string' }
