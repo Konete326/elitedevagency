@@ -50,6 +50,12 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   const onboardTenantMutation = useOnboardTenant();
 
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const priceRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+
+  const isEmailValid = !ownerEmail || emailRegex.test(ownerEmail);
+  const isCustomPriceValid = plan !== 'CUSTOM' || !customPlanPrice || priceRegex.test(customPlanPrice);
+
   useEffect(() => {
     let sub;
     getDatabase().then((db) => {
@@ -95,6 +101,12 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   const handleOnboard = (e) => {
     e.preventDefault();
+
+    if (!isEmailValid || !isCustomPriceValid) {
+      toast.error('Please fix the highlighted invalid input fields before proceeding.');
+      return;
+    }
+
     if (!businessName || !ownerName || !ownerEmail || !ownerPassword || !dbURI) {
       toast.error('All required fields must be completed.');
       return;
@@ -308,7 +320,11 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                   required
                   value={ownerEmail}
                   onChange={(e) => setOwnerEmail(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                  className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground placeholder:text-muted-foreground/60 outline-none focus:ring-2 focus:bg-background transition-all ${
+                    isEmailValid 
+                      ? 'border-border dark:border-zinc-700 focus:ring-ring' 
+                      : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                  }`}
                   placeholder="owner@fitzone.com"
                 />
               </div>
@@ -374,7 +390,11 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                     required
                     value={customPlanPrice}
                     onChange={(e) => setCustomPlanPrice(e.target.value)}
-                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
+                    className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-semibold text-foreground outline-none focus:ring-2 focus:bg-background transition-all ${
+                      isCustomPriceValid 
+                        ? 'border-border dark:border-zinc-700 focus:ring-ring' 
+                        : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                    }`}
                     placeholder="e.g. 199.99"
                   />
                 </div>

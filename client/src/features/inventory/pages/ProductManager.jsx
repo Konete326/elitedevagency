@@ -69,8 +69,36 @@ export const ProductManager = () => {
     }
   };
 
+  const numRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+
+  const isPriceValid = !price || numRegex.test(price);
+  const isCostPriceValid = !costPrice || numRegex.test(costPrice);
+
+  const parsedPriceNum = parseFloat(price) || 0;
+  const parsedCostPriceNum = parseFloat(costPrice) || 0;
+  const hasProfitConflict = parsedPriceNum > 0 && parsedCostPriceNum > 0 && parsedPriceNum <= parsedCostPriceNum;
+
+  const checkProfitability = () => {
+    const pVal = parseFloat(price) || 0;
+    const cVal = parseFloat(costPrice) || 0;
+    if (pVal > 0 && cVal > 0 && pVal <= cVal) {
+      toast.warning('Selling price must be greater than the wholesale cost price to maintain profit margins.');
+    }
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
+
+    if (!isPriceValid || !isCostPriceValid) {
+      toast.error('Please fix the highlighted invalid input fields before proceeding.');
+      return;
+    }
+
+    if (hasProfitConflict) {
+      toast.error('Selling price must be greater than the wholesale cost price to maintain profit margins.');
+      return;
+    }
+
     if (!name || !price || !sku) {
       toast.error('Product name, price, and SKU are required');
       return;
@@ -275,7 +303,12 @@ export const ProductManager = () => {
                     step="0.01"
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                    onBlur={checkProfitability}
+                    className={`w-full rounded-lg border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all ${
+                      !isPriceValid || hasProfitConflict
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                        : 'border-border focus:ring-ring'
+                    }`}
                     placeholder="e.g. 29.99"
                   />
                 </div>
@@ -289,7 +322,12 @@ export const ProductManager = () => {
                     step="0.01"
                     value={costPrice}
                     onChange={(e) => setCostPrice(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                    onBlur={checkProfitability}
+                    className={`w-full rounded-lg border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 transition-all ${
+                      !isCostPriceValid || hasProfitConflict
+                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                        : 'border-border focus:ring-ring'
+                    }`}
                     placeholder="e.g. 10.00"
                   />
                 </div>

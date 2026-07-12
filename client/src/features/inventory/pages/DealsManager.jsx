@@ -116,8 +116,17 @@ export const DealsManager = () => {
     setSelectedItems(selectedItems.filter((_, i) => i !== index));
   };
 
+  const numRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+  const isPriceValid = !dealPrice || numRegex.test(dealPrice);
+
   const handleCreateDeal = async (e) => {
     e.preventDefault();
+
+    if (!isPriceValid) {
+      toast.error('Please fix the highlighted invalid input fields before proceeding.');
+      return;
+    }
+
     if (!dealName || !dealPrice) {
       toast.error('Deal Name and Price are required');
       return;
@@ -305,7 +314,11 @@ export const DealsManager = () => {
                     required
                     value={dealPrice}
                     onChange={(e) => setDealPrice(e.target.value)}
-                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
+                      isPriceValid 
+                        ? 'border-border dark:border-zinc-700 focus:ring-ring' 
+                        : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                    }`}
                     placeholder="e.g. 19.99"
                   />
                 </div>

@@ -31,8 +31,20 @@ export const PlanManager = () => {
     };
   }, []);
 
+  const numRegex = /^[0-9]+(\.[0-9]{1,2})?$/;
+  const intRegex = /^[0-9]+$/;
+
+  const isPriceValid = !planPrice || numRegex.test(planPrice);
+  const isDurationValid = !planDuration || intRegex.test(planDuration);
+
   const handleCreatePlan = async (e) => {
     e.preventDefault();
+
+    if (!isPriceValid || !isDurationValid) {
+      toast.error('Please fix the highlighted invalid input fields before proceeding.');
+      return;
+    }
+
     if (!planName || !planPrice || !planDuration) {
       toast.error('Name, Price, and Duration are required');
       return;
@@ -98,79 +110,93 @@ export const PlanManager = () => {
   return (
     <div className="flex flex-col h-screen bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
       <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border dark:border-zinc-700 hover:bg-muted transition-colors mr-2 text-foreground"
+            className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
-          <span className="font-extrabold text-lg tracking-tight">Membership Plans</span>
+          <div>
+            <h1 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
+              <Award className="h-5 w-5 text-accent" />
+              <span>Membership Plans</span>
+            </h1>
+            <p className="text-[10px] text-muted-foreground font-semibold">Manage club subscription pricing bundles</p>
+          </div>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold text-xs transition-colors shadow-sm"
+          className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity shadow-sm"
         >
           <Plus className="h-4 w-4" />
-          <span>Create Plan</span>
+          <span>New Plan</span>
         </button>
       </header>
 
-      <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 overflow-y-auto">
-        <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden flex flex-col transition-colors duration-300">
-          <div className="overflow-x-auto w-full">
-            {plans.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-64 text-muted-foreground p-6">
-                <Award className="h-10 w-10 text-muted-foreground/30 mb-2" />
-                <p className="text-sm font-semibold text-foreground">No Plans Configured</p>
-                <p className="text-xs text-muted-foreground mt-1">Configure gym plans to begin registering members</p>
-              </div>
-            ) : (
-              <table className="w-full text-left border-collapse min-w-[40rem]">
-                <thead>
-                  <tr className="border-b border-border dark:border-zinc-700 bg-slate-100/60 dark:bg-zinc-800/40 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Plan Name</th>
-                    <th className="py-3.5 px-6">Price</th>
-                    <th className="py-3.5 px-6">Duration</th>
-                    <th className="py-3.5 px-6">Description</th>
-                    <th className="py-3.5 px-6 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border dark:divide-zinc-700 text-sm font-semibold">
-                  {plans.map((plan) => (
-                    <tr key={plan._id} className="hover:bg-muted/40 transition-colors">
-                      <td className="py-4 px-6 font-extrabold text-foreground flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-accent" /> {plan.name}
-                      </td>
-                      <td className="py-4 px-6 font-bold text-accent">${plan.price.toFixed(2)}</td>
-                      <td className="py-4 px-6 font-semibold text-foreground">{plan.durationInDays} Days</td>
-                      <td className="py-4 px-6 text-xs text-muted-foreground font-medium">{plan.description || '-'}</td>
-                      <td className="py-4 px-6 text-right">
-                        <button
-                          onClick={() => handleDeletePlan(plan._id)}
-                          className="p-2 hover:bg-red-500/10 text-red-500 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-500/20"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+      <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto">
+        {plans.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 border border-dashed border-border rounded-2xl text-muted-foreground bg-white dark:bg-zinc-800 p-8 space-y-3">
+            <Award className="h-10 w-10 text-muted-foreground/40" />
+            <h3 className="font-extrabold text-base tracking-tight text-foreground">No membership plans</h3>
+            <p className="text-xs text-center max-w-xs font-semibold">
+              Create club membership packages for your frontdesk cashiers to select and bind to members.
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <div
+                key={plan._id}
+                className="flex flex-col justify-between p-6 rounded-2xl border border-border bg-white dark:bg-zinc-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
+              >
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="text-base font-black text-foreground uppercase tracking-wide">{plan.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1 min-h-[2rem] line-clamp-2">{plan.description}</p>
+                    </div>
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] px-3 py-1 text-xs font-black text-white">
+                      ${plan.price.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 rounded-xl">
+                    <Shield className="h-4 w-4 text-accent shrink-0" />
+                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                      Access Validity: <strong className="text-foreground">{plan.durationInDays} Days</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-border dark:border-zinc-700 flex items-center justify-end">
+                  <button
+                    onClick={() => handleDeletePlan(plan._id)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-red-50 hover:text-red-600 p-2 text-xs font-bold text-slate-650 transition-colors shadow-sm"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Delete Package</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
-            <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
-              <X className="h-4 w-4" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 font-semibold">
+          <div className="w-full max-w-md rounded-2xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative overflow-hidden flex flex-col">
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-foreground rounded-lg transition-colors"
+            >
+              <X className="h-5 w-5" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
+            <h3 className="text-lg font-black tracking-tight mb-6 flex items-center gap-1.5 text-foreground">
               <Award className="h-5 w-5 text-accent" /> Create Membership Plan
             </h3>
+
             <form onSubmit={handleCreatePlan} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Plan Name *</label>
@@ -193,7 +219,11 @@ export const PlanManager = () => {
                     required
                     value={planPrice}
                     onChange={(e) => setPlanPrice(e.target.value)}
-                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
+                      isPriceValid 
+                        ? 'border-border dark:border-zinc-700 focus:ring-ring' 
+                        : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                    }`}
                     placeholder="e.g. 49.99"
                   />
                 </div>
@@ -204,7 +234,11 @@ export const PlanManager = () => {
                     required
                     value={planDuration}
                     onChange={(e) => setPlanDuration(e.target.value)}
-                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
+                      isDurationValid 
+                        ? 'border-border dark:border-zinc-700 focus:ring-ring' 
+                        : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                    }`}
                     placeholder="e.g. 30"
                   />
                 </div>
@@ -222,7 +256,7 @@ export const PlanManager = () => {
 
               <button
                 type="submit"
-                className="w-full rounded-lg bg-foreground text-background py-3 text-xs font-bold shadow-sm"
+                className="w-full rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white py-3 text-xs font-bold shadow-sm hover:opacity-90 transition-opacity"
               >
                 Save Plan
               </button>
