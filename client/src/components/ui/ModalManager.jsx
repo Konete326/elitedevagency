@@ -52,7 +52,7 @@ export const ModalManager = () => {
         <div className="flex justify-end gap-2 pt-2 border-t border-border dark:border-zinc-700">
           <button
             onClick={closeModal}
-            className="px-3 py-1.5 text-[10px] font-bold border border-border dark:border-zinc-700 hover:bg-slate-50 dark:hover:bg-zinc-700 rounded-lg text-slate-700 dark:text-zinc-250 transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-[10px] font-bold border border-slate-200 dark:border-zinc-600 hover:bg-slate-50 dark:hover:bg-zinc-700 rounded-lg text-slate-700 dark:text-zinc-300 transition-colors cursor-pointer"
           >
             {cancelText}
           </button>
