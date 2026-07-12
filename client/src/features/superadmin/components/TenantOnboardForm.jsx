@@ -21,9 +21,9 @@ const planDefaults = {
 };
 
 const nicheFeaturesMap = {
-  GYM: ['RFID Attendance', 'Diet Routines', 'Trainer Payroll'],
-  RESTAURANT: ['Multi-Kitchen KOT', 'Table Management', 'Recipe Costing'],
-  GARMENTS: ['Barcode Scanner', 'Variant Matrix', 'Stock Alerts']
+  GYM: ['BMI Tracker', 'Instructor Payroll'],
+  RESTAURANT: ['Kitchen Order Ticket', 'Table Management'],
+  GARMENTS: ['Barcode Printing', 'Size-Color Matrix']
 };
 
 const globalFeatures = ['Custom Brand Colors'];
@@ -62,13 +62,26 @@ export const TenantOnboardForm = ({ onSuccess }) => {
       sub = db.pricing_tiers
         .find({ selector: { isActive: true } })
         .$.subscribe((docs) => {
-          setPricingTiers(docs.map(d => ({ name: d.name, price: d.price })));
+          setPricingTiers(docs.map(d => ({ name: d.name, price: d.price, features: d.features || [] })));
         });
     });
     return () => {
       if (sub) sub.unsubscribe();
     };
   }, []);
+
+  const handlePlanChange = (selectedPlanName) => {
+    setPlan(selectedPlanName);
+    if (selectedPlanName === 'CUSTOM') {
+      return;
+    }
+    const matchedTier = pricingTiers.find(t => t.name.toUpperCase() === selectedPlanName.toUpperCase());
+    if (matchedTier) {
+      setSelectedFeatures(matchedTier.features || []);
+    } else {
+      setSelectedFeatures([]);
+    }
+  };
 
   useEffect(() => {
     setActiveModules(planDefaults[plan] || ['POS']);
@@ -348,22 +361,15 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                 <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider mb-1">pricing tier</label>
                 <select
                   value={plan}
-                  onChange={(e) => setPlan(e.target.value)}
+                  onChange={(e) => handlePlanChange(e.target.value)}
                   className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-900/20 px-3.5 py-2.5 text-sm font-bold text-foreground outline-none focus:ring-2 focus:ring-ring focus:bg-background transition-all"
                 >
-                  {pricingTiers.length > 0 ? (
-                    pricingTiers.map((tier) => (
-                      <option key={tier.name} value={tier.name.toUpperCase()}>
-                        {tier.name}
-                      </option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="STARTER">Starter Tier</option>
-                      <option value="GROWTH">Growth Tier</option>
-                      <option value="PRO">Enterprise Pro Tier</option>
-                    </>
-                  )}
+                  <option value="">Select pricing plan...</option>
+                  {pricingTiers.map((tier) => (
+                    <option key={tier.name} value={tier.name.toUpperCase()}>
+                      {tier.name}
+                    </option>
+                  ))}
                   <option value="CUSTOM">Custom pricing tier</option>
                 </select>
               </div>
