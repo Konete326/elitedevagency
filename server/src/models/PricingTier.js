@@ -6,7 +6,8 @@ const pricingTierSchema = new mongoose.Schema({
   description: { type: String },
   isActive: { type: Boolean, default: true },
   tenantId: { type: String, required: true },
-  isDeleted: { type: Boolean, default: false }
+  isDeleted: { type: Boolean, default: false },
+  features: [{ type: String }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('PricingTier', pricingTierSchema);

@@ -358,6 +358,10 @@ const pricingTierSchema = {
     price: { type: 'number' },
     description: { type: 'string' },
     isActive: { type: 'boolean' },
+    features: {
+      type: 'array',
+      items: { type: 'string' }
+    },
     isSynced: { type: 'boolean' },
     isDeleted: { type: 'boolean' },
     updatedAt: { type: 'string' }

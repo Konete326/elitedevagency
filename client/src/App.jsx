@@ -16,6 +16,7 @@ import { Dashboard } from './features/superadmin/pages/Dashboard';
 import { TenantOnboardForm } from './features/superadmin/components/TenantOnboardForm';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
 import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
+import { PricingTiersManager } from './features/superadmin/pages/PricingTiersManager';
 import { StyleWrapper } from './components/layout/StyleWrapper';
 import { ProductManager } from './features/inventory/pages/ProductManager';
 import { DealsManager } from './features/inventory/pages/DealsManager';
@@ -493,6 +494,20 @@ function App() {
                 ) : user?.role === 'SUPER_ADMIN' ? (
                   <SuperAdminLayout>
                     <HardwareApproval />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin/pricing-tiers" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <PricingTiersManager />
                   </SuperAdminLayout>
                 ) : (
                   <POSPage />

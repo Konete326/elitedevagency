@@ -1,7 +1,7 @@
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, UserPlus, Cpu, Activity } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, UserPlus, Cpu, Activity, Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../hooks/usePwaInstall';
@@ -36,6 +36,7 @@ export const SuperAdminLayout = ({ children }) => {
   const isOnboardActive = location.pathname === '/superadmin/tenants/new';
   const isHardwareActive = location.pathname === '/superadmin/hardware';
   const isDiagnosticsActive = location.pathname === '/superadmin/diagnostics';
+  const isPricingActive = location.pathname === '/superadmin/pricing-tiers';
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
@@ -109,6 +110,17 @@ export const SuperAdminLayout = ({ children }) => {
               >
                 <Activity className={`h-5 w-5 shrink-0 ${isDiagnosticsActive ? 'text-white' : 'text-slate-455'}`} />
                 <span>Sync Diagnostics</span>
+              </Link>
+              <Link
+                to="/superadmin/pricing-tiers"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-all ${
+                  isPricingActive 
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white shadow-sm' 
+                    : 'text-slate-650 hover:bg-slate-100 hover:text-foreground'
+                }`}
+              >
+                <Layers className={`h-5 w-5 shrink-0 ${isPricingActive ? 'text-white' : 'text-slate-455'}`} />
+                <span>Pricing Plans</span>
               </Link>
             </nav>
           </div>
