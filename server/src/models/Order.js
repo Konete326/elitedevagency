@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema({
   paymentMode: { type: String, required: true },
   returnStatus: { type: String, enum: ['NONE', 'PARTIAL', 'FULL'], default: 'NONE' },
   status: { type: String, enum: ['DRAFT', 'COMPLETED'], default: 'COMPLETED' },
+  paymentStatus: { type: String, enum: ['PAID', 'UNPAID'], default: 'PAID' },
   tableId: { type: String },
   isDeleted: { type: Boolean, default: false }
 }, {

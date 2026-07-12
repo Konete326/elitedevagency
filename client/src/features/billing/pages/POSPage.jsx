@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ProductGrid } from '../components/ProductGrid';
 import { Cart } from '../components/Cart';
 import { useAuthStore } from '../../../store/useAuthStore';
-import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid, Tag, Award, UserCheck, CircleDollarSign, Activity } from 'lucide-react';
+import { LogOut, LayoutDashboard, Package, Settings, TrendingUp, Wifi, WifiOff, Download, RotateCcw, Users, History, LayoutGrid, Tag, Award, UserCheck, CircleDollarSign, Activity, Coins, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNetworkStatus } from '../../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../../hooks/usePwaInstall';
@@ -122,93 +122,111 @@ export const POSPage = () => {
             <p className="text-sm font-black">{user?.name}</p>
           </div>
 
-          {(user?.role === 'OWNER' || user?.role === 'MANAGER') && (
-            <div className="flex items-center gap-2">
-              {user?.niche === 'gym' && (
-                <>
-                  <button
-                    onClick={() => navigate('/plans')}
-                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                    title="Membership Plans"
-                  >
-                    <Award className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/members')}
-                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                    title="Members"
-                  >
-                    <UserCheck className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/payments')}
-                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                    title="12-Mo Fees"
-                  >
-                    <CircleDollarSign className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/trainers')}
-                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                    title="Trainers"
-                  >
-                    <Users className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => navigate('/measurements')}
-                    className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                    title="Metrics"
-                  >
-                    <Activity className="h-5 w-5" />
-                  </button>
-                </>
-              )}
-              <button
-                onClick={() => navigate('/inventory')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                title="Product Catalog"
-              >
-                <Package className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/deals')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                title="Deals Catalog"
-              >
-                <Tag className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/returns')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-              >
-                <RotateCcw className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/orders')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-              >
-                <History className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/employees')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-              >
-                <Users className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/reports')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-              >
-                <TrendingUp className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => navigate('/settings')}
-                className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-              >
-                <Settings className="h-5 w-5" />
-              </button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/orders')}
+              className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+              title="History"
+            >
+              <History className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => navigate('/galla')}
+              className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+              title="Drawer"
+            >
+              <Coins className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => navigate('/khata')}
+              className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+              title="Credit Ledger"
+            >
+              <Wallet className="h-5 w-5" />
+            </button>
+
+            {(user?.role === 'OWNER' || user?.role === 'MANAGER') && (
+              <>
+                {user?.niche === 'gym' && (
+                  <>
+                    <button
+                      onClick={() => navigate('/plans')}
+                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                      title="Membership Plans"
+                    >
+                      <Award className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => navigate('/members')}
+                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                      title="Members"
+                    >
+                      <UserCheck className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => navigate('/payments')}
+                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                      title="12-Mo Fees"
+                    >
+                      <CircleDollarSign className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => navigate('/trainers')}
+                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                      title="Trainers"
+                    >
+                      <Users className="h-5 w-5" />
+                    </button>
+                    <button
+                      onClick={() => navigate('/measurements')}
+                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                      title="Metrics"
+                    >
+                      <Activity className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => navigate('/inventory')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                  title="Product Catalog"
+                >
+                  <Package className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => navigate('/deals')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                  title="Deals Catalog"
+                >
+                  <Tag className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => navigate('/returns')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                >
+                  <RotateCcw className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => navigate('/employees')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                >
+                  <Users className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => navigate('/reports')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                >
+                  <TrendingUp className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => navigate('/settings')}
+                  className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                >
+                  <Settings className="h-5 w-5" />
+                </button>
+              </>
+            )}
+          </div>
 
           <button
             onClick={logout}

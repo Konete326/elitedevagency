@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus, CreditCard, Banknote, Landmark, CircleDollarSign, Plus, X } from 'lucide-react';
+import { ArrowLeft, UserPlus, Banknote, Landmark, Plus, X, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const TrainerPayroll = () => {

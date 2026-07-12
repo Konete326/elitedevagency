@@ -10,7 +10,9 @@ const getModel = (tenantConnection, collection) => {
     payments: 'Payment',
     trainers: 'Trainer',
     trainer_ledgers: 'TrainerLedger',
-    measurements: 'Measurement'
+    measurements: 'Measurement',
+    customers: 'Customer',
+    cash_shifts: 'CashShift'
   };
   const modelName = map[collection];
   if (!modelName) {

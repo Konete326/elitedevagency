@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, Trash2, Plus, X, Users, UserPlus, CreditCard } from 'lucide-react';
+import { ArrowLeft, Trash2, X, Users, UserPlus, CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const MemberManager = () => {

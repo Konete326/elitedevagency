@@ -29,6 +29,8 @@ import { MemberManager } from './features/gym/pages/MemberManager';
 import { PaymentGrid } from './features/gym/pages/PaymentGrid';
 import { TrainerPayroll } from './features/gym/pages/TrainerPayroll';
 import { MeasurementTracker } from './features/gym/pages/MeasurementTracker';
+import { CashDrawer } from './features/billing/pages/CashDrawer';
+import { Khata } from './features/customers/pages/Khata';
 
 const queryClient = new QueryClient();
 
@@ -111,6 +113,8 @@ function App() {
           startReplication(db, 'trainers');
           startReplication(db, 'trainer_ledgers');
           startReplication(db, 'measurements');
+          startReplication(db, 'customers');
+          startReplication(db, 'cash_shifts');
           startImageSync();
         }
       });
@@ -262,6 +266,34 @@ function App() {
                   <MeasurementTracker />
                 ) : (
                   <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/galla" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <CashDrawer />
+                )
+              } 
+            />
+            <Route 
+              path="/khata" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <Khata />
                 )
               } 
             />

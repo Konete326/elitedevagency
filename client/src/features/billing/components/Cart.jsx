@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '../../../store/useCartStore';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { getDatabase } from '../../../db/database';
 import { printHardwareReceipt, printKOT } from '../../../lib/device';
-import { Minus, Plus, Trash2, ShoppingBag, Printer, Coffee, Inbox } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, Printer, Coffee, Inbox, UserPlus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,6 +26,53 @@ export const Cart = () => {
   const [isKotModalOpen, setIsKotModalOpen] = useState(false);
   const [isHoldMode, setIsHoldMode] = useState(false);
   const [kotGroups, setKotGroups] = useState({});
+
+  const [checkoutMode, setCheckoutMode] = useState('CASH');
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [isNewCustOpen, setIsNewCustOpen] = useState(false);
+  const [newCustName, setNewCustName] = useState('');
+  const [newCustPhone, setNewCustPhone] = useState('');
+
+  useEffect(() => {
+    let sub;
+    getDatabase().then((db) => {
+      sub = db.customers
+        .find({ selector: { isDeleted: false } })
+        .$.subscribe((docs) => {
+          setCustomers(docs);
+        });
+    });
+    return () => {
+      if (sub) sub.unsubscribe();
+    };
+  }, []);
+
+  const handleCreateCustomerFromPOS = async (e) => {
+    e.preventDefault();
+    if (!newCustName || !newCustPhone) return;
+    try {
+      const db = await getDatabase();
+      const customerId = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+      await db.customers.insert({
+        _id: customerId,
+        tenantId: user?.tenantId || 'default',
+        name: newCustName,
+        phone: newCustPhone,
+        receivableBalance: 0,
+        isSynced: false,
+        isDeleted: false,
+        updatedAt: new Date().toISOString()
+      });
+      setSelectedCustomerId(customerId);
+      setNewCustName('');
+      setNewCustPhone('');
+      setIsNewCustOpen(false);
+      toast.success('Customer added successfully');
+    } catch {
+      toast.error('Failed to add customer');
+    }
+  };
 
   const handleKotClick = () => {
     if (cartItems.length === 0) {
@@ -198,8 +245,23 @@ export const Cart = () => {
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
 
+    if (checkoutMode === 'UDHAAR' && !selectedCustomerId) {
+      toast.error('Please select a customer for credit checkout.');
+      return;
+    }
+
     try {
       const db = await getDatabase();
+      let activeShiftDoc = null;
+
+      if (checkoutMode === 'CASH') {
+        activeShiftDoc = await db.cash_shifts.findOne({ selector: { status: 'OPEN', isDeleted: false } }).exec();
+        if (!activeShiftDoc) {
+          toast.error('Register is closed! Please open the cash register (Drawer) first before checking out with Cash.');
+          return;
+        }
+      }
+
       const orderId = activeOrderId || (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15));
       
       const orderDoc = {
@@ -218,7 +280,8 @@ export const Cart = () => {
           selectedAddons: (item.selectedAddons || []).map(a => ({ name: a.name, price: a.price }))
         })),
         totalAmount: total,
-        paymentMode: 'CASH',
+        paymentMode: checkoutMode,
+        paymentStatus: checkoutMode === 'UDHAAR' ? 'UNPAID' : 'PAID',
         returnStatus: 'NONE',
         status: 'COMPLETED',
         tableId: activeTableId || '',
@@ -226,6 +289,27 @@ export const Cart = () => {
         isDeleted: false,
         updatedAt: new Date().toISOString()
       };
+
+      if (checkoutMode === 'CASH') {
+        if (activeShiftDoc) {
+          const curSales = activeShiftDoc.cashSales || 0;
+          await activeShiftDoc.patch({
+            cashSales: curSales + total,
+            isSynced: false,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      } else if (checkoutMode === 'UDHAAR') {
+        const custDoc = await db.customers.findOne(selectedCustomerId).exec();
+        if (custDoc) {
+          const curBal = custDoc.receivableBalance || 0;
+          await custDoc.patch({
+            receivableBalance: curBal + total,
+            isSynced: false,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      }
 
       if (activeOrderId) {
         const existing = await db.orders.findOne(activeOrderId).exec();
@@ -459,6 +543,59 @@ export const Cart = () => {
             </div>
           </div>
 
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setCheckoutMode('CASH')}
+                className={`flex-1 py-2 text-center text-xs font-black rounded-lg border transition-all ${
+                  checkoutMode === 'CASH'
+                    ? 'bg-emerald-650 border-emerald-650 text-white shadow-sm font-bold'
+                    : 'border-border bg-white dark:bg-zinc-800 text-foreground'
+                }`}
+              >
+                CASH
+              </button>
+              <button
+                type="button"
+                onClick={() => setCheckoutMode('UDHAAR')}
+                className={`flex-1 py-2 text-center text-xs font-black rounded-lg border transition-all ${
+                  checkoutMode === 'UDHAAR'
+                    ? 'bg-red-600 border-red-600 text-white shadow-sm font-bold'
+                    : 'border-border bg-white dark:bg-zinc-800 text-foreground'
+                }`}
+              >
+                CREDIT
+              </button>
+            </div>
+
+            {checkoutMode === 'UDHAAR' && (
+              <div className="space-y-2 border border-dashed border-red-500/20 rounded-lg p-3 bg-red-500/5 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select Credit Customer *</label>
+                  <button
+                    type="button"
+                    onClick={() => setIsNewCustOpen(true)}
+                    className="inline-flex items-center gap-1 text-[10px] font-black text-red-600 dark:text-red-400 hover:underline"
+                  >
+                    <UserPlus className="h-3 w-3" />
+                    <span>New Account</span>
+                  </button>
+                </div>
+                <select
+                  value={selectedCustomerId}
+                  onChange={(e) => setSelectedCustomerId(e.target.value)}
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-2 text-xs font-bold text-foreground outline-none"
+                >
+                  <option value="">-- Choose Customer --</option>
+                  {customers.map((c) => (
+                    <option key={c._id} value={c._id}>{c.name} ({c.phone})</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-2">
             {user?.niche === 'restaurant' && activeTableId ? (
               <>
@@ -524,6 +661,49 @@ export const Cart = () => {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isNewCustOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+            <button onClick={() => setIsNewCustOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+              <X className="h-4 w-4" />
+            </button>
+            <h3 className="text-base font-black tracking-tight mb-4 flex items-center gap-1.5 text-foreground">
+              <UserPlus className="h-5 w-5 text-red-500" /> New Credit Customer Onboard
+            </h3>
+            <form onSubmit={handleCreateCustomerFromPOS} className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={newCustName}
+                  onChange={(e) => setNewCustName(e.target.value)}
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                  placeholder="e.g. Imran Khan"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number *</label>
+                <input
+                  type="tel"
+                  required
+                  value={newCustPhone}
+                  onChange={(e) => setNewCustPhone(e.target.value)}
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                  placeholder="e.g. 0321-7654321"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full rounded-lg bg-red-600 text-white py-2.5 text-xs font-bold shadow-sm"
+              >
+                Register Customer
+              </button>
+            </form>
           </div>
         </div>
       )}

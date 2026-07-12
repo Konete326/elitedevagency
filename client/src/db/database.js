@@ -121,6 +121,7 @@ const orderSchema = {
     paymentMode: { type: 'string' },
     returnStatus: { type: 'string' },
     status: { type: 'string' },
+    paymentStatus: { type: 'string' },
     tableId: { type: 'string' },
     isSynced: { type: 'boolean' },
     isDeleted: { type: 'boolean' },
@@ -304,6 +305,47 @@ const measurementSchema = {
   required: ['_id', 'tenantId', 'memberId', 'weight', 'height', 'bmi', 'isDeleted', 'updatedAt']
 };
 
+const customerSchema = {
+  title: 'customer schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    phone: { type: 'string' },
+    receivableBalance: { type: 'number' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'phone', 'receivableBalance', 'isDeleted', 'updatedAt']
+};
+
+const cashShiftSchema = {
+  title: 'cash shift schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    openedAt: { type: 'string' },
+    closedAt: { type: 'string' },
+    openingBalance: { type: 'number' },
+    cashSales: { type: 'number' },
+    expenses: { type: 'number' },
+    closingBalance: { type: 'number' },
+    status: { type: 'string' },
+    openedBy: { type: 'string' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'openedAt', 'openingBalance', 'cashSales', 'expenses', 'status', 'openedBy', 'isDeleted', 'updatedAt']
+};
+
 let dbPromise = null;
 
 export const getDatabase = async () => {
@@ -325,7 +367,9 @@ export const getDatabase = async () => {
       payments: { schema: paymentSchema },
       trainers: { schema: trainerSchema },
       trainer_ledgers: { schema: trainerLedgerSchema },
-      measurements: { schema: measurementSchema }
+      measurements: { schema: measurementSchema },
+      customers: { schema: customerSchema },
+      cash_shifts: { schema: cashShiftSchema }
     });
     return db;
   });

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, CircleDollarSign, Landmark, Ruler, Activity, Trash2 } from 'lucide-react';
+import { ArrowLeft, Landmark, Ruler, Activity, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const MeasurementTracker = () => {
