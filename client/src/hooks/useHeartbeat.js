@@ -38,6 +38,23 @@ export const useHeartbeat = () => {
             setLocked(true, result.data.reason);
           } else {
             setLocked(false, '');
+            const currentUser = useAuthStore.getState().user;
+            if (currentUser) {
+              const currentFeatures = currentUser.features || [];
+              const nextFeatures = result.data.features || [];
+              const featuresChanged = currentFeatures.length !== nextFeatures.length ||
+                !currentFeatures.every((f) => nextFeatures.includes(f));
+              
+              if (currentUser.blockMobileAccess !== result.data.blockMobileAccess || featuresChanged) {
+                useAuthStore.setState({
+                  user: {
+                    ...currentUser,
+                    blockMobileAccess: result.data.blockMobileAccess,
+                    features: nextFeatures
+                  }
+                });
+              }
+            }
           }
         }
       } catch {

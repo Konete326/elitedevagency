@@ -14,7 +14,8 @@ const createTenant = async (req, res) => {
     dbURI, 
     features, 
     customPlanName, 
-    customPlanPrice 
+    customPlanPrice,
+    blockMobileAccess
   } = req.body;
 
   const result = await superadminService.onboardTenant(
@@ -30,7 +31,8 @@ const createTenant = async (req, res) => {
     dbURI,
     features,
     customPlanName,
-    customPlanPrice
+    customPlanPrice,
+    blockMobileAccess
   );
   
   res.status(201).json({
@@ -83,10 +85,33 @@ const toggleLock = async (req, res) => {
   });
 };
 
+const toggleMobileAccess = async (req, res) => {
+  const { tenantId } = req.params;
+  const tenant = await superadminService.toggleMobileAccess(tenantId);
+  
+  res.status(200).json({
+    success: true,
+    data: tenant
+  });
+};
+
+const updateTenantFeatures = async (req, res) => {
+  const { tenantId } = req.params;
+  const { features } = req.body;
+  const tenant = await superadminService.updateFeatures(tenantId, features);
+  
+  res.status(200).json({
+    success: true,
+    data: tenant
+  });
+};
+
 module.exports = {
   createTenant,
   listPendingDevices,
   approveFingerprint,
   listTenants,
-  toggleLock
+  toggleLock,
+  toggleMobileAccess,
+  updateTenantFeatures
 };

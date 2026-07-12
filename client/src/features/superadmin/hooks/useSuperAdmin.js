@@ -111,3 +111,54 @@ export const useToggleTenantLock = () => {
     }
   });
 };
+
+export const useToggleMobileAccess = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (tenantId) => {
+      const response = await fetch(`${apiURL}/superadmin/tenants/${tenantId}/toggle-mobile-access`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Toggle mobile access operation failed');
+      }
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+    }
+  });
+};
+
+export const useUpdateTenantFeatures = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tenantId, features }) => {
+      const response = await fetch(`${apiURL}/superadmin/tenants/${tenantId}/features`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ features })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update tenant features');
+      }
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+    }
+  });
+};

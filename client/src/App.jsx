@@ -1,8 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState, Component } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
-import { Component } from 'react';
 import { LoginPage } from './pages/LoginPage';
 import { POSPage } from './features/billing/pages/POSPage';
 import { useAuthStore } from './store/useAuthStore';
@@ -33,6 +32,64 @@ import { CashDrawer } from './features/billing/pages/CashDrawer';
 import { Khata } from './features/customers/pages/Khata';
 
 const queryClient = new QueryClient();
+
+function MobileBlockerGuard({ children }) {
+  const { isAuthenticated, user } = useAuthStore();
+  const [isTooNarrow, setIsTooNarrow] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsTooNarrow(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (isAuthenticated && user?.role !== 'SUPER_ADMIN' && user?.blockMobileAccess && isTooNarrow) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-md text-white p-6 text-center select-none pointer-events-auto">
+        <div className="max-w-md space-y-4">
+          <h2 className="text-2xl font-black tracking-tight text-red-500">Access Restricted</h2>
+          <p className="text-sm font-semibold text-slate-300">
+            Mobile and Tablet layouts are disabled for this account. Please log in using a desktop or widescreen terminal.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
+}
+
+function FeatureGuard({ feature, children }) {
+  const { user } = useAuthStore();
+  const features = user?.features || [];
+
+  if (user?.role === 'SUPER_ADMIN') {
+    return children;
+  }
+
+  if (!features.includes(feature)) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-slate-950 text-white p-6 text-center select-none">
+        <div className="max-w-md space-y-4">
+          <h2 className="text-2xl font-black tracking-tight text-red-500">Access Denied</h2>
+          <p className="text-sm font-semibold text-slate-350">
+            This feature is not enabled for your account. Please contact your administrator.
+          </p>
+          <button
+            onClick={() => window.location.href = '/'}
+            className="mt-6 inline-flex items-center justify-center rounded-lg bg-white text-slate-950 font-bold px-4 py-2 text-sm hover:bg-slate-100 transition-colors"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
+}
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -140,7 +197,8 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+        <MobileBlockerGuard>
+          <BrowserRouter>
           <Toaster richColors position="top-right" closeButton />
           <Routes>
             <Route 
@@ -247,7 +305,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <TrainerPayroll />
+                  <FeatureGuard feature="Instructor Payroll">
+                    <TrainerPayroll />
+                  </FeatureGuard>
                 ) : (
                   <POSPage />
                 )
@@ -263,7 +323,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <MeasurementTracker />
+                  <FeatureGuard feature="BMI Tracker">
+                    <MeasurementTracker />
+                  </FeatureGuard>
                 ) : (
                   <POSPage />
                 )
@@ -385,7 +447,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : (
-                  <FloorMap />
+                  <FeatureGuard feature="Table Management">
+                    <FloorMap />
+                  </FeatureGuard>
                 )
               } 
             />
@@ -433,6 +497,7 @@ function App() {
             />
           </Routes>
         </BrowserRouter>
+        </MobileBlockerGuard>
       </QueryClientProvider>
     </ErrorBoundary>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTenants, useToggleTenantLock } from '../hooks/useSuperAdmin';
+import { useTenants, useToggleTenantLock, useToggleMobileAccess, useUpdateTenantFeatures } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
 import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers } from 'lucide-react';
 
@@ -9,6 +9,11 @@ export const TenantManager = () => {
 
   const { data, isLoading } = useTenants(page, limit);
   const toggleLockMutation = useToggleTenantLock();
+  const toggleMobileAccessMutation = useToggleMobileAccess();
+  const updateFeaturesMutation = useUpdateTenantFeatures();
+
+  const [selectedTenantForFeatures, setSelectedTenantForFeatures] = useState(null);
+  const [tempFeatures, setTempFeatures] = useState([]);
 
   const tenants = data?.data || [];
   const meta = data?.meta || { total: 0 };
@@ -19,6 +24,18 @@ export const TenantManager = () => {
       onSuccess: (updatedTenant) => {
         const action = updatedTenant.rentOverdue ? 'locked' : 'unlocked';
         toast.success(`Tenant "${updatedTenant.businessName}" has been ${action}!`);
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Operation failed');
+      }
+    });
+  };
+
+  const handleToggleMobileAccess = (tenantId) => {
+    toggleMobileAccessMutation.mutate(tenantId, {
+      onSuccess: (updatedTenant) => {
+        const action = updatedTenant.blockMobileAccess ? 'blocked' : 'allowed';
+        toast.success(`Mobile access for "${updatedTenant.businessName}" has been ${action}!`);
       },
       onError: (error) => {
         toast.error(error.message || 'Operation failed');
@@ -104,6 +121,7 @@ export const TenantManager = () => {
                 <th className="py-3 px-4">Database Path</th>
                 <th className="py-3 px-4">Subscription End</th>
                 <th className="py-3 px-4">License Status</th>
+                <th className="py-3 px-4">Mobile Access</th>
                 <th className="py-3 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -156,7 +174,32 @@ export const TenantManager = () => {
                       </span>
                     )}
                   </td>
+                  <td className="py-3.5 px-4">
+                    <button
+                      onClick={() => handleToggleMobileAccess(tenant._id)}
+                      disabled={toggleMobileAccessMutation.isPending}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        tenant.blockMobileAccess ? 'bg-amber-600' : 'bg-slate-200 dark:bg-zinc-700'
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                          tenant.blockMobileAccess ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </button>
+                  </td>
                   <td className="py-3.5 px-4 text-right">
+                    <button
+                      onClick={() => {
+                        setSelectedTenantForFeatures(tenant);
+                        setTempFeatures(tenant.features || []);
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2.5 py-1.5 text-xs font-bold mr-2 transition-colors"
+                    >
+                      <Layers className="h-3.5 w-3.5 text-amber-600 dark:text-amber-500" />
+                      <span>Features</span>
+                    </button>
                     <button
                       onClick={() => handleToggleLock(tenant._id)}
                       disabled={toggleLockMutation.isPending}
@@ -208,6 +251,130 @@ export const TenantManager = () => {
               <span>Next</span>
               <ChevronRight className="h-4 w-4" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {selectedTenantForFeatures && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-3xl w-full shadow-lg overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-border dark:border-zinc-700 flex justify-between items-center">
+              <div>
+                <h3 className="text-lg font-bold text-foreground">Edit Features - {selectedTenantForFeatures.businessName}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">Toggle niche-specific permissions</p>
+              </div>
+              <button
+                onClick={() => setSelectedTenantForFeatures(null)}
+                className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
+              >
+                <Layers className="h-5 w-5 shrink-0 rotate-180" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto max-h-[60vh] space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x divide-border dark:divide-zinc-700">
+                <div className="space-y-4">
+                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Garments Features</h4>
+                  <div className="space-y-2">
+                    {['Barcode Printing', 'Size-Color Matrix'].map((feat) => {
+                      const isChecked = tempFeatures.includes(feat);
+                      return (
+                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setTempFeatures((prev) =>
+                                prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
+                              );
+                            }}
+                            className="h-4 w-4 rounded border-border text-amber-600 focus:ring-amber-500"
+                          />
+                          <span>{feat}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-4 md:pl-6">
+                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Restaurant Features</h4>
+                  <div className="space-y-2">
+                    {['Kitchen Order Ticket', 'Table Management'].map((feat) => {
+                      const isChecked = tempFeatures.includes(feat);
+                      return (
+                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setTempFeatures((prev) =>
+                                prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
+                              );
+                            }}
+                            className="h-4 w-4 rounded border-border text-amber-600 focus:ring-amber-500"
+                          />
+                          <span>{feat}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="space-y-4 md:pl-6">
+                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Gym Features</h4>
+                  <div className="space-y-2">
+                    {['BMI Tracker', 'Instructor Payroll'].map((feat) => {
+                      const isChecked = tempFeatures.includes(feat);
+                      return (
+                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => {
+                              setTempFeatures((prev) =>
+                                prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
+                              );
+                            }}
+                            className="h-4 w-4 rounded border-border text-amber-600 focus:ring-amber-500"
+                          />
+                          <span>{feat}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedTenantForFeatures(null)}
+                className="px-4 py-2 border border-border dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-750 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  updateFeaturesMutation.mutate(
+                    { tenantId: selectedTenantForFeatures._id, features: tempFeatures },
+                    {
+                      onSuccess: () => {
+                        toast.success(`Features for "${selectedTenantForFeatures.businessName}" updated successfully!`);
+                        setSelectedTenantForFeatures(null);
+                      },
+                      onError: (err) => {
+                        toast.error(err.message || 'Failed to update features');
+                      }
+                    }
+                  );
+                }}
+                disabled={updateFeaturesMutation.isPending}
+                className="px-4 py-2 bg-foreground text-background hover:bg-foreground/90 text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
+              >
+                {updateFeaturesMutation.isPending ? 'Saving...' : 'Save Features'}
+              </button>
+            </div>
           </div>
         </div>
       )}

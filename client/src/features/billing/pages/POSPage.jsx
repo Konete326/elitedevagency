@@ -15,6 +15,7 @@ export const POSPage = () => {
   const navigate = useNavigate();
   const isOnline = useNetworkStatus();
   const { isInstallable, promptInstall } = usePwaInstall();
+  const features = user?.features || [];
 
   useEffect(() => {
     let buffer = '';
@@ -108,7 +109,7 @@ export const POSPage = () => {
             </button>
           )}
 
-          {user?.niche === 'restaurant' && (
+          {user?.niche === 'restaurant' && features.includes('Table Management') && (
             <button
               onClick={() => navigate('/floor-map')}
               className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
@@ -170,20 +171,24 @@ export const POSPage = () => {
                     >
                       <CircleDollarSign className="h-5 w-5" />
                     </button>
-                    <button
-                      onClick={() => navigate('/trainers')}
-                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                      title="Trainers"
-                    >
-                      <Users className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => navigate('/measurements')}
-                      className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
-                      title="Metrics"
-                    >
-                      <Activity className="h-5 w-5" />
-                    </button>
+                    {features.includes('Instructor Payroll') && (
+                      <button
+                        onClick={() => navigate('/trainers')}
+                        className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                        title="Trainers"
+                      >
+                        <Users className="h-5 w-5" />
+                      </button>
+                    )}
+                    {features.includes('BMI Tracker') && (
+                      <button
+                        onClick={() => navigate('/measurements')}
+                        className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+                        title="Metrics"
+                      >
+                        <Activity className="h-5 w-5" />
+                      </button>
+                    )}
                   </>
                 )}
                 <button

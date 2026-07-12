@@ -44,6 +44,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
   const [lightPrimary, setLightPrimary] = useState('#d97706');
   const [darkPrimary, setDarkPrimary] = useState('#f59e0b');
   const [credentials, setCredentials] = useState(null);
+  const [blockMobileAccess, setBlockMobileAccess] = useState(false);
 
   const onboardTenantMutation = useOnboardTenant();
 
@@ -108,7 +109,8 @@ export const TenantOnboardForm = ({ onSuccess }) => {
         dbURI,
         features: selectedFeatures,
         customPlanName: plan === 'CUSTOM' ? customPlanName : undefined,
-        customPlanPrice: plan === 'CUSTOM' ? parseFloat(customPlanPrice) : undefined
+        customPlanPrice: plan === 'CUSTOM' ? parseFloat(customPlanPrice) : undefined,
+        blockMobileAccess
       },
       {
         onSuccess: (response) => {
@@ -128,6 +130,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
           setTrialDays(30);
           setLightPrimary('#d97706');
           setDarkPrimary('#f59e0b');
+          setBlockMobileAccess(false);
         },
         onError: (error) => {
           toast.error(error.message || 'Onboarding failed');
@@ -397,6 +400,29 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-450 uppercase tracking-wider mb-2">Access Control</label>
+              <div className="p-4 rounded-lg border border-border dark:border-zinc-700 bg-slate-50/30 dark:bg-zinc-900/10 flex items-center justify-between mb-4 font-semibold">
+                <div>
+                  <p className="text-xs font-bold text-foreground">Block Mobile/Tablet Access</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Restrict workspace logins exclusively to widescreen desktop terminals</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setBlockMobileAccess(!blockMobileAccess)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    blockMobileAccess ? 'bg-amber-600' : 'bg-slate-200 dark:bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      blockMobileAccess ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
               </div>
             </div>
 

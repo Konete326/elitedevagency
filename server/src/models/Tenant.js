@@ -22,7 +22,8 @@ const tenantSchema = new mongoose.Schema({
   customTheme: {
     lightPrimary: { type: String, default: null },
     darkPrimary: { type: String, default: null }
-  }
+  },
+  blockMobileAccess: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

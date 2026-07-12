@@ -16,7 +16,8 @@ const onboardTenant = async (
   dbURI,
   features,
   customPlanName,
-  customPlanPrice
+  customPlanPrice,
+  blockMobileAccess = false
 ) => {
   const expiryDate = new Date();
   expiryDate.setDate(expiryDate.getDate() + trialDays);
@@ -45,7 +46,8 @@ const onboardTenant = async (
     customPlanName: plan === 'CUSTOM' ? customPlanName : undefined,
     customPlanPrice: plan === 'CUSTOM' ? customPlanPrice : undefined,
     subscriptionExpiry: expiryDate,
-    customTheme: customTheme || { lightPrimary: null, darkPrimary: null }
+    customTheme: customTheme || { lightPrimary: null, darkPrimary: null },
+    blockMobileAccess
   });
   
   await tenant.save();
@@ -139,10 +141,34 @@ const toggleTenantLock = async (tenantId) => {
   return tenant;
 };
 
+const toggleMobileAccess = async (tenantId) => {
+  const tenant = await Tenant.findById(tenantId);
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  tenant.blockMobileAccess = !tenant.blockMobileAccess;
+  await tenant.save();
+  return tenant;
+};
+
+const updateFeatures = async (tenantId, features) => {
+  const tenant = await Tenant.findById(tenantId);
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  tenant.features = features;
+  await tenant.save();
+  return tenant;
+};
+
 module.exports = {
   onboardTenant,
   getPendingDevices,
   approveDevice,
   getTenants,
-  toggleTenantLock
+  toggleTenantLock,
+  toggleMobileAccess,
+  updateFeatures
 };

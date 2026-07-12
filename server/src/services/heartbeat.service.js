@@ -23,7 +23,7 @@ const checkHeartbeat = async (tenantId, deviceFingerprint) => {
     return { status: 'locked', reason: 'This hardware device is not approved' };
   }
   
-  return { status: 'active' };
+  return { status: 'active', blockMobileAccess: tenant.blockMobileAccess || false, features: tenant.features || [] };
 };
 
 module.exports = {

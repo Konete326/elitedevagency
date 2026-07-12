@@ -24,7 +24,8 @@ const onboardSchema = z.object({
     customTheme: z.object({
       lightPrimary: hexColor.optional().nullable(),
       darkPrimary: hexColor.optional().nullable()
-    }).optional()
+    }).optional(),
+    blockMobileAccess: z.boolean().optional()
   })
 });
 
@@ -55,9 +56,20 @@ const toggleLockSchema = z.object({
   })
 });
 
+const updateFeaturesSchema = z.object({
+  params: z.object({
+    tenantId: z.string().min(1, 'Tenant ID is required')
+  }),
+  body: z.object({
+    features: z.array(z.string(), { required_error: 'Features are required' })
+  })
+});
+
 router.post('/tenants', validate(onboardSchema), superadminController.createTenant);
 router.get('/tenants', validate(listTenantsSchema), superadminController.listTenants);
 router.put('/tenants/:tenantId/toggle-lock', validate(toggleLockSchema), superadminController.toggleLock);
+router.put('/tenants/:tenantId/toggle-mobile-access', validate(toggleLockSchema), superadminController.toggleMobileAccess);
+router.put('/tenants/:tenantId/features', validate(updateFeaturesSchema), superadminController.updateTenantFeatures);
 router.get('/devices', superadminController.listPendingDevices);
 router.put('/devices/:deviceId/approve', validate(approveSchema), superadminController.approveFingerprint);
 
