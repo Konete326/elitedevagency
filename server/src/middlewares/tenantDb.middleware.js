@@ -13,6 +13,7 @@ const TrainerLedger = require('../models/TrainerLedger');
 const Measurement = require('../models/Measurement');
 const Customer = require('../models/Customer');
 const CashShift = require('../models/CashShift');
+const PricingTier = require('../models/PricingTier');
 
 const connectionCache = {};
 
@@ -54,6 +55,7 @@ const tenantDbMiddleware = async (req, res, next) => {
       conn.model('Measurement', Measurement.schema);
       conn.model('Customer', Customer.schema);
       conn.model('CashShift', CashShift.schema);
+      conn.model('PricingTier', PricingTier.schema);
 
       connectionCache[tenantId] = conn;
     }

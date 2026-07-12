@@ -160,7 +160,7 @@ export const MemberManager = () => {
                         <td className="py-4 px-6 text-xs text-muted-foreground font-mono">
                           {member.rfidCard ? (
                             <span className="flex items-center gap-1">
-                              <CreditCard className="h-3.5 w-3.5 text-accent-niche" /> {member.rfidCard}
+                              <CreditCard className="h-3.5 w-3.5 text-accent" /> {member.rfidCard}
                             </span>
                           ) : '-'}
                         </td>
@@ -200,7 +200,7 @@ export const MemberManager = () => {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <UserPlus className="h-5 w-5 text-accent-niche" /> Register Gym Member
+              <UserPlus className="h-5 w-5 text-accent" /> Register Gym Member
             </h3>
             <form onSubmit={handleRegisterMember} className="space-y-4">
               <div>

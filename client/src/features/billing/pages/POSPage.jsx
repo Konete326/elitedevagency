@@ -85,7 +85,7 @@ export const POSPage = () => {
     <div className="flex flex-col h-screen bg-background text-foreground transition-colors duration-300">
       <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0 shadow-sm">
         <div className="flex items-center gap-3">
-          <LayoutDashboard className="h-6 w-6 text-accent-niche" />
+          <LayoutDashboard className="h-6 w-6 text-accent" />
           <span className="font-extrabold text-lg tracking-tight">Unified POS Engine</span>
         </div>
 

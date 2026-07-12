@@ -99,7 +99,7 @@ const loginUser = async (email, password, deviceFingerprint) => {
     { expiresIn: process.env.JWT_EXPIRES_IN || '30d' }
   );
 
-  return { token, user: { id: user._id, name: user.name, role: user.role, email: user.email, tenantId: user.tenantId, niche: tenant.niche, customTheme: tenant.customTheme || null, blockMobileAccess: tenant.blockMobileAccess || false, features: tenant.features || [] } };
+  return { token, user: { id: user._id, name: user.name, role: user.role, email: user.email, tenantId: user.tenantId, niche: tenant.niche, customTheme: tenant.customTheme || null, blockMobileAccess: tenant.blockMobileAccess || false, features: tenant.features || [], isSuspended: tenant.isSuspended || false, suspensionTitle: tenant.suspensionTitle || "", suspensionDescription: tenant.suspensionDescription || "" } };
 };
 
 module.exports = { loginUser };

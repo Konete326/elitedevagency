@@ -23,7 +23,10 @@ const tenantSchema = new mongoose.Schema({
     lightPrimary: { type: String, default: null },
     darkPrimary: { type: String, default: null }
   },
-  blockMobileAccess: { type: Boolean, default: false }
+  blockMobileAccess: { type: Boolean, default: false },
+  isSuspended: { type: Boolean, default: false },
+  suspensionTitle: { type: String, default: "" },
+  suspensionDescription: { type: String, default: "" }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

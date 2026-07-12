@@ -106,7 +106,7 @@ export const CategoryManager = ({ onClose }) => {
       <div className="relative w-full max-w-4xl bg-card border border-border rounded-xl shadow-lg flex flex-col max-h-[85vh] overflow-hidden">
         <div className="flex items-center justify-between border-b border-border p-5">
           <div className="flex items-center gap-2">
-            <FolderPlus className="h-5 w-5 text-accent-niche" />
+            <FolderPlus className="h-5 w-5 text-accent" />
             <h3 className="font-extrabold text-lg tracking-tight">Category Manager</h3>
           </div>
           <button onClick={onClose} className="rounded-lg border border-border p-1.5 hover:bg-muted transition-colors">

@@ -142,7 +142,7 @@ export const EmployeeManagement = () => {
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm h-fit">
             <div className="mb-6 flex items-center gap-2">
-              <UserPlus className="h-5 w-5 text-accent-niche" />
+              <UserPlus className="h-5 w-5 text-accent" />
               <h2 className="text-lg font-bold tracking-tight">Add Staff Account</h2>
             </div>
 
@@ -234,7 +234,7 @@ export const EmployeeManagement = () => {
 
           <div className="md:col-span-2 rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-fit">
             <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
-              <Users className="h-5 w-5 text-accent-niche" />
+              <Users className="h-5 w-5 text-accent" />
               <div>
                 <h2 className="text-lg font-bold tracking-tight">Active Staff Directory</h2>
                 <p className="text-xs text-muted-foreground font-semibold">Roles, states, and permissions</p>
@@ -265,7 +265,7 @@ export const EmployeeManagement = () => {
                           </div>
                         </td>
                         <td className="py-3.5 px-4">
-                          <span className="inline-flex items-center rounded-full bg-accent-niche/10 px-2 py-0.5 text-[10px] font-bold text-accent-niche border border-accent-niche/10">
+                          <span className="inline-flex items-center rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent border border-accent/10">
                             {emp.role}
                           </span>
                         </td>

@@ -166,7 +166,7 @@ export const CashDrawer = () => {
               </div>
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-md hover:bg-emerald-500 transition-colors uppercase tracking-wider"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-sm shadow-md hover:opacity-90 transition-opacity uppercase tracking-wider"
               >
                 Open Register
               </button>

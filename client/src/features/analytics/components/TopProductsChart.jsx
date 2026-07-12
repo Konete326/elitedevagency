@@ -25,7 +25,7 @@ const ProductBar = ({ product, rank, maxQty }) => {
             <span className="text-xs font-semibold text-muted-foreground tabular-nums">
               ${product.revenue.toFixed(2)}
             </span>
-            <span className="text-xs font-black text-accent-niche bg-accent-niche/10 px-2 py-0.5 rounded-full tabular-nums">
+            <span className="text-xs font-black text-accent bg-accent/10 px-2 py-0.5 rounded-full tabular-nums">
               {product.qty} sold
             </span>
           </div>
@@ -33,7 +33,7 @@ const ProductBar = ({ product, rank, maxQty }) => {
         <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
           <div
             style={{ width: `${percentage}%` }}
-            className="h-full bg-accent-niche rounded-full transition-all duration-700"
+            className="h-full bg-accent rounded-full transition-all duration-700"
           />
         </div>
       </div>

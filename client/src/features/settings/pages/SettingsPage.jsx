@@ -60,7 +60,7 @@ export const SettingsPage = () => {
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-border bg-muted/40">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-accent-niche/10 border border-accent-niche/20 text-accent-niche rounded-lg">
+                <div className="p-3 bg-accent/10 border border-accent/20 text-accent rounded-lg">
                   <Printer className="h-6 w-6" />
                 </div>
                 <div>

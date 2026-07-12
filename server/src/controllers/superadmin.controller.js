@@ -106,6 +106,25 @@ const updateTenantFeatures = async (req, res) => {
   });
 };
 
+const getDiagnostics = async (req, res) => {
+  const data = await superadminService.getDiagnostics();
+  res.status(200).json({
+    success: true,
+    data
+  });
+};
+
+const updateTenantSuspension = async (req, res) => {
+  const { tenantId } = req.params;
+  const { isSuspended, suspensionTitle, suspensionDescription } = req.body;
+  const tenant = await superadminService.updateSuspension(tenantId, isSuspended, suspensionTitle, suspensionDescription);
+  
+  res.status(200).json({
+    success: true,
+    data: tenant
+  });
+};
+
 module.exports = {
   createTenant,
   listPendingDevices,
@@ -113,5 +132,7 @@ module.exports = {
   listTenants,
   toggleLock,
   toggleMobileAccess,
-  updateTenantFeatures
+  updateTenantFeatures,
+  getDiagnostics,
+  updateTenantSuspension
 };

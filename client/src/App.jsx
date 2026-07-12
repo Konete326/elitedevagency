@@ -15,6 +15,8 @@ import { SuperAdminLayout } from './components/layout/SuperAdminLayout';
 import { Dashboard } from './features/superadmin/pages/Dashboard';
 import { TenantOnboardForm } from './features/superadmin/components/TenantOnboardForm';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
+import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
+import { StyleWrapper } from './components/layout/StyleWrapper';
 import { ProductManager } from './features/inventory/pages/ProductManager';
 import { DealsManager } from './features/inventory/pages/DealsManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
@@ -91,6 +93,30 @@ function FeatureGuard({ feature, children }) {
   return children;
 }
 
+function SuspensionGuard({ children }) {
+  const { user } = useAuthStore();
+
+  if (user?.role === 'SUPER_ADMIN') {
+    return children;
+  }
+
+  if (user?.isSuspended) {
+    const title = user.suspensionTitle || 'Account Suspended';
+    const description = user.suspensionDescription || 'Your subscription workspace has been suspended. Please contact the administrator to resolve your account status and billing history.';
+
+    return (
+      <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center select-none font-semibold">
+        <div className="max-w-md space-y-4">
+          <h2 className="text-3xl font-black tracking-tight text-red-500">{title}</h2>
+          <p className="text-sm font-semibold text-slate-350">{description}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
+}
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -127,32 +153,7 @@ function App() {
 
   useHeartbeat();
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.classList.remove('theme-gym', 'theme-restaurant', 'theme-garments');
 
-    const existingStyle = document.getElementById('custom-theme-vars');
-    if (existingStyle) existingStyle.remove();
-
-    if (!isAuthenticated || !user) return;
-
-    const { customTheme, niche } = user;
-    const hasCustom = customTheme?.lightPrimary || customTheme?.darkPrimary;
-
-    if (hasCustom) {
-      const light = customTheme.lightPrimary || customTheme.darkPrimary;
-      const dark = customTheme.darkPrimary || customTheme.lightPrimary;
-      const styleEl = document.createElement('style');
-      styleEl.id = 'custom-theme-vars';
-      styleEl.textContent = [
-        `:root { --accent-niche: ${light}; --ring: ${light}; }`,
-        `.dark { --accent-niche: ${dark}; --ring: ${dark}; }`
-      ].join('\n');
-      document.head.appendChild(styleEl);
-    } else if (niche) {
-      root.classList.add(`theme-${niche.toLowerCase()}`);
-    }
-  }, [isAuthenticated, user]);
 
   useEffect(() => {
     let active = true;
@@ -172,6 +173,7 @@ function App() {
           startReplication(db, 'measurements');
           startReplication(db, 'customers');
           startReplication(db, 'cash_shifts');
+          startReplication(db, 'pricing_tiers');
           startImageSync();
         }
       });
@@ -198,9 +200,11 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <MobileBlockerGuard>
-          <BrowserRouter>
-          <Toaster richColors position="top-right" closeButton />
-          <Routes>
+          <StyleWrapper>
+            <BrowserRouter>
+            <Toaster richColors position="top-right" closeButton />
+          <SuspensionGuard>
+            <Routes>
             <Route 
               path="/" 
               element={
@@ -495,8 +499,24 @@ function App() {
                 )
               } 
             />
-          </Routes>
-        </BrowserRouter>
+            <Route 
+              path="/superadmin/diagnostics" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <DiagnosticsPanel />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            </Routes>
+          </SuspensionGuard>
+          </BrowserRouter>
+        </StyleWrapper>
         </MobileBlockerGuard>
       </QueryClientProvider>
     </ErrorBoundary>

@@ -164,7 +164,7 @@ export const Khata = () => {
                             setSelectedCustomerId(cust._id);
                             setIsPaymentModalOpen(true);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[10px] hover:bg-emerald-500 shadow-sm transition-colors"
+                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-[10px] hover:opacity-90 shadow-sm transition-opacity"
                         >
                           Receive Payment
                         </button>
@@ -246,7 +246,7 @@ export const Khata = () => {
               </div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-emerald-600 text-white font-bold py-3 text-xs shadow-sm"
+                className="w-full rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold py-3 text-xs shadow-sm hover:opacity-90 transition-opacity"
               >
                 Submit Payment Entry
               </button>

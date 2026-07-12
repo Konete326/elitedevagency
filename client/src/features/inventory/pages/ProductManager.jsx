@@ -319,7 +319,7 @@ export const ProductManager = () => {
               <div className="border border-border rounded-xl p-3 bg-muted/30">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Percent className="h-4 w-4 text-accent-niche" />
+                    <Percent className="h-4 w-4 text-accent" />
                     <span className="text-xs font-bold">Promotional Discount</span>
                   </div>
                   <input
@@ -459,7 +459,7 @@ export const ProductManager = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-4 font-extrabold text-accent-niche">${product.price.toFixed(2)}</td>
+                        <td className="py-4 px-4 font-extrabold text-accent">${product.price.toFixed(2)}</td>
                         <td className="py-4 px-4 font-medium">
                           {product.stock <= product.alertLevel ? (
                             <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">

@@ -12,7 +12,8 @@ const getModel = (tenantConnection, collection) => {
     trainer_ledgers: 'TrainerLedger',
     measurements: 'Measurement',
     customers: 'Customer',
-    cash_shifts: 'CashShift'
+    cash_shifts: 'CashShift',
+    pricing_tiers: 'PricingTier'
   };
   const modelName = map[collection];
   if (!modelName) {

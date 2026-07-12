@@ -179,7 +179,7 @@ export const ProductGrid = () => {
                   <Tag className="h-3 w-3" />
                   <span>{product.category}</span>
                 </div>
-                <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-foreground group-hover:text-accent-niche transition-colors">
+                <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-foreground group-hover:text-accent transition-colors">
                   {product.name}
                 </h3>
               </div>
@@ -312,7 +312,7 @@ export const ProductGrid = () => {
                           }`}
                         >
                           <span className="text-xs font-semibold">{addon.name}</span>
-                          <span className="text-xs font-bold text-accent-niche">+${addon.price.toFixed(2)}</span>
+                          <span className="text-xs font-bold text-accent">+${addon.price.toFixed(2)}</span>
                         </button>
                       );
                     })}

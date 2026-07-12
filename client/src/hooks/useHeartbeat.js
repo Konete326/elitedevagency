@@ -45,12 +45,19 @@ export const useHeartbeat = () => {
               const featuresChanged = currentFeatures.length !== nextFeatures.length ||
                 !currentFeatures.every((f) => nextFeatures.includes(f));
               
-              if (currentUser.blockMobileAccess !== result.data.blockMobileAccess || featuresChanged) {
+              const suspensionChanged = currentUser.isSuspended !== result.data.isSuspended ||
+                currentUser.suspensionTitle !== result.data.suspensionTitle ||
+                currentUser.suspensionDescription !== result.data.suspensionDescription;
+              
+              if (currentUser.blockMobileAccess !== result.data.blockMobileAccess || featuresChanged || suspensionChanged) {
                 useAuthStore.setState({
                   user: {
                     ...currentUser,
                     blockMobileAccess: result.data.blockMobileAccess,
-                    features: nextFeatures
+                    features: nextFeatures,
+                    isSuspended: result.data.isSuspended,
+                    suspensionTitle: result.data.suspensionTitle,
+                    suspensionDescription: result.data.suspensionDescription
                   }
                 });
               }

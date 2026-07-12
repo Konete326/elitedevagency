@@ -149,7 +149,7 @@ export const MeasurementTracker = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-8 overflow-hidden items-stretch">
         <div className="lg:col-span-1 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-sm flex flex-col min-h-0">
           <h3 className="text-base font-black tracking-tight mb-4 flex items-center gap-2">
-            <Activity className="h-5 w-5 text-accent-niche" /> Gym Members Catalog
+            <Activity className="h-5 w-5 text-accent" /> Gym Members Catalog
           </h3>
           <div className="flex-1 overflow-y-auto divide-y divide-border dark:divide-zinc-750 pr-1">
             {members.length === 0 ? (
@@ -178,7 +178,7 @@ export const MeasurementTracker = () => {
             <>
               <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-sm">
                 <h3 className="text-sm font-black tracking-tight mb-4 flex items-center gap-1.5">
-                  <Ruler className="h-5 w-5 text-accent-niche" /> Record Body Measurement Logs
+                  <Ruler className="h-5 w-5 text-accent" /> Record Body Measurement Logs
                 </h3>
                 <form onSubmit={handlePostMetrics} className="grid gap-4 sm:grid-cols-3">
                   <div>

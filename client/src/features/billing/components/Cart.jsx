@@ -429,7 +429,7 @@ export const Cart = () => {
       <div className="flex items-center justify-between p-4 border-b border-border dark:border-zinc-700">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="h-5 w-5 text-accent-niche" />
+            <ShoppingBag className="h-5 w-5 text-accent" />
             <h2 className="font-bold text-base tracking-tight text-foreground">Active Cart</h2>
           </div>
           {activeTableNo && (
@@ -539,7 +539,7 @@ export const Cart = () => {
             </div>
             <div className="flex justify-between text-base font-extrabold border-t border-border dark:border-zinc-700 pt-3 mt-2">
               <span>Total</span>
-              <span className="text-accent-niche font-black">${total.toFixed(2)}</span>
+              <span className="text-accent font-black">${total.toFixed(2)}</span>
             </div>
           </div>
 
@@ -601,14 +601,14 @@ export const Cart = () => {
               <>
                 <button
                   onClick={handleHold}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-3 text-sm transition-colors shadow-sm"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm"
                 >
                   <Inbox className="h-4 w-4" />
                   <span>Send to Kitchen (Hold)</span>
                 </button>
                 <button
                   onClick={handleCheckout}
-                  className="flex-1 inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors shadow-sm"
+                  className="flex-1 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm"
                 >
                   Checkout
                 </button>
@@ -626,7 +626,7 @@ export const Cart = () => {
                 )}
                 <button
                   onClick={handleCheckout}
-                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors`}
+                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm`}
                 >
                   Complete Order
                 </button>

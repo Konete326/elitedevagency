@@ -140,9 +140,9 @@ export const PlanManager = () => {
                   {plans.map((plan) => (
                     <tr key={plan._id} className="hover:bg-muted/40 transition-colors">
                       <td className="py-4 px-6 font-extrabold text-foreground flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-accent-niche" /> {plan.name}
+                        <Shield className="h-4 w-4 text-accent" /> {plan.name}
                       </td>
-                      <td className="py-4 px-6 font-bold text-accent-niche">${plan.price.toFixed(2)}</td>
+                      <td className="py-4 px-6 font-bold text-accent">${plan.price.toFixed(2)}</td>
                       <td className="py-4 px-6 font-semibold text-foreground">{plan.durationInDays} Days</td>
                       <td className="py-4 px-6 text-xs text-muted-foreground font-medium">{plan.description || '-'}</td>
                       <td className="py-4 px-6 text-right">
@@ -169,7 +169,7 @@ export const PlanManager = () => {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <Award className="h-5 w-5 text-accent-niche" /> Create Membership Plan
+              <Award className="h-5 w-5 text-accent" /> Create Membership Plan
             </h3>
             <form onSubmit={handleCreatePlan} className="space-y-4">
               <div>

@@ -2,6 +2,20 @@ const Tenant = require('../models/Tenant');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const SyncLog = require('../models/SyncLog');
+const Product = require('../models/Product');
+const Order = require('../models/Order');
+const Category = require('../models/Category');
+const Table = require('../models/Table');
+const Deal = require('../models/Deal');
+const Plan = require('../models/Plan');
+const Member = require('../models/Member');
+const Payment = require('../models/Payment');
+const Trainer = require('../models/Trainer');
+const TrainerLedger = require('../models/TrainerLedger');
+const Measurement = require('../models/Measurement');
+const Customer = require('../models/Customer');
+const CashShift = require('../models/CashShift');
 
 const onboardTenant = async (
   businessName,
@@ -163,6 +177,87 @@ const updateFeatures = async (tenantId, features) => {
   return tenant;
 };
 
+const getDiagnostics = async () => {
+  const tenants = await Tenant.find({}).lean();
+  const diagnostics = [];
+
+  const modelsList = ['Product', 'Order', 'Category', 'Table', 'Deal', 'Plan', 'Member', 'Payment', 'Trainer', 'TrainerLedger', 'Measurement', 'Customer', 'CashShift'];
+  const schemas = {
+    Product: Product.schema,
+    Order: Order.schema,
+    Category: Category.schema,
+    Table: Table.schema,
+    Deal: Deal.schema,
+    Plan: Plan.schema,
+    Member: Member.schema,
+    Payment: Payment.schema,
+    Trainer: Trainer.schema,
+    TrainerLedger: TrainerLedger.schema,
+    Measurement: Measurement.schema,
+    Customer: Customer.schema,
+    CashShift: CashShift.schema
+  };
+
+  for (const tenant of tenants) {
+    let dbStatus = 'Disconnected';
+    let totalSynced = 0;
+
+    try {
+      const conn = mongoose.createConnection(tenant.databaseURI);
+      await Promise.race([
+        conn.asPromise(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+      ]);
+      
+      dbStatus = conn.readyState === 1 ? 'Connected' : 'Unreachable';
+      
+      if (dbStatus === 'Connected') {
+        for (const m of modelsList) {
+          const model = conn.model(m, schemas[m]);
+          const count = await model.countDocuments({ tenantId: tenant._id });
+          totalSynced += count;
+        }
+      }
+      await conn.close();
+    } catch (err) {
+      dbStatus = 'Unreachable';
+    }
+
+    const latestLog = await SyncLog.findOne({ tenantId: tenant._id })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    diagnostics.push({
+      tenantId: tenant._id,
+      businessName: tenant.businessName,
+      dbStatus,
+      totalSynced,
+      latestLog: latestLog ? {
+        timestamp: latestLog.timestamp,
+        bytesTransferred: latestLog.bytesTransferred,
+        durationMs: latestLog.durationMs,
+        status: latestLog.status
+      } : null,
+      dbURI: tenant.dbURI || tenant.databaseURI
+    });
+  }
+
+  return diagnostics;
+};
+
+const updateSuspension = async (tenantId, isSuspended, suspensionTitle, suspensionDescription) => {
+  const tenant = await Tenant.findById(tenantId);
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  tenant.isSuspended = isSuspended;
+  tenant.suspensionTitle = suspensionTitle || "";
+  tenant.suspensionDescription = suspensionDescription || "";
+  await tenant.save();
+  return tenant;
+};
+
 module.exports = {
   onboardTenant,
   getPendingDevices,
@@ -170,5 +265,7 @@ module.exports = {
   getTenants,
   toggleTenantLock,
   toggleMobileAccess,
-  updateFeatures
+  updateFeatures,
+  getDiagnostics,
+  updateSuspension
 };

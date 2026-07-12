@@ -81,7 +81,7 @@ export const OrderHistory = () => {
       <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-fit">
           <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
-            <ShoppingBag className="h-5 w-5 text-accent-niche" />
+            <ShoppingBag className="h-5 w-5 text-accent" />
             <div>
               <h2 className="text-lg font-bold tracking-tight">Recent Transactions</h2>
               <p className="text-xs text-muted-foreground font-semibold font-mono">Offline-first local orders index</p>
@@ -126,7 +126,7 @@ export const OrderHistory = () => {
                           {order.returnStatus === 'NONE' || !order.returnStatus ? 'Original' : order.returnStatus}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 font-extrabold text-accent-niche">
+                      <td className="py-3.5 px-4 font-extrabold text-accent">
                         ${order.totalAmount.toFixed(2)}
                       </td>
                       <td className="py-3.5 px-4 text-right">

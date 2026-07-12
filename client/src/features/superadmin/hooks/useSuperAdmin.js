@@ -162,3 +162,48 @@ export const useUpdateTenantFeatures = () => {
     }
   });
 };
+
+export const useDiagnostics = () => {
+  const token = useAuthStore((state) => state.token);
+  return useQuery({
+    queryKey: ['diagnostics'],
+    queryFn: async () => {
+      const response = await fetch(`${apiURL}/superadmin/diagnostics`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to fetch diagnostics');
+      }
+      return data.data;
+    },
+    enabled: !!token,
+    refetchInterval: 15000
+  });
+};
+
+export const useToggleTenantSuspension = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tenantId, isSuspended, suspensionTitle, suspensionDescription }) => {
+      const response = await fetch(`${apiURL}/superadmin/tenants/${tenantId}/suspension`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ isSuspended, suspensionTitle, suspensionDescription })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update tenant suspension');
+      }
+      return data.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+    }
+  });
+};

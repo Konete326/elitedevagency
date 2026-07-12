@@ -63,10 +63,10 @@ const ReportsHeader = ({ user, onBack }) => {
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <BarChart3 className="h-5 w-5 text-accent-niche" />
+        <BarChart3 className="h-5 w-5 text-accent" />
         <span className="font-extrabold text-lg tracking-tight">Sales Analytics</span>
         {nicheLabel && (
-          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-accent-niche/10 text-accent-niche border border-accent-niche/20">
+          <span className="hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-accent/10 text-accent border border-accent/20">
             {nicheLabel}
           </span>
         )}

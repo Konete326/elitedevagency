@@ -346,6 +346,25 @@ const cashShiftSchema = {
   required: ['_id', 'tenantId', 'openedAt', 'openingBalance', 'cashSales', 'expenses', 'status', 'openedBy', 'isDeleted', 'updatedAt']
 };
 
+const pricingTierSchema = {
+  title: 'pricing tier schema',
+  version: 0,
+  primaryKey: '_id',
+  type: 'object',
+  properties: {
+    _id: { type: 'string' },
+    tenantId: { type: 'string' },
+    name: { type: 'string' },
+    price: { type: 'number' },
+    description: { type: 'string' },
+    isActive: { type: 'boolean' },
+    isSynced: { type: 'boolean' },
+    isDeleted: { type: 'boolean' },
+    updatedAt: { type: 'string' }
+  },
+  required: ['_id', 'tenantId', 'name', 'price', 'isDeleted', 'updatedAt']
+};
+
 let dbPromise = null;
 
 export const getDatabase = async () => {
@@ -369,7 +388,8 @@ export const getDatabase = async () => {
       trainer_ledgers: { schema: trainerLedgerSchema },
       measurements: { schema: measurementSchema },
       customers: { schema: customerSchema },
-      cash_shifts: { schema: cashShiftSchema }
+      cash_shifts: { schema: cashShiftSchema },
+      pricing_tiers: { schema: pricingTierSchema }
     });
     return db;
   });

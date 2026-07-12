@@ -240,7 +240,7 @@ export const DealsManager = () => {
                         )}
                       </td>
                       <td className="py-4 px-6 font-extrabold text-foreground">{deal.name}</td>
-                      <td className="py-4 px-6 font-bold text-accent-niche">${deal.price.toFixed(2)}</td>
+                      <td className="py-4 px-6 font-bold text-accent">${deal.price.toFixed(2)}</td>
                       <td className="py-4 px-6 text-xs text-muted-foreground font-medium">
                         <div className="flex flex-col gap-0.5">
                           {(deal.items || []).map((item, idx) => {
@@ -282,7 +282,7 @@ export const DealsManager = () => {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <Tag className="h-5 w-5 text-accent-niche" /> Create Combo Deal Package
+              <Tag className="h-5 w-5 text-accent" /> Create Combo Deal Package
             </h3>
             <form onSubmit={handleCreateDeal} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">

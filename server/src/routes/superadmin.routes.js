@@ -65,12 +65,25 @@ const updateFeaturesSchema = z.object({
   })
 });
 
+const updateSuspensionSchema = z.object({
+  params: z.object({
+    tenantId: z.string().min(1, 'Tenant ID is required')
+  }),
+  body: z.object({
+    isSuspended: z.boolean({ required_error: 'isSuspended must be a boolean' }),
+    suspensionTitle: z.string().optional(),
+    suspensionDescription: z.string().optional()
+  })
+});
+
 router.post('/tenants', validate(onboardSchema), superadminController.createTenant);
 router.get('/tenants', validate(listTenantsSchema), superadminController.listTenants);
 router.put('/tenants/:tenantId/toggle-lock', validate(toggleLockSchema), superadminController.toggleLock);
 router.put('/tenants/:tenantId/toggle-mobile-access', validate(toggleLockSchema), superadminController.toggleMobileAccess);
 router.put('/tenants/:tenantId/features', validate(updateFeaturesSchema), superadminController.updateTenantFeatures);
+router.put('/tenants/:tenantId/suspension', validate(updateSuspensionSchema), superadminController.updateTenantSuspension);
 router.get('/devices', superadminController.listPendingDevices);
 router.put('/devices/:deviceId/approve', validate(approveSchema), superadminController.approveFingerprint);
+router.get('/diagnostics', superadminController.getDiagnostics);
 
 module.exports = router;

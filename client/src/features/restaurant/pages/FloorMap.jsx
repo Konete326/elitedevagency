@@ -183,7 +183,7 @@ export const FloorMap = () => {
               <X className="h-4 w-4" />
             </button>
             <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <Layers className="h-5 w-5 text-accent-niche" /> Onboard Table
+              <Layers className="h-5 w-5 text-accent" /> Onboard Table
             </h3>
             <form onSubmit={handleAddTable} className="space-y-4">
               <div>
