@@ -17,6 +17,8 @@ import { TenantsPage } from './features/superadmin/pages/TenantsPage';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
 import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
 import { PricingTiersManager } from './features/superadmin/pages/PricingTiersManager';
+import { SystemLogs } from './features/superadmin/pages/SystemLogs';
+import { TenantLogs } from './features/settings/pages/TenantLogs';
 import { StyleWrapper } from './components/layout/StyleWrapper';
 import { ModalManager } from './components/ui/ModalManager';
 import { Agentation } from 'agentation';
@@ -382,6 +384,18 @@ function App() {
               } 
             />
             <Route 
+              path="/settings/logs" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLogs />
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
               path="/reports" 
               element={
                 !isAuthenticated ? (
@@ -523,6 +537,20 @@ function App() {
                 ) : user?.role === 'SUPER_ADMIN' ? (
                   <SuperAdminLayout>
                     <DiagnosticsPanel />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin/logs" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <SystemLogs />
                   </SuperAdminLayout>
                 ) : (
                   <POSPage />

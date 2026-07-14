@@ -27,6 +27,7 @@ const heartbeatRoutes = require('./routes/heartbeat.routes');
 const superadminRoutes = require('./routes/superadmin.routes');
 const mediaRoutes = require('./routes/media.routes');
 const employeeRoutes = require('./routes/employee.routes');
+const logRoutes = require('./routes/log.routes');
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ success: true, message: 'API is running', timestamp: new Date() });
@@ -38,6 +39,7 @@ app.use('/api/heartbeat', heartbeatRoutes);
 app.use('/api/superadmin', superadminRoutes);
 app.use('/api/media', mediaRoutes);
 app.use('/api/employees', employeeRoutes);
+app.use('/api', logRoutes);
 
 app.use(errorHandler);
 

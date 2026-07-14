@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers, Shield, X, AlertTriangle, CheckCircle, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModalStore } from '../../../store/useModalStore';
+import { TableSkeleton } from '../../../components/ui/TableSkeleton';
 
 export const TenantManager = ({ onEdit }) => {
   const { openModal } = useModalStore();
@@ -164,9 +165,7 @@ export const TenantManager = ({ onEdit }) => {
 
       <div className="overflow-x-auto w-full min-h-[300px]">
         {isLoading ? (
-          <div className="flex items-center justify-center h-36">
-            <p className="text-xs text-muted-foreground font-medium animate-pulse">Loading onboarded tenants...</p>
-          </div>
+          <TableSkeleton cols={6} rows={6} />
         ) : tenants.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-36 text-muted-foreground p-6">
             <p className="text-xs font-semibold text-foreground">No Tenants Found</p>

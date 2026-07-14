@@ -5,12 +5,14 @@ import { toast } from 'sonner';
 import { Layers, Plus, Trash2, Edit2, Check, ChevronLeft } from 'lucide-react';
 import { AdminTable } from '../../../components/ui/AdminTable';
 import { useModalStore } from '../../../store/useModalStore';
+import { CardSkeleton } from '../../../components/ui/CardSkeleton';
 
 export const PricingTiersManager = () => {
   const { user } = useAuthStore();
   const [tiers, setTiers] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { openModal } = useModalStore();
 
   const [name, setName] = useState('');
@@ -34,6 +36,7 @@ export const PricingTiersManager = () => {
 
   useEffect(() => {
     let sub;
+    setIsLoading(true);
     getDatabase().then((db) => {
       sub = db.pricing_tiers
         .find({
@@ -51,6 +54,7 @@ export const PricingTiersManager = () => {
             features: doc.features || [],
             isActive: doc.isActive !== false
           })));
+          setIsLoading(false);
         });
     });
     return () => {
@@ -345,6 +349,8 @@ export const PricingTiersManager = () => {
             </form>
           </div>
         </div>
+      ) : isLoading ? (
+        <CardSkeleton count={3} />
       ) : (
         <AdminTable
           title="Available Pricing Tiers"

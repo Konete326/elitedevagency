@@ -4,11 +4,13 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { Plus, Tag, Inbox, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { CardSkeleton } from '../../../components/ui/CardSkeleton';
 
 export const ProductGrid = () => {
   const { user } = useAuthStore();
   const [products, setProducts] = useState([]);
   const [deals, setDeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const addToCart = useCartStore((state) => state.addToCart);
   const [selectedProductForVariants, setSelectedProductForVariants] = useState(null);
@@ -18,6 +20,7 @@ export const ProductGrid = () => {
 
   useEffect(() => {
     let subProd, subDeals;
+    setIsLoading(true);
     getDatabase().then((db) => {
       subProd = db.products
         .find({
@@ -47,6 +50,7 @@ export const ProductGrid = () => {
             kitchenSection: doc.kitchenSection || 'Main Kitchen'
           }));
           setProducts(mapped);
+          setIsLoading(false);
         });
 
       if (user?.niche === 'restaurant') {
@@ -68,6 +72,7 @@ export const ProductGrid = () => {
               items: doc.items || []
             }));
             setDeals(mapped);
+            setIsLoading(false);
           });
       }
     });
@@ -125,7 +130,9 @@ export const ProductGrid = () => {
         ))}
       </div>
 
-      {products.length === 0 && deals.length === 0 ? (
+      {isLoading ? (
+        <CardSkeleton count={8} />
+      ) : products.length === 0 && deals.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-2xl text-muted-foreground p-8 space-y-3">
           <Inbox className="h-10 w-10 text-muted-foreground/40" />
           <h3 className="font-extrabold text-base tracking-tight text-foreground">No products available</h3>

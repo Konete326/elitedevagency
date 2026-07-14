@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { getSystemPrinters } from '../../../lib/device';
-import { ArrowLeft, Printer, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Printer, RefreshCw, Terminal } from 'lucide-react';
 
 export const SettingsPage = () => {
   const navigate = useNavigate();
@@ -99,6 +99,34 @@ export const SettingsPage = () => {
                 Detected hardware interfaces are refreshed using system profiles
               </p>
             </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-6">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">Diagnostics & Logs</h2>
+            <p className="text-sm text-muted-foreground">Monitor client-side warnings and application exception histories</p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border border-border bg-muted/40">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-accent/10 border border-accent/20 text-accent rounded-lg">
+                <Terminal className="h-6 w-6" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold">Workspace System Logs</h4>
+                <p className="text-xs text-muted-foreground">
+                  View diagnostic traces and callstacks for debugging
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/settings/logs')}
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card hover:bg-muted px-4 py-2 text-xs font-bold transition-colors text-foreground cursor-pointer"
+            >
+              <span>View Logs</span>
+            </button>
           </div>
         </div>
       </main>

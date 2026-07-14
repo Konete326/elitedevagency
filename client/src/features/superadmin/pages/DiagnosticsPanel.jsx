@@ -5,6 +5,7 @@ import { AdminTable } from '../../../components/ui/AdminTable';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useModalStore } from '../../../store/useModalStore';
+import { TableSkeleton } from '../../../components/ui/TableSkeleton';
 
 export const DiagnosticsPanel = () => {
   const { openModal } = useModalStore();
@@ -228,9 +229,7 @@ export const DiagnosticsPanel = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-48 border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 rounded-xl shadow-lg">
-          <p className="text-xs text-muted-foreground font-medium animate-pulse">Loading system diagnostics...</p>
-        </div>
+        <TableSkeleton cols={5} rows={5} />
       ) : (
         <AdminTable
           title="Connection & Synchronization Registry"

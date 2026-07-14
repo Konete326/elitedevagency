@@ -259,3 +259,52 @@ export const useDeleteTenant = () => {
     }
   });
 };
+
+export const useSuperAdminLogs = (filters) => {
+  const token = useAuthStore((state) => state.token);
+  return useQuery({
+    queryKey: ['superadmin-logs', filters],
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (filters.tenantId) queryParams.set('tenantId', filters.tenantId);
+      if (filters.type) queryParams.set('type', filters.type);
+      if (filters.url) queryParams.set('url', filters.url);
+      if (filters.page) queryParams.set('page', filters.page);
+      if (filters.limit) queryParams.set('limit', filters.limit);
+
+      const response = await fetch(`${apiURL}/superadmin/logs?${queryParams.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to fetch superadmin logs');
+      }
+      return data;
+    },
+    enabled: !!token
+  });
+};
+
+export const useClearSuperAdminLogs = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`${apiURL}/superadmin/logs/clear`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to clear logs');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['superadmin-logs'] });
+    }
+  });
+};
