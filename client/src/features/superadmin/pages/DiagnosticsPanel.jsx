@@ -296,6 +296,15 @@ export const DiagnosticsPanel = () => {
                     </p>
                   </div>
                 </div>
+                {selectedTenant.dbStatus === 'Connected' ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400">
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 text-[9px] font-black uppercase text-rose-600 dark:text-rose-450">
+                    Inactive
+                  </span>
+                )}
               </div>
             </div>
 
