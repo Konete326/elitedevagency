@@ -18,7 +18,19 @@ function canSendLog() {
   return true;
 }
 
+const recentErrors = new Map();
+
 async function sendLog(type, message, stack) {
+  const fingerprint = `${type}:${message}:${window.location.href}`;
+  const now = Date.now();
+  if (recentErrors.has(fingerprint)) {
+    const expiry = recentErrors.get(fingerprint);
+    if (now < expiry) {
+      return;
+    }
+  }
+  recentErrors.set(fingerprint, now + 30000);
+
   if (!canSendLog()) {
     return;
   }

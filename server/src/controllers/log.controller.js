@@ -6,6 +6,8 @@ setInterval(() => {
   ipCounts.clear();
 }, 60000);
 
+const serverLogsCache = new Map();
+
 const createClientLog = async (req, res) => {
   const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
   const count = ipCounts.get(ip) || 0;
@@ -25,6 +27,16 @@ const createClientLog = async (req, res) => {
   if (type !== 'ERROR' && type !== 'WARNING') {
     return res.status(400).json({ success: false, error: 'Invalid log type' });
   }
+
+  const key = `${tenantId || 'PUBLIC'}:${type}:${message}:${url || ''}`;
+  const now = Date.now();
+  if (serverLogsCache.has(key)) {
+    const expiry = serverLogsCache.get(key);
+    if (now < expiry) {
+      return res.status(200).json({ success: true, message: 'Duplicate log dropped' });
+    }
+  }
+  serverLogsCache.set(key, now + 10000);
 
   const log = new ErrorLog({
     tenantId: tenantId || 'PUBLIC',
