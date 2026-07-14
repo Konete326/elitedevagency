@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const tenantSchema = new mongoose.Schema({
   businessName: { type: String, required: true },
   niche: { type: String, enum: ['GYM', 'RESTAURANT', 'GARMENTS'], required: true },
-  plan: { type: String, enum: ['STARTER', 'GROWTH', 'PRO', 'CUSTOM'], required: true },
+  plan: { type: String, required: true },
   activeModules: [{ type: String }],
   isActive: { type: Boolean, default: true },
   rentOverdue: { type: Boolean, default: false },
