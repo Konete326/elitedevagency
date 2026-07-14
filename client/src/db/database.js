@@ -1,4 +1,4 @@
-import { createRxDatabase } from 'rxdb';
+import { createRxDatabase, addRxPlugin } from 'rxdb';
 import { getRxStorageDexie } from 'rxdb/plugins/storage-dexie';
 
 const categorySchema = {
@@ -7,7 +7,7 @@ const categorySchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     description: { type: 'string' },
@@ -27,7 +27,7 @@ const productSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     price: { type: 'number' },
@@ -86,7 +86,7 @@ const orderSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     items: {
       type: 'array',
@@ -136,7 +136,7 @@ const tableSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     tableNo: { type: 'string' },
     capacity: { type: 'number' },
@@ -155,7 +155,7 @@ const dealSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     price: { type: 'number' },
@@ -189,7 +189,7 @@ const planSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     price: { type: 'number' },
@@ -209,7 +209,7 @@ const memberSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     phone: { type: 'string' },
@@ -230,7 +230,7 @@ const paymentSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     memberId: { type: 'string' },
     amountReceived: { type: 'number' },
@@ -251,7 +251,7 @@ const trainerSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     phone: { type: 'string' },
@@ -270,7 +270,7 @@ const trainerLedgerSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     trainerId: { type: 'string' },
     type: { type: 'string' },
@@ -289,7 +289,7 @@ const measurementSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     memberId: { type: 'string' },
     weight: { type: 'number' },
@@ -311,7 +311,7 @@ const customerSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     phone: { type: 'string' },
@@ -329,7 +329,7 @@ const cashShiftSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     openedAt: { type: 'string' },
     closedAt: { type: 'string' },
@@ -352,7 +352,7 @@ const pricingTierSchema = {
   primaryKey: '_id',
   type: 'object',
   properties: {
-    _id: { type: 'string' },
+    _id: { type: 'string', maxLength: 100 },
     tenantId: { type: 'string' },
     name: { type: 'string' },
     price: { type: 'number' },
@@ -375,11 +375,21 @@ let dbPromise = null;
 export const getDatabase = async () => {
   if (dbPromise) return dbPromise;
   
-  dbPromise = createRxDatabase({
-    name: 'pos_offline_db',
-    storage: getRxStorageDexie(),
-    ignoreDuplicate: true
-  }).then(async (db) => {
+  dbPromise = (async () => {
+    let storage = getRxStorageDexie();
+    if (import.meta.env.DEV) {
+      const { RxDBDevModePlugin } = await import('rxdb/plugins/dev-mode');
+      addRxPlugin(RxDBDevModePlugin);
+      const { wrappedValidateAjvStorage } = await import('rxdb/plugins/validate-ajv');
+      storage = wrappedValidateAjvStorage({ storage });
+    }
+    
+    const db = await createRxDatabase({
+      name: 'pos_offline_db',
+      storage,
+      ignoreDuplicate: true
+    });
+    
     await db.addCollections({
       products: { schema: productSchema },
       orders: { schema: orderSchema },
@@ -396,8 +406,9 @@ export const getDatabase = async () => {
       cash_shifts: { schema: cashShiftSchema },
       pricing_tiers: { schema: pricingTierSchema }
     });
+    
     return db;
-  });
+  })();
   
   return dbPromise;
 };
