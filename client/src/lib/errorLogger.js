@@ -21,6 +21,28 @@ function canSendLog() {
 const recentErrors = new Map();
 
 async function sendLog(type, message, stack) {
+  const lowerMsg = String(message).toLowerCase();
+  const lowerStack = String(stack || '').toLowerCase();
+  const lowerUrl = String(window.location.href).toLowerCase();
+
+  const isBlocked = 
+    lowerMsg.includes('/api/heartbeat') ||
+    lowerMsg.includes('/api/logs') ||
+    lowerMsg.includes('failed to fetch') ||
+    lowerMsg.includes('networkerror') ||
+    lowerMsg.includes('err_connection_refused') ||
+    lowerStack.includes('/api/heartbeat') ||
+    lowerStack.includes('/api/logs') ||
+    lowerStack.includes('failed to fetch') ||
+    lowerStack.includes('networkerror') ||
+    lowerStack.includes('err_connection_refused') ||
+    lowerUrl.includes('/api/heartbeat') ||
+    lowerUrl.includes('/api/logs');
+
+  if (isBlocked) {
+    return;
+  }
+
   const fingerprint = `${type}:${message}:${window.location.href}`;
   const now = Date.now();
   if (recentErrors.has(fingerprint)) {
