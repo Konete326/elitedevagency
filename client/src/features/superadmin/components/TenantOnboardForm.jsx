@@ -58,7 +58,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   // Regex rules
   const businessNameRegex = /^[A-Za-z0-9][A-Za-z0-9\s-]{2,39}$/;
-  const trialDaysRegex = /^[1-9]\d*$/;
+  const trialDaysRegex = /^(0|[1-9]\d*)$/;
   const dbURIRegex = /^mongodb(\+srv)?:\/\/.+$/;
   const passwordRegex = /^.{6,20}$/;
   const ownerNameRegex = /^[A-Za-z][A-Za-z\s]{1,29}$/;
@@ -109,10 +109,10 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   const handleTrialDaysChange = (val) => {
     setTrialDays(val);
-    if (!val) {
-      setTrialDaysError('Trial Period is required.');
+    if (val === '') {
+      setTrialDaysError('');
     } else if (!trialDaysRegex.test(val)) {
-      setTrialDaysError('Must be a positive integer.');
+      setTrialDaysError('Must be a non-negative integer.');
     } else {
       setTrialDaysError('');
     }
@@ -204,7 +204,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
       return;
     }
 
-    const parsedDays = parseInt(trialDays, 10);
+    const parsedDays = trialDays ? parseInt(trialDays, 10) : 0;
     onboardTenantMutation.mutate(
       {
         businessName,
@@ -361,10 +361,9 @@ export const TenantOnboardForm = ({ onSuccess }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trial Period (Days) *</label>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Trial Period (Days, 0 for none)</label>
                   <input
                     type="text"
-                    required
                     value={trialDays}
                     onChange={(e) => handleTrialDaysChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
