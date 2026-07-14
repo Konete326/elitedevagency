@@ -18,6 +18,7 @@ import { HardwareApproval } from './features/superadmin/components/HardwareAppro
 import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
 import { PricingTiersManager } from './features/superadmin/pages/PricingTiersManager';
 import { SystemLogs } from './features/superadmin/pages/SystemLogs';
+import { SubscriptionTracker } from './features/superadmin/pages/SubscriptionTracker';
 import { TenantLogs } from './features/settings/pages/TenantLogs';
 import { StyleWrapper } from './components/layout/StyleWrapper';
 import { ModalManager } from './components/ui/ModalManager';
@@ -551,6 +552,20 @@ function App() {
                 ) : user?.role === 'SUPER_ADMIN' ? (
                   <SuperAdminLayout>
                     <SystemLogs />
+                  </SuperAdminLayout>
+                ) : (
+                  <POSPage />
+                )
+              } 
+            />
+            <Route 
+              path="/superadmin/billing" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <SubscriptionTracker />
                   </SuperAdminLayout>
                 ) : (
                   <POSPage />

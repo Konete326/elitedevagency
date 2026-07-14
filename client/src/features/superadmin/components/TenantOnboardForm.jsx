@@ -521,7 +521,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                       ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
                       : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
                   }`}
-                  placeholder="mongodb://localhost:27017/pos_tenant_database"
+                  placeholder="mongodb+srv://username:password@cluster.mongodb.net/database"
                 />
                 {dbURIError && (
                   <p className="text-[9px] text-red-500 font-bold mt-0.5">{dbURIError}</p>

@@ -101,6 +101,16 @@ const deleteTenantSchema = z.object({
   })
 });
 
+const updateSubscriptionSchema = z.object({
+  params: z.object({
+    tenantId: z.string().min(1, 'Tenant ID is required')
+  }),
+  body: z.object({
+    trialPeriod: z.number().int().nonnegative().optional(),
+    pricingTier: z.string().min(1).optional()
+  })
+});
+
 router.post('/tenants/test-connection', superadminController.testConnection);
 router.post('/tenants', validate(onboardSchema), superadminController.createTenant);
 router.get('/tenants', validate(listTenantsSchema), superadminController.listTenants);
@@ -108,6 +118,7 @@ router.put('/tenants/:tenantId/toggle-lock', validate(toggleLockSchema), superad
 router.put('/tenants/:tenantId/toggle-mobile-access', validate(toggleLockSchema), superadminController.toggleMobileAccess);
 router.put('/tenants/:tenantId/features', validate(updateFeaturesSchema), superadminController.updateTenantFeatures);
 router.put('/tenants/:tenantId/suspension', validate(updateSuspensionSchema), superadminController.updateTenantSuspension);
+router.put('/tenants/:tenantId/subscription', validate(updateSubscriptionSchema), superadminController.updateTenantSubscription);
 router.put('/tenants/:tenantId', validate(updateTenantSchema), superadminController.updateTenant);
 router.delete('/tenants/:tenantId', validate(deleteTenantSchema), superadminController.deleteTenant);
 router.get('/devices', superadminController.listPendingDevices);

@@ -418,6 +418,27 @@ const deleteTenant = async (tenantId) => {
   return { success: true };
 };
 
+const updateSubscription = async (tenantId, trialPeriod, pricingTier) => {
+  const tenant = await Tenant.findById(tenantId);
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  if (pricingTier !== undefined) {
+    tenant.plan = pricingTier;
+  }
+
+  if (trialPeriod !== undefined) {
+    const start = tenant.createdAt || new Date();
+    const expiryDate = new Date(start);
+    expiryDate.setDate(expiryDate.getDate() + trialPeriod);
+    tenant.subscriptionExpiry = expiryDate;
+  }
+
+  await tenant.save();
+  return tenant;
+};
+
 module.exports = {
   onboardTenant,
   getPendingDevices,
@@ -429,5 +450,6 @@ module.exports = {
   getDiagnostics,
   updateSuspension,
   updateTenant,
-  deleteTenant
+  deleteTenant,
+  updateSubscription
 };

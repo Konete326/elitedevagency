@@ -162,6 +162,18 @@ const testConnection = async (req, res) => {
   }
 };
 
+const updateTenantSubscription = async (req, res) => {
+  const { tenantId } = req.params;
+  const { trialPeriod, pricingTier } = req.body;
+
+  const tenant = await superadminService.updateSubscription(tenantId, trialPeriod, pricingTier);
+  
+  res.status(200).json({
+    success: true,
+    data: tenant
+  });
+};
+
 module.exports = {
   createTenant,
   listPendingDevices,
@@ -174,5 +186,6 @@ module.exports = {
   updateTenantSuspension,
   updateTenant,
   deleteTenant,
-  testConnection
+  testConnection,
+  updateTenantSubscription
 };

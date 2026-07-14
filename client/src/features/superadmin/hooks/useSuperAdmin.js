@@ -356,3 +356,30 @@ export const useTestConnection = () => {
     }
   });
 };
+
+export const useUpdateTenantSubscription = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ tenantId, trialPeriod, pricingTier }) => {
+      const response = await fetch(`${apiURL}/superadmin/tenants/${tenantId}/subscription`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ trialPeriod, pricingTier })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update subscription details');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      queryClient.invalidateQueries({ queryKey: ['diagnostics'] });
+    }
+  });
+};

@@ -1,7 +1,7 @@
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, UserPlus, Cpu, Activity, Layers, Terminal } from 'lucide-react';
+import { LayoutDashboard, LogOut, Menu, Moon, Sun, Shield, Wifi, WifiOff, Download, Bell, Search, ChevronDown, UserPlus, Cpu, Activity, Layers, Terminal, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { usePwaInstall } from '../../hooks/usePwaInstall';
@@ -40,6 +40,7 @@ export const SuperAdminLayout = ({ children }) => {
   const isDiagnosticsActive = location.pathname === '/superadmin/diagnostics';
   const isPricingActive = location.pathname === '/superadmin/pricing-tiers';
   const isLogsActive = location.pathname === '/superadmin/logs';
+  const isBillingActive = location.pathname === '/superadmin/billing';
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
@@ -135,6 +136,17 @@ export const SuperAdminLayout = ({ children }) => {
               >
                 <Terminal className={`h-5 w-5 shrink-0 ${isLogsActive ? 'text-white' : 'text-slate-455 dark:text-zinc-400'}`} />
                 <span>System Logs</span>
+              </Link>
+              <Link
+                to="/superadmin/billing"
+                className={`flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold transition-all ${
+                  isBillingActive 
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white shadow-sm' 
+                    : 'text-slate-650 dark:text-zinc-350 hover:bg-slate-100 dark:hover:bg-zinc-750 hover:text-foreground dark:hover:text-white'
+                }`}
+              >
+                <Clock className={`h-5 w-5 shrink-0 ${isBillingActive ? 'text-white' : 'text-slate-455 dark:text-zinc-400'}`} />
+                <span>Subscription Tracker</span>
               </Link>
             </nav>
           </div>
