@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useOnboardTenant, useUpdateTenant } from '../hooks/useSuperAdmin';
+import { useOnboardTenant, useUpdateTenant, useTestConnection } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
 import { CheckSquare, Square, ShieldCheck, Key, Clipboard, X, AlertCircle, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { getDatabase } from '../../../db/database';
@@ -46,6 +46,8 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [blockMobileAccess, setBlockMobileAccess] = useState(false);
   const [pricingTiers, setPricingTiers] = useState([]);
+  const [isConnectionTested, setIsConnectionTested] = useState(false);
+  const [isConnectionSuccessful, setIsConnectionSuccessful] = useState(false);
 
   // Real-time Validation Errors
   const [businessNameError, setBusinessNameError] = useState('');
@@ -57,6 +59,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
 
   const onboardTenantMutation = useOnboardTenant();
   const updateTenantMutation = useUpdateTenant();
+  const testConnectionMutation = useTestConnection();
 
   useEffect(() => {
     if (editingTenant) {
@@ -77,9 +80,10 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
       const calculatedDays = Math.max(0, Math.round((expiry - start) / (1000 * 60 * 60 * 24))) || 30;
       setTrialDays(calculatedDays.toString());
 
-      setOwnerName(editingTenant.ownerName || editingTenant.owner?.name || '');
       setOwnerEmail(editingTenant.ownerEmail || editingTenant.owner?.email || '');
       setOwnerPassword('');
+      setIsConnectionTested(true);
+      setIsConnectionSuccessful(true);
     }
   }, [editingTenant]);
 
@@ -147,12 +151,36 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
 
   const handleDbURIChange = (val) => {
     setDbURI(val);
+    setIsConnectionTested(false);
+    setIsConnectionSuccessful(false);
     if (!val) {
       setDbURIError('Database URI is required.');
     } else if (!dbURIRegex.test(val)) {
       setDbURIError('Must be a valid MongoDB Connection String (e.g. mongodb://host/db).');
     } else {
       setDbURIError('');
+    }
+  };
+
+  const handleTestConnection = async () => {
+    if (!dbURI || dbURIError) {
+      toast.error('Please enter a valid Database URI before testing.');
+      return;
+    }
+    try {
+      const res = await testConnectionMutation.mutateAsync(dbURI);
+      setIsConnectionTested(true);
+      if (res.success) {
+        setIsConnectionSuccessful(true);
+        toast.success('Database connection established successfully.');
+      } else {
+        setIsConnectionSuccessful(false);
+        toast.error(res.message || 'Database connection failed.');
+      }
+    } catch (err) {
+      setIsConnectionTested(true);
+      setIsConnectionSuccessful(false);
+      toast.error(err.message || 'Database connection failed.');
     }
   };
 
@@ -256,6 +284,11 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
         }
       );
     } else {
+      if (!isConnectionTested || !isConnectionSuccessful) {
+        toast.error('Please test and verify the database connection before onboarding.');
+        return;
+      }
+
       if (
         businessNameError ||
         trialDaysError ||
@@ -306,6 +339,8 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
             setLightPrimary('#d97706');
             setDarkPrimary('#f59e0b');
             setBlockMobileAccess(false);
+            setIsConnectionTested(false);
+            setIsConnectionSuccessful(false);
           },
           onError: (error) => {
             toast.error(error.message || 'Onboarding failed');
@@ -453,7 +488,25 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Database Connection String (URI) *</label>
+                <div className="flex items-center justify-between">
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Database Connection String (URI) *</label>
+                  <button
+                    type="button"
+                    disabled={testConnectionMutation.isPending || !dbURI || !!dbURIError}
+                    onClick={handleTestConnection}
+                    className={`px-2 py-0.5 text-[9px] font-black uppercase rounded border transition-all ${
+                      testConnectionMutation.isPending
+                        ? 'bg-slate-100 dark:bg-zinc-700 border-border text-slate-400 cursor-not-allowed animate-pulse'
+                        : isConnectionTested && isConnectionSuccessful
+                        ? 'bg-green-500/10 border-green-500 text-green-600 dark:text-green-400 font-extrabold'
+                        : isConnectionTested && !isConnectionSuccessful
+                        ? 'bg-red-500/10 border-red-500 text-red-650 dark:text-red-400 font-extrabold'
+                        : 'bg-background hover:bg-muted border-border text-foreground cursor-pointer'
+                    }`}
+                  >
+                    {testConnectionMutation.isPending ? 'Testing...' : isConnectionTested && isConnectionSuccessful ? 'Connected' : 'Test Connection'}
+                  </button>
+                </div>
                 <input
                   type="text"
                   required
@@ -462,8 +515,10 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                   className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-mono font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                     dbURIError
                       ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
-                      : dbURI && !dbURIError
+                      : dbURI && isConnectionTested && isConnectionSuccessful
                       ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
+                      : dbURI && isConnectionTested && !isConnectionSuccessful
+                      ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
                       : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
                   }`}
                   placeholder="mongodb://localhost:27017/pos_tenant_database"
@@ -700,7 +755,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
 
           <button
             type="submit"
-            disabled={onboardTenantMutation.isPending || updateTenantMutation.isPending || (editingTenant ? false : hasAnyErrors)}
+            disabled={onboardTenantMutation.isPending || updateTenantMutation.isPending || (editingTenant ? false : (hasAnyErrors || !isConnectionTested || !isConnectionSuccessful))}
             className="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 font-bold px-4 py-2.5 text-xs transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {onboardTenantMutation.isPending || updateTenantMutation.isPending ? (

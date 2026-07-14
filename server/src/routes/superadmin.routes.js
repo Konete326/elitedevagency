@@ -101,6 +101,7 @@ const deleteTenantSchema = z.object({
   })
 });
 
+router.post('/tenants/test-connection', superadminController.testConnection);
 router.post('/tenants', validate(onboardSchema), superadminController.createTenant);
 router.get('/tenants', validate(listTenantsSchema), superadminController.listTenants);
 router.put('/tenants/:tenantId/toggle-lock', validate(toggleLockSchema), superadminController.toggleLock);

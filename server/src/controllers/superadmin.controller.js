@@ -146,6 +146,22 @@ const deleteTenant = async (req, res) => {
   });
 };
 
+const testConnection = async (req, res) => {
+  const { dbUri } = req.body;
+  if (!dbUri) {
+    return res.status(400).json({ success: false, message: 'Database connection URI is required.' });
+  }
+  const mongoose = require('mongoose');
+  try {
+    const testConn = await mongoose.createConnection(dbUri, { serverSelectionTimeoutMS: 4000 });
+    await testConn.asPromise();
+    await testConn.close();
+    res.status(200).json({ success: true, message: 'Connection established successfully.' });
+  } catch {
+    res.status(200).json({ success: false, message: 'Connection failed. Verify network access, IP whitelisting, or URI format.' });
+  }
+};
+
 module.exports = {
   createTenant,
   listPendingDevices,
@@ -157,5 +173,6 @@ module.exports = {
   getDiagnostics,
   updateTenantSuspension,
   updateTenant,
-  deleteTenant
+  deleteTenant,
+  testConnection
 };

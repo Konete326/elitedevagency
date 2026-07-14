@@ -49,6 +49,12 @@ const onboardTenant = async (
     } else {
       finalModules = ['POS'];
     }
+  try {
+    const testConn = await mongoose.createConnection(dbURI, { serverSelectionTimeoutMS: 4000 });
+    await testConn.asPromise();
+    await testConn.close();
+  } catch {
+    throw new Error('Database pre-connection test failed. Verify network access, IP whitelisting, or URI format.');
   }
 
   const tenant = new Tenant({

@@ -334,3 +334,25 @@ export const useDeleteSingleLog = () => {
     }
   });
 };
+
+export const useTestConnection = () => {
+  const token = useAuthStore((state) => state.token);
+
+  return useMutation({
+    mutationFn: async (dbUri) => {
+      const response = await fetch(`${apiURL}/superadmin/tenants/test-connection`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ dbUri })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Connection test failed');
+      }
+      return data;
+    }
+  });
+};
