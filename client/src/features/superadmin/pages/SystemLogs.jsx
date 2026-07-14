@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSuperAdminLogs, useClearSuperAdminLogs, useDeleteSingleLog } from '../hooks/useSuperAdmin';
+import { useSuperAdminLogs, useClearSuperAdminLogs, useDeleteSingleLog, useTenants } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
 import { AlertCircle, CheckCircle, Clipboard, Trash2, ArrowLeft, RefreshCw, Eye, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +22,25 @@ export const SystemLogs = () => {
   const [selectedLog, setSelectedLog] = useState(null);
 
   const { data, isLoading, refetch } = useSuperAdminLogs(filters);
+  const { data: tenantsData } = useTenants(1, 100);
   const clearMutation = useClearSuperAdminLogs();
   const deleteMutation = useDeleteSingleLog();
+
+  const onboardedTenants = tenantsData?.data || [];
+  const logs = data?.data || [];
+  const meta = data?.meta || { page: 1, limit: 10, total: 0 };
+  const totalPages = Math.ceil(meta.total / meta.limit) || 1;
+
+  const tenantOptions = [...new Set([
+    'PUBLIC',
+    ...onboardedTenants.map(t => t._id),
+    ...logs.map(log => log.tenantId)
+  ])].filter(Boolean);
+
+  const emailOptions = [...new Set([
+    ...onboardedTenants.map(t => t.ownerEmail),
+    ...logs.map(log => log.userEmail)
+  ])].filter(Boolean);
 
   const handleClearLogs = () => {
     openModal({
@@ -66,10 +83,6 @@ export const SystemLogs = () => {
     navigator.clipboard.writeText(text);
     toast.success('Diagnostic details copied to clipboard');
   };
-
-  const logs = data?.data || [];
-  const meta = data?.meta || { page: 1, limit: 10, total: 0 };
-  const totalPages = Math.ceil(meta.total / meta.limit) || 1;
 
   return (
     <div className="space-y-4">
@@ -114,23 +127,35 @@ export const SystemLogs = () => {
         <div className="space-y-1">
           <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Tenant</label>
           <input
+            list="tenants-list"
             type="text"
             placeholder="Tenant ID..."
             value={filters.tenantId}
             onChange={(e) => setFilters(prev => ({ ...prev, tenantId: e.target.value, page: 1 }))}
             className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
           />
+          <datalist id="tenants-list">
+            {tenantOptions.map(id => (
+              <option key={id} value={id}>{id}</option>
+            ))}
+          </datalist>
         </div>
 
         <div className="space-y-1">
           <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">User Email</label>
           <input
+            list="emails-list"
             type="text"
             placeholder="User Email..."
             value={filters.userEmail}
             onChange={(e) => setFilters(prev => ({ ...prev, userEmail: e.target.value, page: 1 }))}
             className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
           />
+          <datalist id="emails-list">
+            {emailOptions.map(email => (
+              <option key={email} value={email}>{email}</option>
+            ))}
+          </datalist>
         </div>
 
         <div className="space-y-1">
