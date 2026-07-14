@@ -13,7 +13,7 @@ import { useHeartbeat } from './hooks/useHeartbeat';
 import { LockScreen } from './components/LockScreen';
 import { SuperAdminLayout } from './components/layout/SuperAdminLayout';
 import { Dashboard } from './features/superadmin/pages/Dashboard';
-import { TenantOnboardForm } from './features/superadmin/components/TenantOnboardForm';
+import { TenantsPage } from './features/superadmin/pages/TenantsPage';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
 import { DiagnosticsPanel } from './features/superadmin/pages/DiagnosticsPanel';
 import { PricingTiersManager } from './features/superadmin/pages/PricingTiersManager';
@@ -480,7 +480,7 @@ function App() {
                   <LoginPage />
                 ) : user?.role === 'SUPER_ADMIN' ? (
                   <SuperAdminLayout>
-                    <TenantOnboardForm onSuccess={() => {}} />
+                    <TenantsPage />
                   </SuperAdminLayout>
                 ) : (
                   <POSPage />

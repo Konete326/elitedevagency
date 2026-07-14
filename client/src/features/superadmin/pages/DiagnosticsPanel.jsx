@@ -14,7 +14,10 @@ export const DiagnosticsPanel = () => {
     niche: 'GYM',
     plan: 'STARTER',
     dbURI: '',
-    trialDays: 30
+    trialDays: 30,
+    ownerName: '',
+    ownerEmail: '',
+    ownerPassword: ''
   });
 
   const updateTenantMutation = useUpdateTenant();
@@ -94,7 +97,10 @@ export const DiagnosticsPanel = () => {
       niche: tenant.niche || 'GYM',
       plan: tenant.plan || 'STARTER',
       dbURI: tenant.dbURI || '',
-      trialDays: calculatedDays
+      trialDays: calculatedDays,
+      ownerName: tenant.owner?.name || '',
+      ownerEmail: tenant.owner?.email || '',
+      ownerPassword: ''
     });
   };
 
@@ -108,7 +114,10 @@ export const DiagnosticsPanel = () => {
           niche: editForm.niche,
           plan: editForm.plan,
           trialDays: parseInt(editForm.trialDays, 10) || 0,
-          dbURI: editForm.dbURI
+          dbURI: editForm.dbURI,
+          ownerName: editForm.ownerName,
+          ownerEmail: editForm.ownerEmail,
+          ownerPassword: editForm.ownerPassword
         }
       },
       {
@@ -396,6 +405,45 @@ export const DiagnosticsPanel = () => {
                       value={editForm.trialDays}
                       onChange={(e) => setEditForm(prev => ({ ...prev, trialDays: e.target.value }))}
                       className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t border-border dark:border-zinc-700 pt-3">
+                  <h4 className="text-[10px] font-black text-slate-700 dark:text-zinc-250 uppercase tracking-wider mb-2">Owner Credentials & Profile</h4>
+                  
+                  <div className="grid gap-3 grid-cols-2">
+                    <div>
+                      <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Owner Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={editForm.ownerName}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, ownerName: e.target.value }))}
+                        className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Owner Email</label>
+                      <input
+                        type="email"
+                        required
+                        value={editForm.ownerEmail}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, ownerEmail: e.target.value }))}
+                        className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">New Password (Leave blank to keep current)</label>
+                    <input
+                      type="password"
+                      value={editForm.ownerPassword}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, ownerPassword: e.target.value }))}
+                      placeholder="Enter new password to reset..."
+                      className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none placeholder:text-muted-foreground"
                     />
                   </div>
                 </div>

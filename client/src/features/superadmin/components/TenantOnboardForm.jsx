@@ -28,7 +28,7 @@ const nicheFeaturesMap = {
 
 const globalFeatures = ['Custom Brand Colors'];
 
-export const TenantOnboardForm = ({ onSuccess }) => {
+export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
   const [businessName, setBusinessName] = useState('');
   const [niche, setNiche] = useState('GYM');
   const [plan, setPlan] = useState('STARTER');
@@ -259,24 +259,26 @@ export const TenantOnboardForm = ({ onSuccess }) => {
 
   return (
     <div className="space-y-4 max-w-7xl mx-auto font-semibold">
-      <div className="flex flex-row items-center justify-between gap-4 border-b border-border dark:border-zinc-700 pb-3">
-        <div className="flex items-center gap-3">
-          <Link
-            to="/superadmin"
-            className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg transition-colors border border-border dark:border-zinc-700"
-          >
-            <ChevronLeft className="h-4.5 w-4.5" />
-          </Link>
-          <div>
-            <h1 className="text-xl font-extrabold tracking-tight text-foreground dark:text-white">
-              Tenant Onboarding
-            </h1>
-            <p className="text-[10px] text-muted-foreground mt-0.5">
-              Deploy and configure new business workspaces on the POS engine
-            </p>
+      {!hideHeader && (
+        <div className="flex flex-row items-center justify-between gap-4 border-b border-border dark:border-zinc-700 pb-3">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/superadmin"
+              className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg transition-colors border border-border dark:border-zinc-700"
+            >
+              <ChevronLeft className="h-4.5 w-4.5" />
+            </Link>
+            <div>
+              <h1 className="text-xl font-extrabold tracking-tight text-foreground dark:text-white">
+                Tenant Onboarding
+              </h1>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Deploy and configure new business workspaces on the POS engine
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {credentials && (
         <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 shadow-sm relative overflow-hidden animate-slide-in w-full">

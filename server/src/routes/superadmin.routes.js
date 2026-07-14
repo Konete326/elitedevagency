@@ -88,7 +88,10 @@ const updateTenantSchema = z.object({
     niche: z.enum(['GYM', 'RESTAURANT', 'GARMENTS']).optional(),
     plan: z.string().min(1, 'Plan is required').optional(),
     trialDays: z.number().int().nonnegative().optional(),
-    dbURI: z.string().min(1, 'Database connection URI is required').optional()
+    dbURI: z.string().min(1, 'Database connection URI is required').optional(),
+    ownerName: z.string().optional(),
+    ownerEmail: z.string().email('Invalid email format').optional(),
+    ownerPassword: z.string().optional()
   })
 });
 

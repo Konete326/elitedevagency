@@ -226,11 +226,25 @@ const getDiagnostics = async () => {
       
       dbStatus = conn.readyState === 1 ? 'Connected' : 'Unreachable';
       
+      let ownerDetails = null;
       if (dbStatus === 'Connected') {
         for (const m of modelsList) {
           const model = conn.model(m, schemas[m]);
           const count = await model.countDocuments({ tenantId: tenant._id });
           totalSynced += count;
+        }
+
+        try {
+          const TenantUserModel = conn.model('User', User.schema);
+          const owner = await TenantUserModel.findOne({ role: 'OWNER' }).lean();
+          if (owner) {
+            ownerDetails = {
+              name: owner.name,
+              email: owner.email
+            };
+          }
+        } catch (err) {
+          logger.error(`Failed to fetch owner details: ${err.message}`);
         }
       }
       await conn.close();
@@ -257,7 +271,8 @@ const getDiagnostics = async () => {
       niche: tenant.niche,
       plan: tenant.plan,
       createdAt: tenant.createdAt,
-      subscriptionExpiry: tenant.subscriptionExpiry
+      subscriptionExpiry: tenant.subscriptionExpiry,
+      owner: ownerDetails
     });
   }
 
@@ -295,6 +310,46 @@ const updateTenant = async (tenantId, updateData) => {
   if (updateData.dbURI !== undefined) {
     tenant.dbURI = updateData.dbURI;
     tenant.databaseURI = updateData.dbURI;
+  }
+
+  if (updateData.ownerName !== undefined || updateData.ownerEmail !== undefined || updateData.ownerPassword !== undefined) {
+    const tenantConnection = mongoose.createConnection(tenant.databaseURI);
+    tenantConnection.on('error', (err) => {
+      logger.error(`Tenant connection error during user update: ${err.message}`);
+    });
+
+    try {
+      await Promise.race([
+        tenantConnection.asPromise(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Connection to tenant database timed out')), 5000))
+      ]);
+
+      const TenantUserModel = tenantConnection.model('User', User.schema);
+      const owner = await TenantUserModel.findOne({ role: 'OWNER' });
+      if (owner) {
+        if (updateData.ownerName !== undefined) owner.name = updateData.ownerName;
+        if (updateData.ownerEmail !== undefined) owner.email = updateData.ownerEmail;
+        if (updateData.ownerPassword !== undefined && updateData.ownerPassword.trim() !== '') {
+          owner.password = await bcrypt.hash(updateData.ownerPassword, 10);
+        }
+        await owner.save();
+      } else {
+        const hashedPassword = await bcrypt.hash(updateData.ownerPassword || 'Admin123!', 10);
+        const newOwner = new TenantUserModel({
+          tenantId: tenant._id,
+          name: updateData.ownerName || 'Admin',
+          email: updateData.ownerEmail || 'admin@tenant.com',
+          password: hashedPassword,
+          role: 'OWNER',
+          isActive: true
+        });
+        await newOwner.save();
+      }
+    } catch (err) {
+      throw new Error(`Failed to update tenant owner details: ${err.message}`);
+    } finally {
+      await tenantConnection.close();
+    }
   }
 
   await tenant.save();
