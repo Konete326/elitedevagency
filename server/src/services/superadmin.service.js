@@ -2,6 +2,7 @@ const Tenant = require('../models/Tenant');
 const User = require('../models/User');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const logger = require('../config/logger.config');
 const SyncLog = require('../models/SyncLog');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
@@ -69,7 +70,16 @@ const onboardTenant = async (
   const hashedPassword = await bcrypt.hash(ownerPassword, 10);
 
   const tenantConnection = mongoose.createConnection(tenant.databaseURI);
+  tenantConnection.on('error', (err) => {
+    logger.error(`Tenant database connection error: ${err.message}`);
+  });
+
   try {
+    await Promise.race([
+      tenantConnection.asPromise(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Connection to tenant database timed out')), 5000))
+    ]);
+
     const TenantUserModel = tenantConnection.model('User', User.schema);
     const newOwner = new TenantUserModel({
       tenantId: tenant._id,
@@ -80,6 +90,9 @@ const onboardTenant = async (
       isActive: true
     });
     await newOwner.save();
+  } catch (err) {
+    await Tenant.deleteOne({ _id: tenant._id });
+    throw new Error(`Failed to initialize tenant database: ${err.message}`);
   } finally {
     await tenantConnection.close();
   }
