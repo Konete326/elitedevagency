@@ -28,6 +28,38 @@ const nicheFeaturesMap = {
 
 const globalFeatures = ['Custom Brand Colors'];
 
+const validateConnectionString = (uri) => {
+  if (!uri) {
+    return { isValid: false, message: 'Database Connection String is required.' };
+  }
+  if (uri.includes('<password>') || uri.includes('<username>') || uri.includes('<dbname>')) {
+    return { isValid: false, message: 'Connection URI still contains placeholder tags like "<password>", "<username>", or "<dbname>". Please replace them with actual credentials.' };
+  }
+  try {
+    const withoutScheme = uri.replace(/^mongodb(\+srv)?:\/\//, '');
+    if (withoutScheme.includes('@')) {
+      const creds = withoutScheme.split('@')[0];
+      if (!creds.includes(':') || creds.split(':')[1] === '') {
+        return { isValid: false, message: 'Database password is missing in the connection string.' };
+      }
+    } else {
+      return { isValid: false, message: 'Database credentials (username and password) are missing in the connection string.' };
+    }
+    const afterCreds = withoutScheme.split('@')[1] || '';
+    const pathIndex = afterCreds.indexOf('/');
+    if (pathIndex === -1) {
+      return { isValid: false, message: 'Database name is missing in the connection string.' };
+    }
+    const pathPart = afterCreds.slice(pathIndex + 1).split('?')[0].trim();
+    if (!pathPart) {
+      return { isValid: false, message: 'Database name is missing in the connection string.' };
+    }
+  } catch {
+    return { isValid: false, message: 'Connection string format is invalid.' };
+  }
+  return { isValid: true };
+};
+
 export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
   const [businessName, setBusinessName] = useState('');
   const [niche, setNiche] = useState('GYM');
@@ -165,6 +197,11 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
   const handleTestConnection = async () => {
     if (!dbURI || dbURIError) {
       toast.error('Please enter a valid Database URI before testing.');
+      return;
+    }
+    const validation = validateConnectionString(dbURI);
+    if (!validation.isValid) {
+      toast.error(validation.message);
       return;
     }
     try {
