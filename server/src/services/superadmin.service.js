@@ -92,7 +92,9 @@ const onboardTenant = async (
     await newOwner.save();
   } catch (err) {
     await Tenant.deleteOne({ _id: tenant._id });
-    throw new Error(`Failed to initialize tenant database: ${err.message}`);
+    const initError = new Error(`Failed to initialize tenant database: ${err.message}`);
+    initError.statusCode = 500;
+    throw initError;
   } finally {
     await tenantConnection.close();
   }
