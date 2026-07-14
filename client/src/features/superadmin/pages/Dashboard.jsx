@@ -38,7 +38,7 @@ export const Dashboard = () => {
               Estimated Monthly MRR
             </p>
             <p className="text-xl font-black tracking-tight text-foreground dark:text-white">
-              ${estimatedMRR.toLocaleString()}
+              Rs. {estimatedMRR.toLocaleString()}
             </p>
             <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-extrabold flex items-center gap-1">
               <span>● Active subscriptions contribution</span>

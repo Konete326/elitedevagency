@@ -23,7 +23,7 @@ const ProductBar = ({ product, rank, maxQty }) => {
           <span className="font-bold truncate text-foreground">{product.name}</span>
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-xs font-semibold text-muted-foreground tabular-nums">
-              ${product.revenue.toFixed(2)}
+              Rs. {product.revenue.toFixed(2)}
             </span>
             <span className="text-xs font-black text-accent bg-accent/10 px-2 py-0.5 rounded-full tabular-nums">
               {product.qty} sold

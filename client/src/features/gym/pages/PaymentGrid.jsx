@@ -161,7 +161,7 @@ export const PaymentGrid = () => {
                         <span className="text-[10px] font-black uppercase tracking-wide">{month}</span>
                         {payment ? (
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-mono font-black">${payment.amountReceived.toFixed(2)}</span>
+                            <span className="text-xs font-mono font-black">Rs. {payment.amountReceived.toFixed(2)}</span>
                             <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                           </div>
                         ) : (
@@ -194,7 +194,7 @@ export const PaymentGrid = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Amount Received ($) *</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Amount Received (Rs) *</label>
                     <input
                       type="number"
                       step="0.01"

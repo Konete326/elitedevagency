@@ -263,7 +263,7 @@ export const ReturnsPage = () => {
                             </div>
                           )}
                         </div>
-                        <span className="text-sm font-extrabold text-foreground shrink-0">${item.price.toFixed(2)}</span>
+                        <span className="text-sm font-extrabold text-foreground shrink-0">Rs. {item.price.toFixed(2)}</span>
                       </div>
                     );
                   })}
@@ -281,7 +281,7 @@ export const ReturnsPage = () => {
                   </div>
                   <div className="flex justify-between text-base font-extrabold border-t border-border pt-3 mt-2">
                     <span>Refund Total</span>
-                    <span className="text-red-500 font-black">${refundTotal.toFixed(2)}</span>
+                    <span className="text-red-500 font-black">Rs. {refundTotal.toFixed(2)}</span>
                   </div>
                 </div>
 

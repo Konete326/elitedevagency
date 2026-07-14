@@ -202,7 +202,7 @@ export const TrainerPayroll = () => {
                       ? 'bg-red-500/10 text-red-600 dark:text-red-400'
                       : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                   }`}>
-                    Adv: ${t.advanceBalance.toFixed(2)}
+                    Adv: Rs. {t.advanceBalance.toFixed(2)}
                   </span>
                 </button>
               ))
@@ -216,15 +216,15 @@ export const TrainerPayroll = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 shrink-0">
                 <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Base Salary</p>
-                  <p className="text-xl font-black text-foreground mt-1">${baseSalary.toFixed(2)}</p>
+                  <p className="text-xl font-black text-foreground mt-1">Rs. {baseSalary.toFixed(2)}</p>
                 </div>
                 <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Outstanding Advance</p>
-                  <p className="text-xl font-black text-red-500 mt-1">${advanceBalance.toFixed(2)}</p>
+                  <p className="text-xl font-black text-red-500 mt-1">Rs. {advanceBalance.toFixed(2)}</p>
                 </div>
                 <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm">
                   <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Net Salary</p>
-                  <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">${netSalary.toFixed(2)}</p>
+                  <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">Rs. {netSalary.toFixed(2)}</p>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ export const TrainerPayroll = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Amount ($) *</label>
+                    <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Amount (Rs) *</label>
                     <input
                       type="number"
                       step="0.01"
@@ -300,7 +300,7 @@ export const TrainerPayroll = () => {
                                 {entry.type}
                               </span>
                             </td>
-                            <td className="py-3 px-4 font-bold text-foreground">${entry.amount.toFixed(2)}</td>
+                            <td className="py-3 px-4 font-bold text-foreground">Rs. {entry.amount.toFixed(2)}</td>
                             <td className="py-3 px-4 text-muted-foreground">{new Date(entry.date).toLocaleDateString()}</td>
                           </tr>
                         ))}
@@ -353,7 +353,7 @@ export const TrainerPayroll = () => {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Base Salary ($) *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Base Salary (Rs) *</label>
                 <input
                   type="number"
                   step="0.01"

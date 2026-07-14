@@ -248,7 +248,7 @@ export const MemberManager = () => {
                 >
                   <option value="">Select a membership plan...</option>
                   {plans.map(p => (
-                    <option key={p._id} value={p._id}>{p.name} (${p.price.toFixed(2)} - {p.durationInDays} Days)</option>
+                    <option key={p._id} value={p._id}>{p.name} (Rs. {p.price.toFixed(2)} - {p.durationInDays} Days)</option>
                   ))}
                 </select>
               </div>

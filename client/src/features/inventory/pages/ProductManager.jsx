@@ -297,7 +297,7 @@ export const ProductManager = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Retail Price ($)</label>
+                  <label className="block text-sm font-semibold mb-1">Retail Price (Rs)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -316,7 +316,7 @@ export const ProductManager = () => {
 
               <div className="grid gap-4 grid-cols-3">
                 <div>
-                  <label className="block text-xs font-semibold mb-1">Cost Price ($)</label>
+                  <label className="block text-xs font-semibold mb-1">Cost Price (Rs)</label>
                   <input
                     type="number"
                     step="0.01"
@@ -380,7 +380,7 @@ export const ProductManager = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-muted-foreground mb-0.5">Price ($)</label>
+                      <label className="block text-[10px] font-bold text-muted-foreground mb-0.5">Price (Rs)</label>
                       <input
                         type="number"
                         step="0.01"
@@ -497,7 +497,7 @@ export const ProductManager = () => {
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-4 font-extrabold text-accent">${product.price.toFixed(2)}</td>
+                        <td className="py-4 px-4 font-extrabold text-accent">Rs. {product.price.toFixed(2)}</td>
                         <td className="py-4 px-4 font-medium">
                           {product.stock <= product.alertLevel ? (
                             <span className="inline-flex items-center rounded-full bg-red-500/10 border border-red-500/20 px-2.5 py-0.5 text-xs font-bold text-red-600 dark:text-red-400">

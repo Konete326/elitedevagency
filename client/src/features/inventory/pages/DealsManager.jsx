@@ -249,7 +249,7 @@ export const DealsManager = () => {
                         )}
                       </td>
                       <td className="py-4 px-6 font-extrabold text-foreground">{deal.name}</td>
-                      <td className="py-4 px-6 font-bold text-accent">${deal.price.toFixed(2)}</td>
+                      <td className="py-4 px-6 font-bold text-accent">Rs. {deal.price.toFixed(2)}</td>
                       <td className="py-4 px-6 text-xs text-muted-foreground font-medium">
                         <div className="flex flex-col gap-0.5">
                           {(deal.items || []).map((item, idx) => {
@@ -307,7 +307,7 @@ export const DealsManager = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price ($) *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price (Rs) *</label>
                   <input
                     type="number"
                     step="0.01"

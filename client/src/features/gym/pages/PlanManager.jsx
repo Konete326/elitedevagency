@@ -157,7 +157,7 @@ export const PlanManager = () => {
                       <p className="text-xs text-muted-foreground mt-1 min-h-[2rem] line-clamp-2">{plan.description}</p>
                     </div>
                     <span className="inline-flex items-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] px-3 py-1 text-xs font-black text-white">
-                      ${plan.price.toFixed(2)}
+                      Rs. {plan.price.toFixed(2)}
                     </span>
                   </div>
 
@@ -212,7 +212,7 @@ export const PlanManager = () => {
 
               <div className="grid gap-4 grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price ($) *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price (Rs) *</label>
                   <input
                     type="number"
                     step="0.01"

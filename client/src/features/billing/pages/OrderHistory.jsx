@@ -127,7 +127,7 @@ export const OrderHistory = () => {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 font-extrabold text-accent">
-                        ${order.totalAmount.toFixed(2)}
+                        Rs. {order.totalAmount.toFixed(2)}
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <button

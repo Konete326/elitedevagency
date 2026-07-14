@@ -488,11 +488,11 @@ export const Cart = () => {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   {item.promotionalDiscount ? (
                     <>
-                      <span className="text-xs text-red-500 font-extrabold">${getPromoPrice(item).toFixed(2)}</span>
-                      <span className="text-[10px] text-muted-foreground line-through font-semibold">${item.price.toFixed(2)}</span>
+                      <span className="text-xs text-red-500 font-extrabold">Rs. {getPromoPrice(item).toFixed(2)}</span>
+                      <span className="text-[10px] text-muted-foreground line-through font-semibold">Rs. {item.price.toFixed(2)}</span>
                     </>
                   ) : (
-                    <span className="text-xs text-muted-foreground font-semibold">${item.price.toFixed(2)}</span>
+                    <span className="text-xs text-muted-foreground font-semibold">Rs. {item.price.toFixed(2)}</span>
                   )}
                 </div>
               </div>
@@ -531,15 +531,15 @@ export const Cart = () => {
           <div className="space-y-1.5 text-sm font-semibold">
             <div className="flex justify-between text-muted-foreground">
               <span>Subtotal</span>
-              <span className="text-foreground font-bold">${subtotal.toFixed(2)}</span>
+              <span className="text-foreground font-bold">Rs. {subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <span>Sales Tax (5%)</span>
-              <span className="text-foreground font-bold">${tax.toFixed(2)}</span>
+              <span className="text-foreground font-bold">Rs. {tax.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-base font-extrabold border-t border-border dark:border-zinc-700 pt-3 mt-2">
               <span>Total</span>
-              <span className="text-accent font-black">${total.toFixed(2)}</span>
+              <span className="text-accent font-black">Rs. {total.toFixed(2)}</span>
             </div>
           </div>
 

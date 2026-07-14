@@ -189,16 +189,16 @@ export const ProductGrid = () => {
                   {product.promotionalDiscount ? (
                     <>
                       <span className="text-sm font-extrabold text-red-500">
-                        ${(product.promotionalDiscount.rate 
+                        Rs. {(product.promotionalDiscount.rate 
                           ? product.price * (1 - product.promotionalDiscount.rate / 100)
                           : product.promotionalDiscount.price).toFixed(2)}
                       </span>
                       <span className="text-[10px] text-muted-foreground line-through font-semibold font-mono">
-                        ${product.price.toFixed(2)}
+                        Rs. {product.price.toFixed(2)}
                       </span>
                     </>
                   ) : (
-                    <span className="text-sm font-extrabold text-foreground">${product.price.toFixed(2)}</span>
+                    <span className="text-sm font-extrabold text-foreground">Rs. {product.price.toFixed(2)}</span>
                   )}
                 </div>
                 <div className="rounded-lg bg-muted border border-border group-hover:bg-foreground group-hover:text-background p-1.5 transition-colors dark:group-hover:text-zinc-900">
@@ -312,7 +312,7 @@ export const ProductGrid = () => {
                           }`}
                         >
                           <span className="text-xs font-semibold">{addon.name}</span>
-                          <span className="text-xs font-bold text-accent">+${addon.price.toFixed(2)}</span>
+                          <span className="text-xs font-bold text-accent">+Rs. {addon.price.toFixed(2)}</span>
                         </button>
                       );
                     })}

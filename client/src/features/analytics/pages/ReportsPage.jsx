@@ -86,7 +86,7 @@ const AnalyticsContent = ({ totalRevenue, totalOrders, avgOrderValue, topProduct
     <div className="grid gap-4 sm:grid-cols-3">
       <StatCard
         label="Total Revenue"
-        value={`$${totalRevenue.toFixed(2)}`}
+        value={`Rs. ${totalRevenue.toFixed(2)}`}
         sub="All completed orders"
         icon={TrendingUp}
       />
@@ -98,7 +98,7 @@ const AnalyticsContent = ({ totalRevenue, totalOrders, avgOrderValue, topProduct
       />
       <StatCard
         label="Avg Order Value"
-        value={`$${avgOrderValue.toFixed(2)}`}
+        value={`Rs. ${avgOrderValue.toFixed(2)}`}
         sub="Per transaction"
         icon={BarChart3}
       />

@@ -156,7 +156,7 @@ export const TenantManager = () => {
                   <td className="py-2 px-3">
                     <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${getPlanBadgeClass(tenant.plan)}`}>
                       {tenant.plan === 'CUSTOM' && tenant.customPlanName
-                        ? `${tenant.customPlanName} ($${tenant.customPlanPrice})`
+                        ? `${tenant.customPlanName} (Rs. ${tenant.customPlanPrice})`
                         : (tenant.plan || 'STARTER')}
                     </span>
                   </td>

@@ -229,7 +229,7 @@ export const PricingTiersManager = () => {
 
                   <div className="space-y-1">
                     <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                      Monthly Price ($) *
+                      Monthly Price (PKR) *
                     </label>
                     <input
                       type="text"
@@ -395,7 +395,7 @@ export const PricingTiersManager = () => {
                     )}
                   </div>
                   <span className="inline-flex items-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white px-2 py-0.5 text-[10px] font-black tracking-wide shrink-0">
-                    ${tier.price.toFixed(2)}/mo
+                    Rs. {tier.price.toFixed(2)}/mo
                   </span>
                 </div>
 
