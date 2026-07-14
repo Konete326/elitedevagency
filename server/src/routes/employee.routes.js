@@ -1,5 +1,6 @@
 const express = require('express');
 const auth = require('../middlewares/auth.middleware');
+const tenantDbMiddleware = require('../middlewares/tenantDb.middleware');
 const employeeController = require('../controllers/employee.controller');
 
 const router = express.Router();
@@ -13,6 +14,7 @@ const authorizeOwnerOrManager = (req, res, next) => {
 
 router.use(auth);
 router.use(authorizeOwnerOrManager);
+router.use(tenantDbMiddleware);
 
 router.post('/', employeeController.createEmployee);
 router.get('/', employeeController.getEmployees);

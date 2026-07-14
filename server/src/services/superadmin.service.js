@@ -1,5 +1,6 @@
 const Tenant = require('../models/Tenant');
 const User = require('../models/User');
+const TenantIdentity = require('../models/TenantIdentity');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const logger = require('../config/logger.config');
@@ -77,8 +78,10 @@ const onboardTenant = async (
   });
 
   try {
+    const connPromise = tenantConnection.asPromise();
+    connPromise.catch(() => {});
     await Promise.race([
-      tenantConnection.asPromise(),
+      connPromise,
       new Promise((_, reject) => setTimeout(() => reject(new Error('Connection to tenant database timed out')), 5000))
     ]);
 
@@ -92,24 +95,19 @@ const onboardTenant = async (
       isActive: true
     });
     await newOwner.save();
-
-    const mainOwner = new User({
+    await TenantIdentity.create({
+      email: ownerEmail.toLowerCase().trim(),
       tenantId: tenant._id,
-      name: ownerName,
-      email: ownerEmail,
-      password: hashedPassword,
-      role: 'OWNER',
-      isActive: true
+      role: 'OWNER'
     });
-    await mainOwner.save();
   } catch (err) {
     await Tenant.deleteOne({ _id: tenant._id });
-    await User.deleteOne({ tenantId: tenant._id });
+    await TenantIdentity.deleteMany({ tenantId: tenant._id });
     const initError = new Error(`Failed to initialize tenant database: ${err.message}`);
     initError.statusCode = 500;
     throw initError;
   } finally {
-    await tenantConnection.close();
+    await tenantConnection.close().catch(() => {});
   }
 
   return {
@@ -233,8 +231,10 @@ const getDiagnostics = async () => {
 
     try {
       const conn = mongoose.createConnection(tenant.databaseURI);
+      const diagConnPromise = conn.asPromise();
+      diagConnPromise.catch(() => {});
       await Promise.race([
-        conn.asPromise(),
+        diagConnPromise,
         new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
       ]);
       
@@ -260,7 +260,7 @@ const getDiagnostics = async () => {
           logger.error(`Failed to fetch owner details: ${err.message}`);
         }
       }
-      await conn.close();
+      await conn.close().catch(() => {});
     } catch (err) {
       dbStatus = 'Unreachable';
     }
@@ -334,8 +334,10 @@ const updateTenant = async (tenantId, updateData) => {
     });
 
     try {
+      const updateConnPromise = tenantConnection.asPromise();
+      updateConnPromise.catch(() => {});
       await Promise.race([
-        tenantConnection.asPromise(),
+        updateConnPromise,
         new Promise((_, reject) => setTimeout(() => reject(new Error('Connection to tenant database timed out')), 5000))
       ]);
 
@@ -384,11 +386,19 @@ const updateTenant = async (tenantId, updateData) => {
     } catch (err) {
       throw new Error(`Failed to update tenant owner details: ${err.message}`);
     } finally {
-      await tenantConnection.close();
+      await tenantConnection.close().catch(() => {});
     }
   }
 
   await tenant.save();
+
+  if (updateData.ownerEmail !== undefined) {
+    await TenantIdentity.updateOne(
+      { tenantId: tenant._id, role: 'OWNER' },
+      { email: updateData.ownerEmail.toLowerCase().trim() }
+    );
+  }
+
   return tenant;
 };
 
@@ -397,6 +407,7 @@ const deleteTenant = async (tenantId) => {
   if (!result) {
     throw new Error('Tenant not found');
   }
+  await TenantIdentity.deleteMany({ tenantId });
   return { success: true };
 };
 

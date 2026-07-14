@@ -1,19 +1,20 @@
-const User = require('../models/User');
+const TenantIdentity = require('../models/TenantIdentity');
 const bcrypt = require('bcryptjs');
 
-const createEmployee = async (tenantId, data) => {
-  const existingUser = await User.findOne({ email: data.email });
+const createEmployee = async (tenantConnection, tenantId, data) => {
+  const UserModel = tenantConnection.model('User');
+
+  const existingUser = await UserModel.findOne({ email: data.email.toLowerCase().trim() }).lean();
   if (existingUser) {
     throw new Error('Email is already registered');
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(data.password, salt);
+  const hashedPassword = await bcrypt.hash(data.password, 10);
 
-  const newEmployee = new User({
+  const newEmployee = new UserModel({
     tenantId,
     name: data.name,
-    email: data.email,
+    email: data.email.toLowerCase().trim(),
     password: hashedPassword,
     role: data.role || 'CASHIER',
     permissions: data.permissions || [],
@@ -22,6 +23,13 @@ const createEmployee = async (tenantId, data) => {
   });
 
   await newEmployee.save();
+
+  await TenantIdentity.create({
+    email: data.email.toLowerCase().trim(),
+    tenantId,
+    role: newEmployee.role
+  });
+
   return {
     id: newEmployee._id,
     name: newEmployee.name,
@@ -33,14 +41,16 @@ const createEmployee = async (tenantId, data) => {
   };
 };
 
-const getEmployees = async (tenantId) => {
-  return User.find({ tenantId, role: { $ne: 'SUPER_ADMIN' } })
+const getEmployees = async (tenantConnection, tenantId) => {
+  const UserModel = tenantConnection.model('User');
+  return UserModel.find({ tenantId, role: { $ne: 'SUPER_ADMIN' } })
     .select('-password')
     .lean();
 };
 
-const updateEmployee = async (id, tenantId, data) => {
-  const employee = await User.findOne({ _id: id, tenantId });
+const updateEmployee = async (tenantConnection, tenantId, id, data) => {
+  const UserModel = tenantConnection.model('User');
+  const employee = await UserModel.findOne({ _id: id, tenantId });
   if (!employee) {
     throw new Error('Employee not found');
   }
@@ -51,6 +61,7 @@ const updateEmployee = async (id, tenantId, data) => {
   if (typeof data.isActive === 'boolean') employee.isActive = data.isActive;
 
   await employee.save();
+
   return {
     id: employee._id,
     name: employee.name,

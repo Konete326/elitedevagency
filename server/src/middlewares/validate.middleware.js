@@ -17,7 +17,7 @@ const validate = (schema) => async (req, res, next) => {
         success: false,
         error: 'Validation Error',
         details: error.errors.map(err => ({
-          path: err.path.join('.'),
+          path: err.path?.join('.') ?? '',
           message: err.message
         }))
       });
