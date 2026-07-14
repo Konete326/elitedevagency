@@ -216,6 +216,7 @@ const getDiagnostics = async () => {
   for (const tenant of tenants) {
     let dbStatus = 'Disconnected';
     let totalSynced = 0;
+    let ownerDetails = null;
 
     try {
       const conn = mongoose.createConnection(tenant.databaseURI);
@@ -226,7 +227,6 @@ const getDiagnostics = async () => {
       
       dbStatus = conn.readyState === 1 ? 'Connected' : 'Unreachable';
       
-      let ownerDetails = null;
       if (dbStatus === 'Connected') {
         for (const m of modelsList) {
           const model = conn.model(m, schemas[m]);

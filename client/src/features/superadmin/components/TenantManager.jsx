@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTenants, useToggleTenantLock, useToggleMobileAccess, useUpdateTenantFeatures, useToggleTenantSuspension, useDeleteTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
 import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers, Shield, X, AlertTriangle, CheckCircle, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const TenantManager = ({ onEdit }) => {
   const [page, setPage] = useState(1);
   const limit = 5;
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const viewId = searchParams.get('view');
 
   const { data, isLoading } = useTenants(page, limit);
   const toggleLockMutation = useToggleTenantLock();
@@ -28,9 +30,18 @@ export const TenantManager = ({ onEdit }) => {
     suspensionDescription: ''
   });
 
-  const tenants = data?.data || [];
+  const tenants = useMemo(() => data?.data || [], [data?.data]);
   const meta = data?.meta || { total: 0 };
   const totalPages = Math.ceil(meta.total / limit) || 1;
+
+  useEffect(() => {
+    if (viewId && tenants.length > 0) {
+      const matched = tenants.find(t => t._id === viewId);
+      if (matched) {
+        setSelectedTenantForView(matched);
+      }
+    }
+  }, [viewId, tenants]);
 
   useEffect(() => {
     const handleCloseDropdown = () => setActiveDropdownTenantId(null);
@@ -369,7 +380,10 @@ export const TenantManager = ({ onEdit }) => {
                 <p className="text-[10px] text-muted-foreground mt-0.5">{selectedTenantForView.businessName}</p>
               </div>
               <button
-                onClick={() => setSelectedTenantForView(null)}
+                onClick={() => {
+                  setSelectedTenantForView(null);
+                  setSearchParams({});
+                }}
                 className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
               >
                 <X className="h-4.5 w-4.5" />
@@ -444,7 +458,10 @@ export const TenantManager = ({ onEdit }) => {
 
             <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end">
               <button
-                onClick={() => setSelectedTenantForView(null)}
+                onClick={() => {
+                  setSelectedTenantForView(null);
+                  setSearchParams({});
+                }}
                 className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
               >
                 Close
