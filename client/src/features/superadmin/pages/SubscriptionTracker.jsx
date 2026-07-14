@@ -20,6 +20,8 @@ export const SubscriptionTracker = () => {
     pricingTier: 'STARTER'
   });
 
+  const [statusFilter, setStatusFilter] = useState(null);
+
   const tenants = useMemo(() => data?.data || [], [data?.data]);
 
   const getRemainingDays = (expiryStr) => {
@@ -29,6 +31,23 @@ export const SubscriptionTracker = () => {
     const diffTime = expiry - now;
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
+
+  const filteredTenants = useMemo(() => {
+    if (!statusFilter) return tenants;
+    return tenants.filter(tenant => {
+      const remaining = getRemainingDays(tenant.subscriptionExpiry);
+      if (statusFilter === 'expired') {
+        return remaining <= 0;
+      }
+      if (statusFilter === 'expiringSoon') {
+        return remaining <= 3 && remaining > 0;
+      }
+      if (statusFilter === 'active') {
+        return remaining > 3;
+      }
+      return true;
+    });
+  }, [tenants, statusFilter]);
 
   const metrics = useMemo(() => {
     let active = 0;
@@ -122,7 +141,14 @@ export const SubscriptionTracker = () => {
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <div className="p-4 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm">
+        <div
+          onClick={() => setStatusFilter(prev => prev === 'active' ? null : 'active')}
+          className={`p-4 rounded-xl border bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm cursor-pointer transition-all ${
+            statusFilter === 'active'
+              ? 'border-green-500 ring-1 ring-green-500'
+              : 'border-border dark:border-zinc-700 hover:border-green-550/30'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 shrink-0">
             <CheckCircle className="h-6 w-6" />
           </div>
@@ -132,7 +158,14 @@ export const SubscriptionTracker = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm">
+        <div
+          onClick={() => setStatusFilter(prev => prev === 'expiringSoon' ? null : 'expiringSoon')}
+          className={`p-4 rounded-xl border bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm cursor-pointer transition-all ${
+            statusFilter === 'expiringSoon'
+              ? 'border-amber-500 ring-1 ring-amber-500'
+              : 'border-border dark:border-zinc-700 hover:border-amber-550/30'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
             <AlertTriangle className="h-6 w-6" />
           </div>
@@ -142,7 +175,14 @@ export const SubscriptionTracker = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm">
+        <div
+          onClick={() => setStatusFilter(prev => prev === 'expired' ? null : 'expired')}
+          className={`p-4 rounded-xl border bg-white dark:bg-zinc-800 flex items-center gap-4 shadow-sm cursor-pointer transition-all ${
+            statusFilter === 'expired'
+              ? 'border-red-500 ring-1 ring-red-500'
+              : 'border-border dark:border-zinc-700 hover:border-red-550/30'
+          }`}
+        >
           <div className="p-3 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 shrink-0">
             <ShieldAlert className="h-6 w-6" />
           </div>
@@ -152,6 +192,15 @@ export const SubscriptionTracker = () => {
           </div>
         </div>
       </div>
+
+      {statusFilter && (
+        <div className="flex items-center gap-2 text-[10px] font-extrabold bg-[var(--accent)]/10 text-[var(--accent)] border border-[var(--accent)]/20 px-2.5 py-1 rounded-lg w-fit select-none">
+          <span>FILTER: <span className="uppercase">{statusFilter === 'expiringSoon' ? 'Expiring Soon' : statusFilter}</span></span>
+          <button onClick={() => setStatusFilter(null)} className="hover:text-red-500 cursor-pointer">
+            <X className="h-3 w-3 inline" />
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <TableSkeleton cols={5} rows={5} />
@@ -170,14 +219,14 @@ export const SubscriptionTracker = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border dark:divide-zinc-700 text-xs font-semibold">
-                {tenants.length === 0 ? (
+                {filteredTenants.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="py-8 text-center text-muted-foreground">
                       No active tenant contracts registered
                     </td>
                   </tr>
                 ) : (
-                  tenants.map(tenant => {
+                  filteredTenants.map(tenant => {
                     const remaining = getRemainingDays(tenant.subscriptionExpiry);
                     const isExpired = remaining <= 0;
                     const isWarning = remaining <= 3 && remaining > 0;
