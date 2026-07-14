@@ -77,8 +77,8 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
       const calculatedDays = Math.max(0, Math.round((expiry - start) / (1000 * 60 * 60 * 24))) || 30;
       setTrialDays(calculatedDays.toString());
 
-      setOwnerName(editingTenant.owner?.name || '');
-      setOwnerEmail(editingTenant.owner?.email || '');
+      setOwnerName(editingTenant.ownerName || editingTenant.owner?.name || '');
+      setOwnerEmail(editingTenant.ownerEmail || editingTenant.owner?.email || '');
       setOwnerPassword('');
     }
   }, [editingTenant]);

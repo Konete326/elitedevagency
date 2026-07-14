@@ -153,7 +153,7 @@ export const TenantManager = ({ onEdit }) => {
         </div>
       </div>
 
-      <div className="overflow-x-auto w-full">
+      <div className="overflow-x-auto w-full min-h-[300px]">
         {isLoading ? (
           <div className="flex items-center justify-center h-36">
             <p className="text-xs text-muted-foreground font-medium animate-pulse">Loading onboarded tenants...</p>

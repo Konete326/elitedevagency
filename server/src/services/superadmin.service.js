@@ -62,7 +62,9 @@ const onboardTenant = async (
     customPlanPrice: plan === 'CUSTOM' ? customPlanPrice : undefined,
     subscriptionExpiry: expiryDate,
     customTheme: customTheme || { lightPrimary: null, darkPrimary: null },
-    blockMobileAccess
+    blockMobileAccess,
+    ownerName,
+    ownerEmail
   });
   
   await tenant.save();
@@ -90,8 +92,19 @@ const onboardTenant = async (
       isActive: true
     });
     await newOwner.save();
+
+    const mainOwner = new User({
+      tenantId: tenant._id,
+      name: ownerName,
+      email: ownerEmail,
+      password: hashedPassword,
+      role: 'OWNER',
+      isActive: true
+    });
+    await mainOwner.save();
   } catch (err) {
     await Tenant.deleteOne({ _id: tenant._id });
+    await User.deleteOne({ tenantId: tenant._id });
     const initError = new Error(`Failed to initialize tenant database: ${err.message}`);
     initError.statusCode = 500;
     throw initError;
@@ -311,6 +324,8 @@ const updateTenant = async (tenantId, updateData) => {
     tenant.dbURI = updateData.dbURI;
     tenant.databaseURI = updateData.dbURI;
   }
+  if (updateData.ownerName !== undefined) tenant.ownerName = updateData.ownerName;
+  if (updateData.ownerEmail !== undefined) tenant.ownerEmail = updateData.ownerEmail;
 
   if (updateData.ownerName !== undefined || updateData.ownerEmail !== undefined || updateData.ownerPassword !== undefined) {
     const tenantConnection = mongoose.createConnection(tenant.databaseURI);
@@ -344,6 +359,27 @@ const updateTenant = async (tenantId, updateData) => {
           isActive: true
         });
         await newOwner.save();
+      }
+
+      const mainOwner = await User.findOne({ tenantId: tenant._id, role: 'OWNER' });
+      if (mainOwner) {
+        if (updateData.ownerName !== undefined) mainOwner.name = updateData.ownerName;
+        if (updateData.ownerEmail !== undefined) mainOwner.email = updateData.ownerEmail;
+        if (updateData.ownerPassword !== undefined && updateData.ownerPassword.trim() !== '') {
+          mainOwner.password = await bcrypt.hash(updateData.ownerPassword, 10);
+        }
+        await mainOwner.save();
+      } else {
+        const hashedPassword = await bcrypt.hash(updateData.ownerPassword || 'Admin123!', 10);
+        const newMainOwner = new User({
+          tenantId: tenant._id,
+          name: updateData.ownerName || 'Admin',
+          email: updateData.ownerEmail || 'admin@tenant.com',
+          password: hashedPassword,
+          role: 'OWNER',
+          isActive: true
+        });
+        await newMainOwner.save();
       }
     } catch (err) {
       throw new Error(`Failed to update tenant owner details: ${err.message}`);

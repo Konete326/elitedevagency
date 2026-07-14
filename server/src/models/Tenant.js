@@ -26,7 +26,9 @@ const tenantSchema = new mongoose.Schema({
   blockMobileAccess: { type: Boolean, default: false },
   isSuspended: { type: Boolean, default: false },
   suspensionTitle: { type: String, default: "" },
-  suspensionDescription: { type: String, default: "" }
+  suspensionDescription: { type: String, default: "" },
+  ownerName: { type: String },
+  ownerEmail: { type: String }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tenant', tenantSchema);
