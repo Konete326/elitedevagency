@@ -21,8 +21,17 @@ export const SystemLogs = () => {
 
   const [selectedLog, setSelectedLog] = useState(null);
 
-  const { data, isLoading, refetch } = useSuperAdminLogs(filters);
+  const { data, isLoading, refetch, isFetching } = useSuperAdminLogs(filters);
   const { data: tenantsData } = useTenants(1, 100);
+
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+      toast.success('Logs list updated successfully');
+    } catch (err) {
+      toast.error(err.message || 'Failed to refresh logs');
+    }
+  };
   const clearMutation = useClearSuperAdminLogs();
   const deleteMutation = useDeleteSingleLog();
 
@@ -106,10 +115,11 @@ export const SystemLogs = () => {
         
         <div className="flex items-center gap-2">
           <button
-            onClick={() => refetch()}
-            className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-card hover:bg-muted px-2.5 py-1.5 text-xs font-bold transition-colors text-foreground cursor-pointer"
+            onClick={handleRefresh}
+            disabled={isFetching}
+            className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-card hover:bg-muted px-2.5 py-1.5 text-xs font-bold transition-colors text-foreground cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
           <button
