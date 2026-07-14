@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOnboardTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
-import { CheckSquare, Square, ShieldCheck, Key, Clipboard, X, AlertCircle, ChevronLeft } from 'lucide-react';
+import { CheckSquare, Square, ShieldCheck, Key, Clipboard, X, AlertCircle, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { getDatabase } from '../../../db/database';
 import { Link } from 'react-router-dom';
 
@@ -43,6 +43,7 @@ export const TenantOnboardForm = ({ onSuccess }) => {
   const [lightPrimary, setLightPrimary] = useState('#d97706');
   const [darkPrimary, setDarkPrimary] = useState('#f59e0b');
   const [credentials, setCredentials] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [blockMobileAccess, setBlockMobileAccess] = useState(false);
   const [pricingTiers, setPricingTiers] = useState([]);
 
@@ -448,20 +449,33 @@ export const TenantOnboardForm = ({ onSuccess }) => {
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
                   <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Owner Password *</label>
-                  <input
-                    type="password"
-                    required
-                    value={ownerPassword}
-                    onChange={(e) => handleOwnerPasswordChange(e.target.value)}
-                    className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
-                      ownerPasswordError
-                        ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
-                        : ownerPassword && !ownerPasswordError
-                        ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
-                        : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
-                    }`}
-                    placeholder="Secret password..."
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={ownerPassword}
+                      onChange={(e) => handleOwnerPasswordChange(e.target.value)}
+                      className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 pl-3 pr-10 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
+                        ownerPasswordError
+                          ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                          : ownerPassword && !ownerPasswordError
+                          ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
+                          : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
+                      }`}
+                      placeholder="Secret password..."
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                   {ownerPasswordError && (
                     <p className="text-[9px] text-red-500 font-bold mt-0.5">{ownerPasswordError}</p>
                   )}
