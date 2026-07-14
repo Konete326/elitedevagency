@@ -76,50 +76,50 @@ export const TenantLogs = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  <th className="p-4">Type</th>
-                  <th className="p-4">Message</th>
-                  <th className="p-4">URL</th>
-                  <th className="p-4">Time</th>
-                  <th className="p-4 text-right">Actions</th>
+                <tr className="border-b border-border bg-muted/40 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  <th className="p-2.5 w-24">Type</th>
+                  <th className="p-2.5">Message</th>
+                  <th className="p-2.5 max-w-xs">URL</th>
+                  <th className="p-2.5 w-36">Time</th>
+                  <th className="p-2.5 w-28 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border text-sm">
+              <tbody className="divide-y divide-border text-xs">
                 {logs.length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="p-8 text-center text-muted-foreground font-medium">
+                  <td colSpan="5" className="p-6 text-center text-muted-foreground font-semibold">
                     No diagnostic records found
                   </td>
                 </tr>
               ) : (
                 logs.map((log) => (
                   <tr key={log._id} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                    <td className="p-2.5">
+                      <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${
                         log.type === 'ERROR' 
-                          ? 'bg-red-500/10 text-red-655 dark:text-red-400' 
-                          : 'bg-amber-500/10 text-amber-655 dark:text-amber-400'
+                          ? 'bg-red-500/10 text-red-600 dark:text-red-400' 
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       }`}>
-                        {log.type === 'ERROR' ? <AlertCircle className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
+                        {log.type === 'ERROR' ? <AlertCircle className="h-2.5 w-2.5" /> : <CheckCircle className="h-2.5 w-2.5" />}
                         {log.type}
                       </span>
                     </td>
-                    <td className="p-4 max-w-md truncate font-medium" title={log.message}>
+                    <td className="p-2.5 max-w-md truncate font-medium text-slate-700 dark:text-zinc-350" title={log.message}>
                       {log.message}
                     </td>
-                    <td className="p-4 max-w-xs truncate text-xs text-muted-foreground" title={log.url}>
+                    <td className="p-2.5 max-w-xs truncate text-[11px] text-muted-foreground" title={log.url}>
                       {log.url}
                     </td>
-                    <td className="p-4 text-xs font-medium">
-                      {new Date(log.timestamp).toLocaleString()}
+                    <td className="p-2.5 text-[10px] font-medium text-muted-foreground">
+                      {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </td>
-                    <td className="p-4 text-right">
+                    <td className="p-2.5 text-right">
                       <button
                         onClick={() => copyToClipboard(log)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-border bg-background hover:bg-muted px-2 py-1 text-xs font-bold transition-colors"
+                        className="p-1 rounded border border-border bg-background hover:bg-muted text-foreground transition-colors cursor-pointer"
+                        title="Copy Diagnostics"
                       >
-                        <Clipboard className="h-3.5 w-3.5" />
-                        <span>Diagnostics</span>
+                        <Clipboard className="h-3 w-3" />
                       </button>
                     </td>
                   </tr>

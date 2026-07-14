@@ -269,6 +269,8 @@ export const useSuperAdminLogs = (filters) => {
       if (filters.tenantId) queryParams.set('tenantId', filters.tenantId);
       if (filters.type) queryParams.set('type', filters.type);
       if (filters.url) queryParams.set('url', filters.url);
+      if (filters.userEmail) queryParams.set('userEmail', filters.userEmail);
+      if (filters.message) queryParams.set('message', filters.message);
       if (filters.page) queryParams.set('page', filters.page);
       if (filters.limit) queryParams.set('limit', filters.limit);
 
@@ -300,6 +302,30 @@ export const useClearSuperAdminLogs = () => {
       const data = await response.json();
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Failed to clear logs');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['superadmin-logs'] });
+    }
+  });
+};
+
+export const useDeleteSingleLog = () => {
+  const token = useAuthStore((state) => state.token);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (logId) => {
+      const response = await fetch(`${apiURL}/superadmin/logs/${logId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete log entry');
       }
       return data;
     },

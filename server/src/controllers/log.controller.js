@@ -60,6 +60,14 @@ const getSuperAdminLogs = async (req, res) => {
     filter.url = { $regex: req.query.url, $options: 'i' };
   }
 
+  if (req.query.userEmail) {
+    filter.userEmail = { $regex: req.query.userEmail, $options: 'i' };
+  }
+
+  if (req.query.message) {
+    filter.message = { $regex: req.query.message, $options: 'i' };
+  }
+
   const logs = await ErrorLog.find(filter)
     .sort({ timestamp: -1 })
     .skip(skip)
@@ -107,9 +115,16 @@ const clearLogs = async (req, res) => {
   res.status(200).json({ success: true, message: 'All logs cleared' });
 };
 
+const deleteSingleLog = async (req, res) => {
+  const { id } = req.params;
+  await ErrorLog.findByIdAndDelete(id);
+  res.status(200).json({ success: true, message: 'Log entry deleted successfully' });
+};
+
 module.exports = {
   createClientLog,
   getSuperAdminLogs,
   getTenantLogs,
-  clearLogs
+  clearLogs,
+  deleteSingleLog
 };

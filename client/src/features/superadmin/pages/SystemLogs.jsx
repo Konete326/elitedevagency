@@ -1,34 +1,64 @@
 import { useState } from 'react';
-import { useSuperAdminLogs, useClearSuperAdminLogs } from '../hooks/useSuperAdmin';
+import { useSuperAdminLogs, useClearSuperAdminLogs, useDeleteSingleLog } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
-import { AlertCircle, CheckCircle, Clipboard, Trash2, ArrowLeft, RefreshCw } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clipboard, Trash2, ArrowLeft, RefreshCw, Eye, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useModalStore } from '../../../store/useModalStore';
 import { TableSkeleton } from '../../../components/ui/TableSkeleton';
 
 export const SystemLogs = () => {
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
   const [filters, setFilters] = useState({
     tenantId: '',
+    userEmail: '',
+    message: '',
     type: '',
     url: '',
     page: 1,
     limit: 10
   });
 
+  const [selectedLog, setSelectedLog] = useState(null);
+
   const { data, isLoading, refetch } = useSuperAdminLogs(filters);
   const clearMutation = useClearSuperAdminLogs();
+  const deleteMutation = useDeleteSingleLog();
 
-  const handleClearLogs = async () => {
-    if (!window.confirm('Are you sure you want to permanently clear all logs?')) {
-      return;
-    }
-    try {
-      await clearMutation.mutateAsync();
-      toast.success('Logs database successfully cleared');
-      refetch();
-    } catch (error) {
-      toast.error(error.message || 'Failed to clear logs');
-    }
+  const handleClearLogs = () => {
+    openModal({
+      title: 'Clear Logs Database',
+      message: 'Are you sure you want to permanently clear all logs? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Clear All',
+      onConfirm: async () => {
+        try {
+          await clearMutation.mutateAsync();
+          toast.success('Logs database successfully cleared');
+          refetch();
+        } catch (error) {
+          toast.error(error.message || 'Failed to clear logs');
+        }
+      }
+    });
+  };
+
+  const handleDeleteLog = (logId) => {
+    openModal({
+      title: 'Delete Log Entry',
+      message: 'Are you sure you want to delete this log entry?',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          await deleteMutation.mutateAsync(logId);
+          toast.success('Log entry deleted successfully');
+          refetch();
+        } catch (error) {
+          toast.error(error.message || 'Failed to delete log');
+        }
+      }
+    });
   };
 
   const copyToClipboard = (log) => {
@@ -42,29 +72,29 @@ export const SystemLogs = () => {
   const totalPages = Math.ceil(meta.total / meta.limit) || 1;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border dark:border-zinc-700 pb-4">
-        <div className="flex items-center gap-3">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border dark:border-zinc-700 pb-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/superadmin')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
+            className="flex items-center justify-center p-1.5 rounded-lg border border-border hover:bg-muted transition-colors text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-foreground dark:text-white">
+            <h1 className="text-lg font-black tracking-tight text-foreground dark:text-white">
               System Logs
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
+            <p className="text-[10px] text-muted-foreground mt-0.5">
               Monitor, filter, and purge global application exceptions and warnings
             </p>
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card hover:bg-muted px-3 py-2 text-xs font-bold transition-colors text-foreground"
+            className="inline-flex items-center justify-center gap-1 rounded-lg border border-border bg-card hover:bg-muted px-2.5 py-1.5 text-xs font-bold transition-colors text-foreground cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Refresh</span>
@@ -72,7 +102,7 @@ export const SystemLogs = () => {
           <button
             onClick={handleClearLogs}
             disabled={clearMutation.isPending}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-red-650 hover:bg-red-700 text-white px-3 py-2 text-xs font-bold transition-colors shadow-sm disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 hover:bg-red-755 text-white px-3 py-1.5 text-xs font-bold transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
             <span>Clear Logs Database</span>
@@ -80,24 +110,46 @@ export const SystemLogs = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Tenant Search</label>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 rounded-lg border border-border bg-card p-3 shadow-xs">
+        <div className="space-y-1">
+          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Tenant</label>
           <input
             type="text"
-            placeholder="Search by Tenant ID..."
+            placeholder="Tenant ID..."
             value={filters.tenantId}
             onChange={(e) => setFilters(prev => ({ ...prev, tenantId: e.target.value, page: 1 }))}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
           />
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Log Type</label>
+        <div className="space-y-1">
+          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">User Email</label>
+          <input
+            type="text"
+            placeholder="User Email..."
+            value={filters.userEmail}
+            onChange={(e) => setFilters(prev => ({ ...prev, userEmail: e.target.value, page: 1 }))}
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Message</label>
+          <input
+            type="text"
+            placeholder="Search Message..."
+            value={filters.message}
+            onChange={(e) => setFilters(prev => ({ ...prev, message: e.target.value, page: 1 }))}
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Log Type</label>
           <select
             value={filters.type}
             onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value, page: 1 }))}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring font-semibold"
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-semibold"
           >
             <option value="">All Logs</option>
             <option value="ERROR">Errors</option>
@@ -105,14 +157,14 @@ export const SystemLogs = () => {
           </select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">URL Search</label>
+        <div className="space-y-1 col-span-2 md:col-span-1">
+          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">URL Search</label>
           <input
             type="text"
             placeholder="Filter by page URL..."
             value={filters.url}
             onChange={(e) => setFilters(prev => ({ ...prev, url: e.target.value, page: 1 }))}
-            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
           />
         </div>
       </div>
@@ -120,103 +172,202 @@ export const SystemLogs = () => {
       {isLoading ? (
         <TableSkeleton cols={5} rows={10} />
       ) : (
-        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="rounded-lg border border-border bg-card shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse min-w-[40rem]">
               <thead>
-                <tr className="border-b border-border bg-muted/40 text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  <th className="p-4">Type</th>
-                  <th className="p-4">Tenant</th>
-                  <th className="p-4">User</th>
-                  <th className="p-4">Message</th>
-                  <th className="p-4">URL</th>
-                  <th className="p-4">Time</th>
-                  <th className="p-4 text-right">Actions</th>
+                <tr className="border-b border-border bg-muted/40 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  <th className="p-3 w-24">Type</th>
+                  <th className="p-3 w-40">Tenant/User</th>
+                  <th className="p-3">Message</th>
+                  <th className="p-3 w-36">Time</th>
+                  <th className="p-3 w-32 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border text-sm">
+              <tbody className="divide-y divide-border text-xs">
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-8 text-center text-muted-foreground font-medium">
+                    <td colSpan="5" className="p-6 text-center text-muted-foreground font-semibold">
                       No diagnostic records found matching search filters
                     </td>
                   </tr>
                 ) : (
-                logs.map((log) => (
-                  <tr key={log._id} className="hover:bg-muted/30 transition-colors">
-                    <td className="p-4">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
-                        log.type === 'ERROR' 
-                          ? 'bg-red-500/10 text-red-650 dark:text-red-400' 
-                          : 'bg-amber-500/10 text-amber-650 dark:text-amber-400'
-                      }`}>
-                        {log.type === 'ERROR' ? <AlertCircle className="h-3 w-3" /> : <CheckCircle className="h-3 w-3" />}
-                        {log.type}
-                      </span>
-                    </td>
-                    <td className="p-4 font-mono text-xs font-semibold">{log.tenantId}</td>
-                    <td className="p-4 font-medium">{log.userEmail}</td>
-                    <td className="p-4 max-w-xs truncate font-medium" title={log.message}>
-                      {log.message}
-                    </td>
-                    <td className="p-4 max-w-xs truncate text-xs text-muted-foreground" title={log.url}>
-                      {log.url}
-                    </td>
-                    <td className="p-4 text-xs font-medium">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        onClick={() => copyToClipboard(log)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-border bg-background hover:bg-muted px-2 py-1 text-xs font-bold transition-colors"
-                      >
-                        <Clipboard className="h-3.5 w-3.5" />
-                        <span>Diagnostics</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 border-t border-border bg-muted/20 text-xs font-bold text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <span>Show</span>
-            <select
-              value={filters.limit}
-              onChange={(e) => setFilters(prev => ({ ...prev, limit: parseInt(e.target.value, 10), page: 1 }))}
-              className="rounded border border-border bg-background px-2 py-1 focus:outline-none"
-            >
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-            </select>
-            <span>entries</span>
+                  logs.map((log) => (
+                    <tr key={log._id} className="hover:bg-muted/30 transition-colors">
+                      <td className="p-2.5">
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${
+                          log.type === 'ERROR' 
+                            ? 'bg-red-500/10 text-red-600 dark:text-red-400' 
+                            : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                        }`}>
+                          {log.type === 'ERROR' ? <AlertCircle className="h-2.5 w-2.5" /> : <CheckCircle className="h-2.5 w-2.5" />}
+                          {log.type}
+                        </span>
+                      </td>
+                      <td className="p-2.5">
+                        <div className="font-bold text-[10px] text-foreground font-mono truncate max-w-[140px]" title={log.tenantId}>
+                          {log.tenantId}
+                        </div>
+                        <div className="text-[9px] text-muted-foreground truncate max-w-[140px]" title={log.userEmail}>
+                          {log.userEmail}
+                        </div>
+                      </td>
+                      <td className="p-2.5 max-w-[200px] truncate font-medium text-slate-700 dark:text-zinc-300" title={log.message}>
+                        {log.message}
+                      </td>
+                      <td className="p-2.5 text-[10px] font-medium text-muted-foreground">
+                        {new Date(log.timestamp).toLocaleDateString()} {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="p-2.5 text-right">
+                        <div className="inline-flex gap-1">
+                          <button
+                            onClick={() => setSelectedLog(log)}
+                            className="p-1 rounded border border-border bg-background hover:bg-muted text-foreground transition-colors cursor-pointer"
+                            title="View Details"
+                          >
+                            <Eye className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => copyToClipboard(log)}
+                            className="p-1 rounded border border-border bg-background hover:bg-muted text-foreground transition-colors cursor-pointer"
+                            title="Copy Diagnostics"
+                          >
+                            <Clipboard className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteLog(log._id)}
+                            className="p-1 rounded border border-border bg-background hover:bg-red-50 dark:hover:bg-red-955/20 text-slate-500 hover:text-red-650 dark:hover:text-red-405 transition-colors cursor-pointer"
+                            title="Delete Log"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span>Page {meta.page} of {totalPages}</span>
-            <div className="flex gap-1">
-              <button
-                disabled={filters.page <= 1}
-                onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
-                className="rounded border border-border bg-card px-2.5 py-1.5 hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3 border-t border-border bg-muted/20 text-[10px] font-bold text-muted-foreground shrink-0">
+            <div className="flex items-center gap-1.5">
+              <span>Show</span>
+              <select
+                value={filters.limit}
+                onChange={(e) => setFilters(prev => ({ ...prev, limit: parseInt(e.target.value, 10), page: 1 }))}
+                className="rounded border border-border bg-background px-1.5 py-0.5 focus:outline-none"
               >
-                Previous
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+              <span>entries</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span>Page {meta.page} of {totalPages}</span>
+              <div className="flex gap-1">
+                <button
+                  disabled={filters.page <= 1}
+                  onClick={() => setFilters(prev => ({ ...prev, page: prev.page - 1 }))}
+                  className="rounded border border-border bg-card px-2 py-1 hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
+                >
+                  Previous
+                </button>
+                <button
+                  disabled={filters.page >= totalPages}
+                  onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
+                  className="rounded border border-border bg-card px-2 py-1 hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedLog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-lg max-w-2xl w-full shadow-lg overflow-hidden flex flex-col font-semibold">
+            <div className="p-3 border-b border-border dark:border-zinc-700 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-800/20">
+              <div className="flex items-center gap-2">
+                <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${
+                  selectedLog.type === 'ERROR' 
+                    ? 'bg-red-500/10 text-red-650 dark:text-red-400' 
+                    : 'bg-amber-500/10 text-amber-650 dark:text-amber-400'
+                }`}>
+                  {selectedLog.type}
+                </span>
+                <h3 className="text-xs font-bold text-foreground dark:text-white">Diagnostic Details</h3>
+              </div>
+              <button
+                onClick={() => setSelectedLog(null)}
+                className="p-1 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700 cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-3 overflow-y-auto max-h-[70vh] text-xs font-semibold text-foreground">
+              <div className="grid grid-cols-2 gap-2 text-[11px]">
+                <div className="p-2 rounded bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">Tenant ID</span>
+                  <span className="font-mono">{selectedLog.tenantId}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">User Email</span>
+                  <span>{selectedLog.userEmail}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 col-span-2">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">Page URL</span>
+                  <span className="break-all font-mono">{selectedLog.url}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 col-span-2">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">User Agent (Browser)</span>
+                  <span className="break-all font-mono">{selectedLog.browserInfo}</span>
+                </div>
+                <div className="p-2 rounded bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 col-span-2">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">Logged Timestamp</span>
+                  <span>{new Date(selectedLog.timestamp).toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase block">Error Message</span>
+                <div className="p-2 rounded bg-red-500/5 text-red-650 dark:text-red-400 font-mono text-[11px] border border-red-500/10 break-words">
+                  {selectedLog.message}
+                </div>
+              </div>
+
+              {selectedLog.stack && (
+                <div className="space-y-1">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase block">Execution Callstack</span>
+                  <pre className="p-2 rounded bg-zinc-900 text-zinc-100 font-mono text-[10px] border border-zinc-950 overflow-x-auto whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed select-text">
+                    {selectedLog.stack}
+                  </pre>
+                </div>
+              )}
+            </div>
+
+            <div className="p-3 border-t border-border dark:border-zinc-700 flex justify-end gap-2 bg-slate-50/50 dark:bg-zinc-800/10">
+              <button
+                onClick={() => copyToClipboard(selectedLog)}
+                className="px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-bold transition-colors inline-flex items-center gap-1 cursor-pointer text-foreground"
+              >
+                <Clipboard className="h-3.5 w-3.5" />
+                <span>Copy Details</span>
               </button>
               <button
-                disabled={filters.page >= totalPages}
-                onClick={() => setFilters(prev => ({ ...prev, page: prev.page + 1 }))}
-                className="rounded border border-border bg-card px-2.5 py-1.5 hover:bg-muted disabled:opacity-50 transition-colors cursor-pointer"
+                onClick={() => setSelectedLog(null)}
+                className="px-3 py-1.5 rounded-lg bg-foreground text-background text-xs font-bold hover:opacity-90 transition-opacity cursor-pointer"
               >
-                Next
+                Close
               </button>
             </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   );
