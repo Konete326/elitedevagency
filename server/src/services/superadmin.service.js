@@ -49,6 +49,7 @@ const onboardTenant = async (
     } else {
       finalModules = ['POS'];
     }
+  }
   try {
     const testConn = await mongoose.createConnection(dbURI, { serverSelectionTimeoutMS: 4000 });
     await testConn.asPromise();
