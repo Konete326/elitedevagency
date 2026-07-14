@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useOnboardTenant } from '../hooks/useSuperAdmin';
+import { useOnboardTenant, useUpdateTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
 import { CheckSquare, Square, ShieldCheck, Key, Clipboard, X, AlertCircle, ChevronLeft, Eye, EyeOff } from 'lucide-react';
 import { getDatabase } from '../../../db/database';
@@ -28,7 +28,7 @@ const nicheFeaturesMap = {
 
 const globalFeatures = ['Custom Brand Colors'];
 
-export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
+export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
   const [businessName, setBusinessName] = useState('');
   const [niche, setNiche] = useState('GYM');
   const [plan, setPlan] = useState('STARTER');
@@ -56,6 +56,32 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
   const [ownerEmailError, setOwnerEmailError] = useState('');
 
   const onboardTenantMutation = useOnboardTenant();
+  const updateTenantMutation = useUpdateTenant();
+
+  useEffect(() => {
+    if (editingTenant) {
+      setBusinessName(editingTenant.businessName || '');
+      setNiche(editingTenant.niche || 'GYM');
+      setPlan(editingTenant.plan || 'STARTER');
+      setActiveModules(editingTenant.activeModules || ['POS']);
+      setDbURI(editingTenant.dbURI || editingTenant.databaseURI || '');
+      setSelectedFeatures(editingTenant.features || []);
+      setBlockMobileAccess(editingTenant.blockMobileAccess || false);
+      if (editingTenant.customTheme) {
+        setLightPrimary(editingTenant.customTheme.lightPrimary || '#d97706');
+        setDarkPrimary(editingTenant.customTheme.darkPrimary || '#f59e0b');
+      }
+
+      const start = editingTenant.createdAt ? new Date(editingTenant.createdAt) : new Date();
+      const expiry = editingTenant.subscriptionExpiry ? new Date(editingTenant.subscriptionExpiry) : new Date();
+      const calculatedDays = Math.max(0, Math.round((expiry - start) / (1000 * 60 * 60 * 24))) || 30;
+      setTrialDays(calculatedDays.toString());
+
+      setOwnerName(editingTenant.owner?.name || '');
+      setOwnerEmail(editingTenant.owner?.email || '');
+      setOwnerPassword('');
+    }
+  }, [editingTenant]);
 
   // Regex rules
   const businessNameRegex = /^[A-Za-z0-9][A-Za-z0-9\s-]{2,39}$/;
@@ -187,63 +213,106 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
   const handleOnboard = (e) => {
     e.preventDefault();
 
-    // final sanity check
-    if (
-      businessNameError ||
-      trialDaysError ||
-      dbURIError ||
-      ownerPasswordError ||
-      ownerNameError ||
-      ownerEmailError ||
-      !businessName ||
-      !ownerName ||
-      !ownerEmail ||
-      !ownerPassword ||
-      !dbURI
-    ) {
-      toast.error('Please fix all validation errors before deploying.');
-      return;
-    }
-
-    const parsedDays = trialDays ? parseInt(trialDays, 10) : 0;
-    onboardTenantMutation.mutate(
-      {
-        businessName,
-        niche,
-        plan,
-        activeModules,
-        trialDays: parsedDays,
-        ownerName,
-        ownerEmail,
-        ownerPassword,
-        customTheme: { lightPrimary, darkPrimary },
-        dbURI,
-        features: selectedFeatures,
-        blockMobileAccess
-      },
-      {
-        onSuccess: (response) => {
-          toast.success(`Tenant "${response.data.businessName}" successfully onboarded!`);
-          setCredentials(response.credentials);
-          if (onSuccess) onSuccess(response.credentials);
-          setBusinessName('');
-          setOwnerName('');
-          setOwnerEmail('');
-          setOwnerPassword('');
-          setDbURI('');
-          setSelectedFeatures([]);
-          setPlan('STARTER');
-          setNiche('GYM');
-          setTrialDays('30');
-          setLightPrimary('#d97706');
-          setDarkPrimary('#f59e0b');
-          setBlockMobileAccess(false);
-        },
-        onError: (error) => {
-          toast.error(error.message || 'Onboarding failed');
-        }
+    if (editingTenant) {
+      if (
+        businessNameError ||
+        trialDaysError ||
+        dbURIError ||
+        (ownerEmail && ownerEmailError) ||
+        (ownerPassword && ownerPasswordError) ||
+        !businessName ||
+        !dbURI
+      ) {
+        toast.error('Please fix all validation errors before updating.');
+        return;
       }
-    );
+
+      const parsedDays = trialDays ? parseInt(trialDays, 10) : 0;
+      updateTenantMutation.mutate(
+        {
+          tenantId: editingTenant._id,
+          updateData: {
+            businessName,
+            niche,
+            plan,
+            trialDays: parsedDays,
+            dbURI,
+            features: selectedFeatures,
+            blockMobileAccess,
+            ownerName: ownerName || undefined,
+            ownerEmail: ownerEmail || undefined,
+            ownerPassword: ownerPassword || undefined,
+            customTheme: { lightPrimary, darkPrimary }
+          }
+        },
+        {
+          onSuccess: (updatedTenant) => {
+            toast.success(`Tenant "${updatedTenant.businessName}" updated successfully!`);
+            if (onSuccess) onSuccess();
+          },
+          onError: (error) => {
+            toast.error(error.message || 'Update failed');
+          }
+        }
+      );
+    } else {
+      if (
+        businessNameError ||
+        trialDaysError ||
+        dbURIError ||
+        ownerPasswordError ||
+        ownerNameError ||
+        ownerEmailError ||
+        !businessName ||
+        !ownerName ||
+        !ownerEmail ||
+        !ownerPassword ||
+        !dbURI
+      ) {
+        toast.error('Please fix all validation errors before deploying.');
+        return;
+      }
+
+      const parsedDays = trialDays ? parseInt(trialDays, 10) : 0;
+      onboardTenantMutation.mutate(
+        {
+          businessName,
+          niche,
+          plan,
+          activeModules,
+          trialDays: parsedDays,
+          ownerName,
+          ownerEmail,
+          ownerPassword,
+          customTheme: { lightPrimary, darkPrimary },
+          dbURI,
+          features: selectedFeatures,
+          blockMobileAccess
+        },
+        {
+          onSuccess: (response) => {
+            toast.success(`Tenant "${response.data.businessName}" successfully onboarded!`);
+            setCredentials(response.credentials);
+            if (onSuccess) onSuccess(response.credentials);
+            setBusinessName('');
+            setOwnerName('');
+            setOwnerEmail('');
+            setOwnerPassword('');
+            setDbURI('');
+            setSelectedFeatures([]);
+            setPlan('STARTER');
+            setNiche('GYM');
+            setTrialDays('30');
+            setLightPrimary('#d97706');
+            setDarkPrimary('#f59e0b');
+            setBlockMobileAccess(false);
+          },
+          onError: (error) => {
+            toast.error(error.message || 'Onboarding failed');
+          }
+        }
+      );
+    }
   };
 
   const currentNicheFeatures = nicheFeaturesMap[niche] || [];
@@ -406,10 +475,12 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Owner Full Name *</label>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    {editingTenant ? 'Owner Full Name (Optional)' : 'Owner Full Name *'}
+                  </label>
                   <input
                     type="text"
-                    required
+                    required={!editingTenant}
                     value={ownerName}
                     onChange={(e) => handleOwnerNameChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
@@ -427,10 +498,12 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Owner Email Address *</label>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    {editingTenant ? 'Owner Email Address (Optional)' : 'Owner Email Address *'}
+                  </label>
                   <input
                     type="email"
-                    required
+                    required={!editingTenant}
                     value={ownerEmail}
                     onChange={(e) => handleOwnerEmailChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
@@ -450,11 +523,13 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Owner Password *</label>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    {editingTenant ? 'Owner Password (Leave blank to keep current)' : 'Owner Password *'}
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
-                      required
+                      required={!editingTenant}
                       value={ownerPassword}
                       onChange={(e) => handleOwnerPasswordChange(e.target.value)}
                       className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 pl-3 pr-10 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
@@ -625,18 +700,18 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader }) => {
 
           <button
             type="submit"
-            disabled={onboardTenantMutation.isPending || hasAnyErrors}
+            disabled={onboardTenantMutation.isPending || updateTenantMutation.isPending || (editingTenant ? false : hasAnyErrors)}
             className="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 font-bold px-4 py-2.5 text-xs transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {onboardTenantMutation.isPending ? (
+            {onboardTenantMutation.isPending || updateTenantMutation.isPending ? (
               <span className="flex items-center gap-2">
                 <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                <span>Deploying Tenant Database...</span>
+                <span>{editingTenant ? 'Saving Tenant Settings...' : 'Deploying Tenant Database...'}</span>
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
-                <span>Deploy & Activate Tenant</span>
+                <span>{editingTenant ? 'Save Tenant Settings' : 'Deploy & Activate Tenant'}</span>
               </span>
             )}
           </button>

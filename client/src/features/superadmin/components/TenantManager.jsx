@@ -1,18 +1,23 @@
-import { useState } from 'react';
-import { useTenants, useToggleTenantLock, useToggleMobileAccess, useUpdateTenantFeatures, useToggleTenantSuspension } from '../hooks/useSuperAdmin';
+import { useState, useEffect } from 'react';
+import { useTenants, useToggleTenantLock, useToggleMobileAccess, useUpdateTenantFeatures, useToggleTenantSuspension, useDeleteTenant } from '../hooks/useSuperAdmin';
 import { toast } from 'sonner';
-import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers, Shield, X, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers, Shield, X, AlertTriangle, CheckCircle, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export const TenantManager = () => {
+export const TenantManager = ({ onEdit }) => {
   const [page, setPage] = useState(1);
   const limit = 5;
+  const navigate = useNavigate();
 
   const { data, isLoading } = useTenants(page, limit);
   const toggleLockMutation = useToggleTenantLock();
   const toggleMobileAccessMutation = useToggleMobileAccess();
   const updateFeaturesMutation = useUpdateTenantFeatures();
   const toggleSuspensionMutation = useToggleTenantSuspension();
+  const deleteTenantMutation = useDeleteTenant();
 
+  const [activeDropdownTenantId, setActiveDropdownTenantId] = useState(null);
+  const [selectedTenantForView, setSelectedTenantForView] = useState(null);
   const [selectedTenantForFeatures, setSelectedTenantForFeatures] = useState(null);
   const [tempFeatures, setTempFeatures] = useState([]);
 
@@ -26,6 +31,12 @@ export const TenantManager = () => {
   const tenants = data?.data || [];
   const meta = data?.meta || { total: 0 };
   const totalPages = Math.ceil(meta.total / limit) || 1;
+
+  useEffect(() => {
+    const handleCloseDropdown = () => setActiveDropdownTenantId(null);
+    window.addEventListener('click', handleCloseDropdown);
+    return () => window.removeEventListener('click', handleCloseDropdown);
+  }, []);
 
   const handleToggleLock = (tenantId) => {
     toggleLockMutation.mutate(tenantId, {
@@ -51,7 +62,29 @@ export const TenantManager = () => {
     });
   };
 
+  const handleEditClick = (tenant) => {
+    if (onEdit) {
+      onEdit(tenant);
+    } else {
+      navigate(`/superadmin/tenants/new?edit=${tenant._id}`);
+    }
+  };
+
+  const handleDeleteClick = (tenant) => {
+    if (window.confirm(`Are you absolutely sure you want to delete tenant "${tenant.businessName}"? This action is irreversible.`)) {
+      deleteTenantMutation.mutate(tenant._id, {
+        onSuccess: () => {
+          toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
+        },
+        onError: (err) => {
+          toast.error(err.message || 'Failed to delete tenant');
+        }
+      });
+    }
+  };
+
   const formatDate = (dateStr) => {
+    if (!dateStr) return 'N/A';
     return new Date(dateStr).toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'short',
@@ -184,7 +217,10 @@ export const TenantManager = () => {
                   </td>
                   <td className="py-2 px-3">
                     <button
-                      onClick={() => handleToggleMobileAccess(tenant._id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleMobileAccess(tenant._id);
+                      }}
                       disabled={toggleMobileAccessMutation.isPending}
                       className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                         tenant.blockMobileAccess ? 'bg-[var(--accent)]' : 'bg-slate-200 dark:bg-zinc-700'
@@ -197,52 +233,99 @@ export const TenantManager = () => {
                       />
                     </button>
                   </td>
-                  <td className="py-2 px-3 text-right">
+                  <td className="py-2 px-3 text-right relative">
                     <button
-                      onClick={() => {
-                        setSelectedTenantForFeatures(tenant);
-                        setTempFeatures(tenant.features || []);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveDropdownTenantId(
+                          activeDropdownTenantId === tenant._id ? null : tenant._id
+                        );
                       }}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2 py-1 text-[11px] font-bold mr-1.5 transition-colors"
+                      className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors border border-border dark:border-zinc-700"
                     >
-                      <Layers className="h-3 w-3 text-amber-600 dark:text-amber-500" />
-                      <span>Features</span>
+                      <MoreVertical className="h-4 w-4" />
                     </button>
-                    <button
-                      onClick={() => {
-                        setSelectedTenantForSuspension(tenant);
-                        setSuspensionState({
-                          isSuspended: tenant.isSuspended || false,
-                          suspensionTitle: tenant.suspensionTitle || '',
-                          suspensionDescription: tenant.suspensionDescription || ''
-                        });
-                      }}
-                      className="inline-flex items-center gap-1 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2 py-1 text-[11px] font-bold mr-1.5 transition-colors"
-                    >
-                      <Shield className="h-3 w-3 text-rose-600 dark:text-rose-455" />
-                      <span>Status</span>
-                    </button>
-                    <button
-                      onClick={() => handleToggleLock(tenant._id)}
-                      disabled={toggleLockMutation.isPending}
-                      className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[11px] font-bold transition-colors ${
-                        tenant.rentOverdue
-                          ? 'bg-green-500/10 hover:bg-green-500/20 text-green-600 border-green-500/20 dark:border-green-550/20'
-                          : 'bg-red-500/10 hover:bg-red-500/20 text-red-650 border-red-500/20 dark:border-red-550/20'
-                      }`}
-                    >
-                      {tenant.rentOverdue ? (
-                        <>
-                          <Unlock className="h-3 w-3" />
-                          <span>Unlock</span>
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="h-3 w-3" />
-                          <span>Lock (Kill)</span>
-                        </>
-                      )}
-                    </button>
+
+                    {activeDropdownTenantId === tenant._id && (
+                      <div className="absolute right-3 mt-1.5 w-44 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 py-1.5 shadow-lg z-50 text-left font-bold text-[11px] text-slate-650 dark:text-zinc-350">
+                        <button
+                          onClick={() => {
+                            setSelectedTenantForView(tenant);
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-200 transition-colors text-left"
+                        >
+                          <Eye className="h-3.5 w-3.5 text-blue-500" />
+                          <span>View Details</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleEditClick(tenant);
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-200 transition-colors text-left"
+                        >
+                          <Edit className="h-3.5 w-3.5 text-amber-500" />
+                          <span>Edit Profile</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedTenantForFeatures(tenant);
+                            setTempFeatures(tenant.features || []);
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-200 transition-colors text-left"
+                        >
+                          <Layers className="h-3.5 w-3.5 text-indigo-550" />
+                          <span>Manage Features</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedTenantForSuspension(tenant);
+                            setSuspensionState({
+                              isSuspended: tenant.isSuspended || false,
+                              suspensionTitle: tenant.suspensionTitle || '',
+                              suspensionDescription: tenant.suspensionDescription || ''
+                            });
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-200 transition-colors text-left"
+                        >
+                          <Shield className="h-3.5 w-3.5 text-orange-500" />
+                          <span>Suspension Status</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleToggleLock(tenant._id);
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-200 transition-colors text-left"
+                        >
+                          {tenant.rentOverdue ? (
+                            <>
+                              <Unlock className="h-3.5 w-3.5 text-green-500" />
+                              <span>Unlock License</span>
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="h-3.5 w-3.5 text-red-500" />
+                              <span>Lock (Kill) License</span>
+                            </>
+                          )}
+                        </button>
+                        <div className="border-t border-border dark:border-zinc-700 my-1"></div>
+                        <button
+                          onClick={() => {
+                            handleDeleteClick(tenant);
+                            setActiveDropdownTenantId(null);
+                          }}
+                          className="flex items-center gap-2 w-full px-3 py-1.5 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-600 dark:text-rose-455 transition-colors text-left"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>Delete Tenant</span>
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -277,31 +360,125 @@ export const TenantManager = () => {
         </div>
       )}
 
-      {selectedTenantForFeatures && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold">
-          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-3xl w-full shadow-lg overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-border dark:border-zinc-700 flex justify-between items-center">
+      {selectedTenantForView && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold animate-fade-in">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-lg w-full shadow-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-border dark:border-zinc-700 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-foreground">Edit Features - {selectedTenantForFeatures.businessName}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Toggle niche-specific permissions</p>
+                <h3 className="text-sm font-bold text-foreground dark:text-white">Tenant Workspace Details</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{selectedTenantForView.businessName}</p>
+              </div>
+              <button
+                onClick={() => setSelectedTenantForView(null)}
+                className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            <div className="p-4 space-y-4 text-xs">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Business Name</p>
+                  <p className="font-bold text-foreground dark:text-zinc-200">{selectedTenantForView.businessName}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Niche Category</p>
+                  <p className="font-bold text-foreground dark:text-zinc-200">{selectedTenantForView.niche}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Subscription Plan</p>
+                  <p className="font-bold text-foreground dark:text-zinc-200">{selectedTenantForView.plan}</p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Subscription Expiry</p>
+                  <p className="font-bold text-foreground dark:text-zinc-200">{formatDate(selectedTenantForView.subscriptionExpiry)}</p>
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-1">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Database Connection URI</p>
+                <p className="font-mono text-[10px] break-all font-semibold text-foreground dark:text-zinc-300">
+                  {selectedTenantForView.databaseURI || selectedTenantForView.dbURI}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Lock / License Status</p>
+                  <p className="font-bold">
+                    {selectedTenantForView.rentOverdue ? (
+                      <span className="text-red-500">Locked / Suspended</span>
+                    ) : (
+                      <span className="text-green-500">Active</span>
+                    )}
+                  </p>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700 space-y-0.5">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">Mobile/Tablet Access</p>
+                  <p className="font-bold text-foreground dark:text-zinc-200">
+                    {selectedTenantForView.blockMobileAccess ? 'Blocked' : 'Allowed'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-zinc-900/40 border border-border dark:border-zinc-700">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Modules & Features Enabled</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedTenantForView.activeModules?.map(m => (
+                    <span key={m} className="px-2 py-0.5 bg-blue-500/10 text-blue-600 rounded text-[9px] font-black uppercase">
+                      {m}
+                    </span>
+                  ))}
+                  {selectedTenantForView.features?.map(f => (
+                    <span key={f} className="px-2 py-0.5 bg-purple-500/10 text-purple-650 rounded text-[9px] font-black uppercase">
+                      {f}
+                    </span>
+                  ))}
+                  {(!selectedTenantForView.activeModules?.length && !selectedTenantForView.features?.length) && (
+                    <span className="text-muted-foreground font-semibold text-[10px]">No extra modules enabled</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end">
+              <button
+                onClick={() => setSelectedTenantForView(null)}
+                className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedTenantForFeatures && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold animate-fade-in">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-lg w-full shadow-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-border dark:border-zinc-700 flex justify-between items-center">
+              <div>
+                <h3 className="text-sm font-bold text-foreground dark:text-white">Edit Tenant Features</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{selectedTenantForFeatures.businessName}</p>
               </div>
               <button
                 onClick={() => setSelectedTenantForFeatures(null)}
                 className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
               >
-                <Layers className="h-5 w-5 shrink-0 rotate-180" />
+                <X className="h-4.5 w-4.5" />
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto max-h-[60vh] space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:divide-x divide-border dark:divide-zinc-700">
-                <div className="space-y-4">
-                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Garments Features</h4>
+            <div className="p-4 space-y-4">
+              <div className="grid gap-3 grid-cols-3">
+                <div className="space-y-2">
+                  <h4 className="text-[9px] font-black tracking-wider text-slate-500 uppercase">Garments Features</h4>
                   <div className="space-y-2">
                     {['Barcode Printing', 'Size-Color Matrix'].map((feat) => {
                       const isChecked = tempFeatures.includes(feat);
                       return (
-                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                        <label key={feat} className="flex items-center gap-2 text-xs cursor-pointer select-none font-bold text-foreground dark:text-zinc-200">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -310,7 +487,7 @@ export const TenantManager = () => {
                                 prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
                               );
                             }}
-                            className="h-4 w-4 rounded border-border text-[var(--accent)] focus:ring-[var(--accent)]"
+                            className="h-3.5 w-3.5 rounded border-border dark:border-zinc-755 text-[var(--accent)] focus:ring-[var(--accent)]"
                           />
                           <span>{feat}</span>
                         </label>
@@ -319,13 +496,13 @@ export const TenantManager = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4 md:pl-6">
-                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Restaurant Features</h4>
+                <div className="space-y-2 border-l border-border dark:border-zinc-700 pl-3">
+                  <h4 className="text-[9px] font-black tracking-wider text-slate-500 uppercase">Restaurant Features</h4>
                   <div className="space-y-2">
                     {['Kitchen Order Ticket', 'Table Management'].map((feat) => {
                       const isChecked = tempFeatures.includes(feat);
                       return (
-                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                        <label key={feat} className="flex items-center gap-2 text-xs cursor-pointer select-none font-bold text-foreground dark:text-zinc-200">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -334,7 +511,7 @@ export const TenantManager = () => {
                                 prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
                               );
                             }}
-                            className="h-4 w-4 rounded border-border text-[var(--accent)] focus:ring-[var(--accent)]"
+                            className="h-3.5 w-3.5 rounded border-border dark:border-zinc-755 text-[var(--accent)] focus:ring-[var(--accent)]"
                           />
                           <span>{feat}</span>
                         </label>
@@ -343,13 +520,13 @@ export const TenantManager = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4 md:pl-6">
-                  <h4 className="text-xs font-extrabold tracking-wider text-slate-500 uppercase">Gym Features</h4>
+                <div className="space-y-2 border-l border-border dark:border-zinc-700 pl-3">
+                  <h4 className="text-[9px] font-black tracking-wider text-slate-500 uppercase">Gym Features</h4>
                   <div className="space-y-2">
                     {['BMI Tracker', 'Instructor Payroll'].map((feat) => {
                       const isChecked = tempFeatures.includes(feat);
                       return (
-                        <label key={feat} className="flex items-center gap-2.5 text-sm cursor-pointer select-none font-bold text-foreground">
+                        <label key={feat} className="flex items-center gap-2 text-xs cursor-pointer select-none font-bold text-foreground dark:text-zinc-200">
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -358,7 +535,7 @@ export const TenantManager = () => {
                                 prev.includes(feat) ? prev.filter((f) => f !== feat) : [...prev, feat]
                               );
                             }}
-                            className="h-4 w-4 rounded border-border text-[var(--accent)] focus:ring-[var(--accent)]"
+                            className="h-3.5 w-3.5 rounded border-border dark:border-zinc-755 text-[var(--accent)] focus:ring-[var(--accent)]"
                           />
                           <span>{feat}</span>
                         </label>
@@ -369,10 +546,10 @@ export const TenantManager = () => {
               </div>
             </div>
 
-            <div className="p-6 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-3">
+            <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedTenantForFeatures(null)}
-                className="px-4 py-2 border border-border dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-750 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg transition-colors"
+                className="px-4 py-2 border border-border text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 text-xs font-bold rounded-lg transition-colors"
               >
                 Cancel
               </button>
@@ -402,64 +579,60 @@ export const TenantManager = () => {
       )}
 
       {selectedTenantForSuspension && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold">
-          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-lg w-full shadow-lg overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-border dark:border-zinc-700 flex justify-between items-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold animate-fade-in">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-md w-full shadow-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-border dark:border-zinc-700 flex justify-between items-center">
               <div>
-                <h3 className="text-lg font-bold text-foreground">Account Status - {selectedTenantForSuspension.businessName}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Manage subscription suspension and custom lock messages</p>
+                <h3 className="text-sm font-bold text-foreground dark:text-white">Workspace Suspension Settings</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{selectedTenantForSuspension.businessName}</p>
               </div>
               <button
                 onClick={() => setSelectedTenantForSuspension(null)}
                 className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4.5 w-4.5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-5">
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-900/40 rounded-xl border border-border dark:border-zinc-700">
-                <span className="text-sm font-bold text-foreground">Current Subscription Tier</span>
-                <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-extrabold tracking-wider uppercase ${getPlanBadgeClass(selectedTenantForSuspension.plan)}`}>
+            <div className="p-4 space-y-4">
+              <div className="flex items-center justify-between p-2.5 bg-slate-50 dark:bg-zinc-900/40 rounded-lg border border-border dark:border-zinc-700">
+                <span className="text-xs font-bold text-foreground dark:text-zinc-200">Subscription Tier</span>
+                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black tracking-wider uppercase ${getPlanBadgeClass(selectedTenantForSuspension.plan)}`}>
                   {selectedTenantForSuspension.plan === 'CUSTOM' && selectedTenantForSuspension.customPlanName
-                    ? `${selectedTenantForSuspension.customPlanName} ($${selectedTenantForSuspension.customPlanPrice})`
+                    ? `${selectedTenantForSuspension.customPlanName} (Rs. ${selectedTenantForSuspension.customPlanPrice.toLocaleString()})`
                     : (selectedTenantForSuspension.plan || 'STARTER')}
                 </span>
               </div>
 
-              <div className="p-4 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 space-y-4">
-                <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Account Status Control</h4>
-                
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Custom Lock Title (Optional)</label>
-                    <input
-                      type="text"
-                      value={suspensionState.suspensionTitle}
-                      onChange={(e) => setSuspensionState(prev => ({ ...prev, suspensionTitle: e.target.value }))}
-                      placeholder="Account Suspended"
-                      className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase mb-1">Custom Lock Description (Optional)</label>
-                    <textarea
-                      value={suspensionState.suspensionDescription}
-                      onChange={(e) => setSuspensionState(prev => ({ ...prev, suspensionDescription: e.target.value }))}
-                      placeholder="Your subscription workspace has been suspended. Please contact the administrator."
-                      rows={3}
-                      className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--accent)] resize-none"
-                    />
-                  </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Custom Lock Title (Optional)</label>
+                  <input
+                    type="text"
+                    value={suspensionState.suspensionTitle}
+                    onChange={(e) => setSuspensionState(prev => ({ ...prev, suspensionTitle: e.target.value }))}
+                    placeholder="Account Suspended"
+                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-transparent px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  />
                 </div>
 
-                <div className="pt-2">
+                <div>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Custom Lock Description (Optional)</label>
+                  <textarea
+                    value={suspensionState.suspensionDescription}
+                    onChange={(e) => setSuspensionState(prev => ({ ...prev, suspensionDescription: e.target.value }))}
+                    placeholder="Your subscription workspace has been suspended. Please contact the administrator."
+                    rows={3}
+                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-transparent px-3 py-2 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-[var(--accent)] resize-none font-semibold"
+                  />
+                </div>
+
+                <div className="pt-1">
                   {suspensionState.isSuspended ? (
                     <button
                       type="button"
                       onClick={() => setSuspensionState(prev => ({ ...prev, isSuspended: false }))}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 py-2.5 text-xs font-bold transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 py-2 text-xs font-bold transition-colors"
                     >
                       <CheckCircle className="h-4 w-4" />
                       <span>Activate Tenant Access</span>
@@ -468,7 +641,7 @@ export const TenantManager = () => {
                     <button
                       type="button"
                       onClick={() => setSuspensionState(prev => ({ ...prev, isSuspended: true }))}
-                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 py-2.5 text-xs font-bold transition-colors"
+                      className="w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-rose-500/20 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 py-2 text-xs font-bold transition-colors"
                     >
                       <AlertTriangle className="h-4 w-4" />
                       <span>Suspend Tenant Access</span>
@@ -478,10 +651,10 @@ export const TenantManager = () => {
               </div>
             </div>
 
-            <div className="p-6 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-3">
+            <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-2">
               <button
                 onClick={() => setSelectedTenantForSuspension(null)}
-                className="px-4 py-2 border border-border dark:border-zinc-700 hover:bg-slate-100 dark:hover:bg-zinc-750 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-lg transition-colors"
+                className="px-4 py-2 border border-border text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 text-xs font-bold rounded-lg transition-colors"
               >
                 Cancel
               </button>
