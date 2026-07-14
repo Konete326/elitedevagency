@@ -3,8 +3,10 @@ import { useTenants, useToggleTenantLock, useToggleMobileAccess, useUpdateTenant
 import { toast } from 'sonner';
 import { Lock, Unlock, ChevronLeft, ChevronRight, Database, Layers, Shield, X, AlertTriangle, CheckCircle, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const TenantManager = ({ onEdit }) => {
+  const { openModal } = useModalStore();
   const [page, setPage] = useState(1);
   const limit = 5;
   const navigate = useNavigate();
@@ -82,16 +84,23 @@ export const TenantManager = ({ onEdit }) => {
   };
 
   const handleDeleteClick = (tenant) => {
-    if (window.confirm(`Are you absolutely sure you want to delete tenant "${tenant.businessName}"? This action is irreversible.`)) {
-      deleteTenantMutation.mutate(tenant._id, {
-        onSuccess: () => {
-          toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
-        },
-        onError: (err) => {
-          toast.error(err.message || 'Failed to delete tenant');
-        }
-      });
-    }
+    openModal({
+      type: 'danger',
+      title: 'Delete Tenant Workspace',
+      message: `This will permanently remove "${tenant.businessName}" and all associated configuration. This action cannot be undone.`,
+      confirmText: 'Delete Tenant',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        deleteTenantMutation.mutate(tenant._id, {
+          onSuccess: () => {
+            toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
+          },
+          onError: (err) => {
+            toast.error(err.message || 'Failed to delete tenant');
+          }
+        });
+      }
+    });
   };
 
   const formatDate = (dateStr) => {

@@ -4,8 +4,10 @@ import { Database, Activity, Wifi, WifiOff, X, Clock, HardDrive, Cpu, AlertTrian
 import { AdminTable } from '../../../components/ui/AdminTable';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const DiagnosticsPanel = () => {
+  const { openModal } = useModalStore();
   const { data: diagnostics = [], isLoading } = useDiagnostics();
   const [selectedTenant, setSelectedTenant] = useState(null);
   const [editingTenant, setEditingTenant] = useState(null);
@@ -133,16 +135,23 @@ export const DiagnosticsPanel = () => {
   };
 
   const handleDeleteClick = (tenant) => {
-    if (window.confirm(`Are you absolutely sure you want to delete tenant "${tenant.businessName}"? This action is irreversible.`)) {
-      deleteTenantMutation.mutate(tenant.tenantId, {
-        onSuccess: () => {
-          toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
-        },
-        onError: (err) => {
-          toast.error(err.message || 'Failed to delete tenant');
-        }
-      });
-    }
+    openModal({
+      type: 'danger',
+      title: 'Delete Tenant Workspace',
+      message: `This will permanently remove "${tenant.businessName}" and all associated configuration. This action cannot be undone.`,
+      confirmText: 'Delete Tenant',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        deleteTenantMutation.mutate(tenant.tenantId, {
+          onSuccess: () => {
+            toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
+          },
+          onError: (err) => {
+            toast.error(err.message || 'Failed to delete tenant');
+          }
+        });
+      }
+    });
   };
 
   const renderRow = (tenant) => (
