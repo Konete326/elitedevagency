@@ -12,14 +12,17 @@ const validate = (schema) => async (req, res, next) => {
     return next();
   } catch (error) {
     logger.warn('Validation failed for incoming request');
-    return res.status(400).json({
-      success: false,
-      error: 'Validation Error',
-      details: error.errors.map(err => ({
-        path: err.path.join('.'),
-        message: err.message
-      }))
-    });
+    if (error.errors && Array.isArray(error.errors)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation Error',
+        details: error.errors.map(err => ({
+          path: err.path.join('.'),
+          message: err.message
+        }))
+      });
+    }
+    return next(error);
   }
 };
 
