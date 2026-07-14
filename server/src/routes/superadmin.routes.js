@@ -16,11 +16,14 @@ const onboardSchema = z.object({
   body: z.object({
     businessName: z.string().min(1, 'Business name is required'),
     niche: z.enum(['GYM', 'RESTAURANT', 'GARMENTS']),
-    plan: z.enum(['STARTER', 'GROWTH', 'PRO']),
+    plan: z.string().min(1, 'Plan is required'),
     activeModules: z.array(z.string()).optional(),
-    trialDays: z.number().int().positive().optional(),
+    trialDays: z.number().int().nonnegative().optional(),
     ownerName: z.string().min(1, 'Owner name is required'),
     ownerEmail: z.string().email('Invalid owner email address'),
+    ownerPassword: z.string().min(6, 'Owner password must be at least 6 characters'),
+    dbURI: z.string().min(1, 'Database connection URI is required'),
+    features: z.array(z.string()).optional(),
     customTheme: z.object({
       lightPrimary: hexColor.optional().nullable(),
       darkPrimary: hexColor.optional().nullable()
