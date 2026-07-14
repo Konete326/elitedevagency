@@ -34,12 +34,16 @@ const loginUser = async (email, password, deviceFingerprint) => {
 
   const user = await User.findOne({ email, isActive: true }).lean();
   if (!user) {
-    throw new Error('Invalid credentials or inactive user');
+    const error = new Error('Invalid credentials or inactive user');
+    error.statusCode = 401;
+    throw error;
   }
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error('Invalid credentials');
+    const error = new Error('Invalid credentials or inactive user');
+    error.statusCode = 401;
+    throw error;
   }
 
   if (user.role === 'SUPER_ADMIN') {
@@ -67,11 +71,15 @@ const loginUser = async (email, password, deviceFingerprint) => {
 
   const tenant = await Tenant.findById(user.tenantId);
   if (!tenant || !tenant.isActive) {
-    throw new Error('Business account is inactive');
+    const error = new Error('Business account is inactive');
+    error.statusCode = 403;
+    throw error;
   }
   
   if (tenant.rentOverdue) {
-    throw new Error('Account suspended due to overdue rent');
+    const error = new Error('Account suspended due to overdue rent');
+    error.statusCode = 403;
+    throw error;
   }
 
   const existingDeviceIndex = tenant.approvedDevices.findIndex(
@@ -85,12 +93,16 @@ const loginUser = async (email, password, deviceFingerprint) => {
       status: 'PENDING'
     });
     await tenant.save();
-    throw new Error('Device not recognized or not approved by SuperAdmin');
+    const error = new Error('Device not recognized or not approved by SuperAdmin');
+    error.statusCode = 403;
+    throw error;
   }
 
   const device = tenant.approvedDevices[existingDeviceIndex];
   if (device.status !== 'APPROVED') {
-    throw new Error('Device not recognized or not approved by SuperAdmin');
+    const error = new Error('Device not recognized or not approved by SuperAdmin');
+    error.statusCode = 403;
+    throw error;
   }
 
   const token = jwt.sign(
