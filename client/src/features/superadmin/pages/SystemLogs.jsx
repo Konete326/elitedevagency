@@ -16,7 +16,7 @@ export const SystemLogs = () => {
     type: '',
     url: '',
     page: 1,
-    limit: 10
+    limit: 5
   });
 
   const [selectedLog, setSelectedLog] = useState(null);
@@ -283,6 +283,7 @@ export const SystemLogs = () => {
                 onChange={(e) => setFilters(prev => ({ ...prev, limit: parseInt(e.target.value, 10), page: 1 }))}
                 className="rounded border border-border bg-background px-1.5 py-0.5 focus:outline-none"
               >
+                <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>
