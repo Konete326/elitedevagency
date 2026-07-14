@@ -17,7 +17,7 @@ export const startImageSync = () => {
       isSyncing = true;
       const db = await getDatabase();
       const collections = ['products', 'categories'];
-      const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      const apiURL = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:5000/api`;
 
       for (const colName of collections) {
         const docsToSync = await db[colName]

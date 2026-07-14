@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/useAuthStore';
 
-const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const apiURL = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:5000/api`;
 
 export const usePendingDevices = () => {
   const token = useAuthStore((state) => state.token);

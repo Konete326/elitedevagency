@@ -15,7 +15,7 @@ export const startReplication = async (db, collectionName) => {
   const collection = db[collectionName];
   if (!collection) return null;
 
-  const apiURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  const apiURL = import.meta.env.VITE_API_URL || `${window.location.protocol}//${window.location.hostname}:5000/api`;
 
   const replicationState = replicateRxCollection({
     collection,
