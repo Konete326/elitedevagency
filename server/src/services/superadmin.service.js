@@ -253,7 +253,11 @@ const getDiagnostics = async () => {
         durationMs: latestLog.durationMs,
         status: latestLog.status
       } : null,
-      dbURI: tenant.dbURI || tenant.databaseURI
+      dbURI: tenant.dbURI || tenant.databaseURI,
+      niche: tenant.niche,
+      plan: tenant.plan,
+      createdAt: tenant.createdAt,
+      subscriptionExpiry: tenant.subscriptionExpiry
     });
   }
 
@@ -273,6 +277,38 @@ const updateSuspension = async (tenantId, isSuspended, suspensionTitle, suspensi
   return tenant;
 };
 
+const updateTenant = async (tenantId, updateData) => {
+  const tenant = await Tenant.findById(tenantId);
+  if (!tenant) {
+    throw new Error('Tenant not found');
+  }
+
+  if (updateData.businessName !== undefined) tenant.businessName = updateData.businessName;
+  if (updateData.niche !== undefined) tenant.niche = updateData.niche;
+  if (updateData.plan !== undefined) tenant.plan = updateData.plan;
+  if (updateData.trialDays !== undefined) {
+    const start = tenant.createdAt || new Date();
+    const expiryDate = new Date(start);
+    expiryDate.setDate(expiryDate.getDate() + updateData.trialDays);
+    tenant.subscriptionExpiry = expiryDate;
+  }
+  if (updateData.dbURI !== undefined) {
+    tenant.dbURI = updateData.dbURI;
+    tenant.databaseURI = updateData.dbURI;
+  }
+
+  await tenant.save();
+  return tenant;
+};
+
+const deleteTenant = async (tenantId) => {
+  const result = await Tenant.findByIdAndDelete(tenantId);
+  if (!result) {
+    throw new Error('Tenant not found');
+  }
+  return { success: true };
+};
+
 module.exports = {
   onboardTenant,
   getPendingDevices,
@@ -282,5 +318,7 @@ module.exports = {
   toggleMobileAccess,
   updateFeatures,
   getDiagnostics,
-  updateSuspension
+  updateSuspension,
+  updateTenant,
+  deleteTenant
 };

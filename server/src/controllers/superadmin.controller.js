@@ -125,6 +125,27 @@ const updateTenantSuspension = async (req, res) => {
   });
 };
 
+const updateTenant = async (req, res) => {
+  const { tenantId } = req.params;
+  const updateData = req.body;
+  const tenant = await superadminService.updateTenant(tenantId, updateData);
+  
+  res.status(200).json({
+    success: true,
+    data: tenant
+  });
+};
+
+const deleteTenant = async (req, res) => {
+  const { tenantId } = req.params;
+  await superadminService.deleteTenant(tenantId);
+  
+  res.status(200).json({
+    success: true,
+    message: 'Tenant deleted successfully'
+  });
+};
+
 module.exports = {
   createTenant,
   listPendingDevices,
@@ -134,5 +155,7 @@ module.exports = {
   toggleMobileAccess,
   updateTenantFeatures,
   getDiagnostics,
-  updateTenantSuspension
+  updateTenantSuspension,
+  updateTenant,
+  deleteTenant
 };

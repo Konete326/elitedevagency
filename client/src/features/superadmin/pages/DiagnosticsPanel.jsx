@@ -1,12 +1,24 @@
 import { useState } from 'react';
-import { useDiagnostics } from '../hooks/useSuperAdmin';
-import { Database, Activity, Wifi, WifiOff, X, Clock, HardDrive, Cpu, AlertTriangle, CheckCircle, ChevronLeft } from 'lucide-react';
+import { useDiagnostics, useUpdateTenant, useDeleteTenant } from '../hooks/useSuperAdmin';
+import { Database, Activity, Wifi, WifiOff, X, Clock, HardDrive, Cpu, AlertTriangle, CheckCircle, ChevronLeft, Eye, Edit, Trash2 } from 'lucide-react';
 import { AdminTable } from '../../../components/ui/AdminTable';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export const DiagnosticsPanel = () => {
   const { data: diagnostics = [], isLoading } = useDiagnostics();
   const [selectedTenant, setSelectedTenant] = useState(null);
+  const [editingTenant, setEditingTenant] = useState(null);
+  const [editForm, setEditForm] = useState({
+    businessName: '',
+    niche: 'GYM',
+    plan: 'STARTER',
+    dbURI: '',
+    trialDays: 30
+  });
+
+  const updateTenantMutation = useUpdateTenant();
+  const deleteTenantMutation = useDeleteTenant();
 
   const formatBytes = (bytes) => {
     if (bytes === undefined || bytes === null) return '0.0 KB';
@@ -71,6 +83,59 @@ export const DiagnosticsPanel = () => {
     }
   };
 
+  const handleEditClick = (tenant) => {
+    const start = tenant.createdAt ? new Date(tenant.createdAt) : new Date();
+    const expiry = tenant.subscriptionExpiry ? new Date(tenant.subscriptionExpiry) : new Date();
+    const calculatedDays = Math.max(0, Math.round((expiry - start) / (1000 * 60 * 60 * 24))) || 30;
+
+    setEditingTenant(tenant);
+    setEditForm({
+      businessName: tenant.businessName,
+      niche: tenant.niche || 'GYM',
+      plan: tenant.plan || 'STARTER',
+      dbURI: tenant.dbURI || '',
+      trialDays: calculatedDays
+    });
+  };
+
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    updateTenantMutation.mutate(
+      {
+        tenantId: editingTenant.tenantId,
+        updateData: {
+          businessName: editForm.businessName,
+          niche: editForm.niche,
+          plan: editForm.plan,
+          trialDays: parseInt(editForm.trialDays, 10) || 0,
+          dbURI: editForm.dbURI
+        }
+      },
+      {
+        onSuccess: () => {
+          toast.success('Tenant successfully updated');
+          setEditingTenant(null);
+        },
+        onError: (err) => {
+          toast.error(err.message || 'Failed to update tenant');
+        }
+      }
+    );
+  };
+
+  const handleDeleteClick = (tenant) => {
+    if (window.confirm(`Are you absolutely sure you want to delete tenant "${tenant.businessName}"? This action is irreversible.`)) {
+      deleteTenantMutation.mutate(tenant.tenantId, {
+        onSuccess: () => {
+          toast.success(`Tenant "${tenant.businessName}" deleted successfully`);
+        },
+        onError: (err) => {
+          toast.error(err.message || 'Failed to delete tenant');
+        }
+      });
+    }
+  };
+
   const renderRow = (tenant) => (
     <tr key={tenant.tenantId} className="hover:bg-muted/40 transition-colors">
       <td className="py-2 px-4 font-extrabold text-foreground dark:text-zinc-200">
@@ -96,13 +161,29 @@ export const DiagnosticsPanel = () => {
         {tenant.totalSynced.toLocaleString()}
       </td>
       <td className="py-2 px-4 text-right">
-        <button
-          onClick={() => setSelectedTenant(tenant)}
-          className="inline-flex items-center gap-1 rounded-md border border-border bg-white text-slate-700 hover:bg-slate-50 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 px-2 py-1 text-[10px] font-bold transition-colors shadow-sm"
-        >
-          <Database className="h-3 w-3 text-amber-600 dark:text-amber-500" />
-          <span>View Analytics</span>
-        </button>
+        <div className="flex items-center justify-end gap-1.5">
+          <button
+            onClick={() => setSelectedTenant(tenant)}
+            className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded transition-colors border border-border dark:border-zinc-700"
+            title="View Sync Analytics"
+          >
+            <Eye className="h-3.5 w-3.5 text-blue-500" />
+          </button>
+          <button
+            onClick={() => handleEditClick(tenant)}
+            className="p-1 hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded transition-colors border border-border dark:border-zinc-700"
+            title="Edit Tenant"
+          >
+            <Edit className="h-3.5 w-3.5 text-amber-500" />
+          </button>
+          <button
+            onClick={() => handleDeleteClick(tenant)}
+            className="p-1 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-rose-500 hover:text-rose-700 rounded transition-colors border border-border dark:border-zinc-700"
+            title="Delete Tenant"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </td>
     </tr>
   );
@@ -137,7 +218,7 @@ export const DiagnosticsPanel = () => {
           title="Connection & Synchronization Registry"
           description="Monitor database connection and sync status for registered clients"
           icon={Activity}
-          headers={['Business Name', 'Database Status', 'Sync Health State', 'Total Synced Records', 'Analytics']}
+          headers={['Business Name', 'Database Status', 'Sync Health State', 'Total Synced Records', 'Actions']}
           data={diagnostics}
           pageSize={7}
           renderRow={renderRow}
@@ -226,6 +307,108 @@ export const DiagnosticsPanel = () => {
                 Close
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {editingTenant && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 font-semibold animate-fade-in">
+          <div className="bg-white dark:bg-zinc-800 border border-border dark:border-zinc-700 rounded-xl max-w-md w-full shadow-lg overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-border dark:border-zinc-700 flex justify-between items-center">
+              <div>
+                <h3 className="text-sm font-bold text-foreground dark:text-white">Edit Tenant Profile</h3>
+                <p className="text-[10px] text-muted-foreground mt-0.5">{editingTenant.businessName}</p>
+              </div>
+              <button
+                onClick={() => setEditingTenant(null)}
+                className="p-1.5 hover:bg-muted text-muted-foreground hover:text-foreground rounded-lg transition-colors border border-transparent hover:border-border dark:hover:bg-zinc-700"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdate}>
+              <div className="p-4 space-y-3">
+                <div>
+                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.businessName}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, businessName: e.target.value }))}
+                    className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                  />
+                </div>
+
+                <div className="grid gap-3 grid-cols-2">
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Niche Category</label>
+                    <select
+                      value={editForm.niche}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, niche: e.target.value }))}
+                      className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-bold text-foreground outline-none focus:outline-none"
+                    >
+                      <option value="GYM">Gym & Fitness Center</option>
+                      <option value="RESTAURANT">Restaurant & Cafe</option>
+                      <option value="GARMENTS">Garments & Retail Boutique</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Pricing Plan</label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.plan}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, plan: e.target.value }))}
+                      className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 grid-cols-3">
+                  <div className="col-span-2">
+                    <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Database Connection URI</label>
+                    <input
+                      type="text"
+                      required
+                      value={editForm.dbURI}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, dbURI: e.target.value }))}
+                      className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-mono font-semibold text-foreground focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Trial Days</label>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={editForm.trialDays}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, trialDays: e.target.value }))}
+                      className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2 text-xs font-semibold text-foreground focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingTenant(null)}
+                  className="px-4 py-2 border border-border text-slate-700 hover:bg-slate-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-750 text-xs font-bold rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={updateTenantMutation.isPending}
+                  className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 disabled:opacity-50 text-xs font-bold rounded-lg transition-opacity shadow-sm"
+                >
+                  {updateTenantMutation.isPending ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
