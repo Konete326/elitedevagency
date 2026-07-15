@@ -35,7 +35,7 @@ export const Sidebar = () => {
 
     const tenantLinks = [
       { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard },
-      { path: '/', label: 'POS Terminal', icon: Store }
+      { path: '/pos', label: 'POS Terminal', icon: Store }
     ];
 
     const isOwnerOrManager = user?.role === 'OWNER' || user?.role === 'MANAGER';

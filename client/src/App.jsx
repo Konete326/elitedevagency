@@ -230,6 +230,22 @@ function App() {
               } 
             />
             <Route 
+              path="/pos" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
               path="/inventory" 
               element={
                 !isAuthenticated ? (
