@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Link, useLocation } from 'react-router-dom';
@@ -13,6 +14,7 @@ export const Sidebar = () => {
   const { user, logout } = useAuthStore();
   const { openModal } = useModalStore();
   const location = useLocation();
+  const [inventoryExpanded, setInventoryExpanded] = useState(true);
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const features = user?.features || [];
@@ -32,15 +34,23 @@ export const Sidebar = () => {
     }
 
     const tenantLinks = [
-      { path: '/', label: 'POS Terminal', icon: Store },
-      { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard }
+      { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard },
+      { path: '/', label: 'POS Terminal', icon: Store }
     ];
 
     const isOwnerOrManager = user?.role === 'OWNER' || user?.role === 'MANAGER';
 
     if (isOwnerOrManager) {
-      tenantLinks.push({ path: '/inventory', label: 'Product Catalog', icon: Package });
-      tenantLinks.push({ path: '/deals', label: 'Deals Catalog', icon: Tag });
+      tenantLinks.push({
+        label: 'Inventory',
+        icon: Package,
+        isGroup: true,
+        children: [
+          { path: '/inventory', label: 'Products List', icon: Package },
+          { path: '/inventory/categories', label: 'Categories List', icon: Layers },
+          { path: '/deals', label: 'Deals Catalog', icon: Tag }
+        ]
+      });
 
       if (niche === 'GYM') {
         tenantLinks.push({ path: '/plans', label: 'Membership Plans', icon: Award });
@@ -122,7 +132,76 @@ export const Sidebar = () => {
 
       <div className={`flex-1 py-5 px-3 space-y-4 ${!sidebarCollapsed ? 'overflow-y-auto scrollbar-thin' : 'overflow-hidden'}`}>
         <nav className="space-y-1">
-          {links.map((link) => {
+          {links.map((link, index) => {
+            if (link.isGroup) {
+              if (sidebarCollapsed) {
+                return link.children.map((child) => {
+                  const isChildActive = location.pathname === child.path || (child.path === '/inventory' && location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories'));
+                  const ChildIcon = child.icon;
+                  return (
+                    <Link
+                      key={child.path}
+                      to={child.path}
+                      className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
+                        isChildActive
+                          ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] border-l-2 border-[var(--primary-accent)] dark:bg-white/10 dark:text-white dark:border-l-2 dark:border-[var(--primary-accent)]'
+                          : 'text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white'
+                      }`}
+                    >
+                      <ChildIcon className={`h-4.5 w-4.5 shrink-0 ${isChildActive ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
+                    </Link>
+                  );
+                });
+              }
+
+              const hasActiveChild = link.children.some(child => {
+                if (child.path === '/inventory') {
+                  return location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories');
+                }
+                return location.pathname.startsWith(child.path);
+              });
+
+              return (
+                <div key={`group-${index}`} className="space-y-1">
+                  <button
+                    onClick={() => setInventoryExpanded(!inventoryExpanded)}
+                    className="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3">
+                      <link.icon className={`h-4.5 w-4.5 shrink-0 ${hasActiveChild ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
+                      <span>{link.label}</span>
+                    </div>
+                    <ChevronRight className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${inventoryExpanded ? 'rotate-90' : ''}`} />
+                  </button>
+                  {inventoryExpanded && (
+                    <div className="pl-4 space-y-1 ml-5 border-l border-slate-200 dark:border-zinc-700">
+                      {link.children.map((child) => {
+                        const isChildActive = child.path === '/inventory'
+                          ? (location.pathname === '/inventory' || (location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories')))
+                          : location.pathname.startsWith(child.path);
+                        const ChildIcon = child.icon;
+
+                        return (
+                          <Link
+                            key={child.path}
+                            to={child.path}
+                            className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
+                              isChildActive
+                                ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] dark:bg-white/10 dark:text-white'
+                                : 'text-slate-550 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white'
+                            }`}
+                          >
+                            <ChildIcon className={`h-4 w-4 shrink-0 ${isChildActive ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive = location.pathname === link.path;
             const Icon = link.icon;
 
@@ -147,7 +226,7 @@ export const Sidebar = () => {
       <div className="border-t border-border dark:border-zinc-750 p-4 bg-slate-50 dark:bg-zinc-900/40">
         <button
           onClick={handleSignOut}
-          className={`flex w-full items-center justify-center gap-2.5 rounded-lg border border-border dark:border-zinc-700 hover:border-red-500/20 dark:hover:border-red-500/30 bg-white dark:bg-zinc-800 py-2.5 text-xs font-extrabold hover:bg-red-500/10 dark:hover:bg-red-950/20 text-slate-700 dark:text-zinc-300 hover:text-red-650 dark:hover:text-red-400 transition-all shadow-sm ${
+          className={`flex w-full items-center justify-center gap-2.5 rounded-lg border border-border dark:border-zinc-700 hover:border-red-500/20 dark:hover:border-red-500/30 bg-white dark:bg-zinc-800 py-2.5 text-xs font-extrabold hover:bg-red-500/10 dark:hover:bg-red-950/20 text-slate-700 dark:text-zinc-300 hover:text-red-650 dark:hover:text-red-400 transition-all shadow-sm cursor-pointer ${
             sidebarCollapsed ? 'px-0' : 'px-4'
           }`}
         >

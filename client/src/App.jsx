@@ -24,7 +24,10 @@ import { TenantLogs } from './features/settings/pages/TenantLogs';
 import { StyleWrapper } from './components/layout/StyleWrapper';
 import { ModalManager } from './components/ui/ModalManager';
 import { Agentation } from 'agentation';
-import { ProductManager } from './features/inventory/pages/ProductManager';
+import { ProductList } from './features/inventory/pages/ProductList';
+import { ProductForm } from './features/inventory/pages/ProductForm';
+import { CategoryList } from './features/inventory/pages/CategoryList';
+import { CategoryForm } from './features/inventory/pages/CategoryForm';
 import { DealsManager } from './features/inventory/pages/DealsManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
@@ -55,13 +58,15 @@ function MobileBlockerGuard({ children }) {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  if (isAuthenticated && user?.role !== 'SUPER_ADMIN' && user?.blockMobileAccess && isTooNarrow) {
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  if (isAuthenticated && user?.role !== 'SUPER_ADMIN' && user?.blockMobileAccess && (isTooNarrow || isMobileUA)) {
     return (
-      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-950/80 backdrop-blur-md text-white p-6 text-center select-none pointer-events-auto">
+      <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center select-none">
         <div className="max-w-md space-y-4">
-          <h2 className="text-2xl font-black tracking-tight text-red-500">Access Restricted</h2>
-          <p className="text-sm font-semibold text-slate-300">
-            Mobile and Tablet layouts are disabled for this account. Please log in using a desktop or widescreen terminal.
+          <h2 className="text-2xl font-black tracking-tight text-red-500">Desktop Terminals Only</h2>
+          <p className="text-sm font-semibold text-slate-350">
+            Mobile and Tablet access is restricted by your workspace administrator.
           </p>
         </div>
       </div>
@@ -219,12 +224,8 @@ function App() {
               element={
                 !isAuthenticated ? (
                   <LoginPage />
-                ) : user?.role === 'SUPER_ADMIN' ? (
-                  <Navigate to="/superadmin" replace />
                 ) : (
-                  <TenantLayout>
-                    <POSPage />
-                  </TenantLayout>
+                  <Navigate to="/dashboard" replace />
                 )
               } 
             />
@@ -239,7 +240,107 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <TenantLayout>
-                    <ProductManager />
+                    <ProductList />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/inventory/new" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <ProductForm />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/inventory/edit/:id" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <ProductForm />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/inventory/categories" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <CategoryList />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/inventory/categories/new" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <CategoryForm />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/inventory/categories/edit/:id" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <CategoryForm />
                   </TenantLayout>
                 ) : (
                   <TenantLayout>
