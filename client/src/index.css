@@ -73,10 +73,9 @@ button:disabled, [role="button"]:disabled, select:disabled, input[type="button"]
 
 * {
   border-color: var(--border);
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    color 0.15s ease;
+  transition-property: background-color, border-color, color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 100ms;
 }
 
 body {

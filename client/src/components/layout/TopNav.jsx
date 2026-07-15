@@ -60,7 +60,7 @@ export const TopNav = () => {
       </div>
 
       <div className="col-span-4 flex items-center justify-center px-2">
-        <div className="relative w-full max-w-md">
+        <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
           <input 
             type="text"
