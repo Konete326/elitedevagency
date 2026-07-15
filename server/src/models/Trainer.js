@@ -6,7 +6,8 @@ const trainerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   phone: { type: String, required: true },
   baseSalary: { type: Number, required: true },
-  advanceBalance: { type: Number, default: 0 }
+  advanceBalance: { type: Number, default: 0 },
+  isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

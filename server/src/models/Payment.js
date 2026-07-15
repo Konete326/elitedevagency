@@ -8,7 +8,8 @@ const paymentSchema = new mongoose.Schema({
   paymentMethod: { type: String, required: true },
   monthPaidFor: { type: String, required: true },
   receiptNo: { type: String },
-  notes: { type: String }
+  notes: { type: String },
+  isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

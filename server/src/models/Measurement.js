@@ -9,7 +9,8 @@ const measurementSchema = new mongoose.Schema({
   bmi: { type: Number, required: true },
   bicep: { type: Number },
   chest: { type: Number },
-  waist: { type: Number }
+  waist: { type: Number },
+  isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

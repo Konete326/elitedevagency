@@ -6,7 +6,8 @@ const trainerLedgerSchema = new mongoose.Schema({
   trainerId: { type: String, required: true },
   type: { type: String, enum: ['Salary', 'Advance'], required: true },
   amount: { type: Number, required: true },
-  date: { type: Date, required: true }
+  date: { type: Date, required: true },
+  isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true
 });

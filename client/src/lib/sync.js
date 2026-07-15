@@ -3,6 +3,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { toast } from 'sonner';
 
 let activeReplications = {};
+const lastSyncToastTime = new Map();
 
 export const startReplication = async (db, collectionName) => {
   const token = useAuthStore.getState().token;
@@ -53,8 +54,18 @@ export const startReplication = async (db, collectionName) => {
         if (!response.ok || !result.success) {
           throw new Error(result.error || 'Pull failed');
         }
+        const allowedProperties = collection.schema.jsonSchema.properties;
+        const sanitizedDocs = (result.data.documents || []).map((doc) => {
+          const sanitized = {};
+          for (const key in doc) {
+            if (allowedProperties[key] !== undefined) {
+              sanitized[key] = doc[key];
+            }
+          }
+          return sanitized;
+        });
         return {
-          documents: result.data.documents,
+          documents: sanitizedDocs,
           checkpoint: result.data.checkpoint
         };
       },
@@ -78,23 +89,52 @@ export const startReplication = async (db, collectionName) => {
   });
 
   let toastId = null;
+  let isFirstSync = true;
+
   replicationState.active$.subscribe((active) => {
     if (active) {
-      toastId = toast.loading(`Syncing ${collectionName}...`, { id: toastId || undefined });
+      if (isFirstSync) {
+        const msg = `Syncing ${collectionName}...`;
+        const now = Date.now();
+        const lastTime = lastSyncToastTime.get(msg);
+        if (!lastTime || now - lastTime >= 300000) {
+          lastSyncToastTime.set(msg, now);
+          toastId = toast.loading(msg);
+        }
+      }
     } else {
-      if (toastId) {
-        toast.success(`${collectionName} sync complete`, { id: toastId });
-        toastId = null;
+      if (isFirstSync) {
+        isFirstSync = false;
+        const successMsg = `${collectionName} sync complete`;
+        const now = Date.now();
+        const lastTime = lastSyncToastTime.get(successMsg);
+        if (toastId) {
+          toast.success(successMsg, { id: toastId });
+          lastSyncToastTime.set(successMsg, now);
+          toastId = null;
+        } else if (!lastTime || now - lastTime >= 300000) {
+          toast.success(successMsg);
+          lastSyncToastTime.set(successMsg, now);
+        }
       }
     }
   });
 
   replicationState.error$.subscribe((err) => {
-    if (toastId) {
-      toast.error(`${collectionName} sync error: ${err.message || err}`, { id: toastId });
+    const errorMsg = `${collectionName} sync error: ${err.message || err}`;
+    const now = Date.now();
+    const lastTime = lastSyncToastTime.get(errorMsg);
+    if (!lastTime || now - lastTime >= 300000) {
+      lastSyncToastTime.set(errorMsg, now);
+      if (toastId) {
+        toast.error(errorMsg, { id: toastId });
+        toastId = null;
+      } else {
+        toast.error(errorMsg);
+      }
+    } else if (toastId) {
+      toast.dismiss(toastId);
       toastId = null;
-    } else {
-      toast.error(`${collectionName} sync error: ${err.message || err}`);
     }
   });
 

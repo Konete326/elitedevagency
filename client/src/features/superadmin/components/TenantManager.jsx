@@ -190,15 +190,6 @@ export const TenantManager = ({ onEdit }) => {
                 <tr key={tenant._id} className="hover:bg-muted/40 transition-colors">
                   <td className="py-2 px-3 font-extrabold text-foreground">
                     <div>{tenant.businessName}</div>
-                    {tenant.features && tenant.features.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {tenant.features.map((f, i) => (
-                          <span key={i} className="inline-flex items-center rounded-full bg-slate-100 dark:bg-zinc-700 px-1.5 py-0.5 text-[8px] font-black uppercase text-slate-650 dark:text-zinc-300">
-                            {f}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </td>
                   <td className="py-2 px-3">
                     <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-bold ${getNicheBadgeClass(tenant.niche)}`}>
