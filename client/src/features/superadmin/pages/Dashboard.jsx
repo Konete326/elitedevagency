@@ -59,7 +59,7 @@ export const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div 
           onClick={() => navigate('/superadmin/billing')}
-          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
         >
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -79,7 +79,7 @@ export const Dashboard = () => {
 
         <div 
           onClick={() => navigate('/superadmin/tenants/new')}
-          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
         >
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
@@ -99,7 +99,7 @@ export const Dashboard = () => {
 
         <div 
           onClick={() => navigate('/superadmin/hardware')}
-          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+          className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
         >
           <div className="space-y-1">
             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">

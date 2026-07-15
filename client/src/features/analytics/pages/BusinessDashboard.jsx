@@ -145,7 +145,7 @@ export const BusinessDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div 
               onClick={() => navigate('/members')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
@@ -165,7 +165,7 @@ export const BusinessDashboard = () => {
 
             <div 
               onClick={() => navigate(features.includes('Instructor Payroll') ? '/trainers' : '/employees')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
@@ -185,7 +185,7 @@ export const BusinessDashboard = () => {
 
             <div 
               onClick={() => navigate('/members')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
@@ -255,7 +255,7 @@ export const BusinessDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div 
               onClick={() => navigate('/orders')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
@@ -275,7 +275,7 @@ export const BusinessDashboard = () => {
 
             <div 
               onClick={() => navigate('/orders')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
@@ -295,7 +295,7 @@ export const BusinessDashboard = () => {
 
             <div 
               onClick={() => navigate('/inventory/categories')}
-              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:shadow-xs cursor-pointer"
             >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">

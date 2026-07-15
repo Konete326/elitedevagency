@@ -57,7 +57,7 @@ export const AdminTable = ({
             {paginatedData.map((item, index) => renderGridItem(item, startIndex + index))}
           </div>
         ) : (
-          <table className="w-full text-left border-collapse min-w-[28rem] [&_tbody_tr]:hover:bg-slate-50/40 [&_tbody_tr]:dark:hover:bg-zinc-750/20 [&_tbody_tr]:transition-colors">
+          <table className="w-full text-left border-collapse min-w-[28rem] [&_tbody_tr]:hover:bg-slate-50/40 [&_tbody_tr]:dark:hover:bg-zinc-700/20 [&_tbody_tr]:transition-colors">
             <thead>
               <tr className="border-b border-border dark:border-zinc-700 bg-slate-100/60 dark:bg-zinc-800/40 text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 {headers.map((header, idx) => (

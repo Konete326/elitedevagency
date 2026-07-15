@@ -43,23 +43,19 @@ export const TopNav = () => {
   };
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
-  const businessName = isSuperAdmin ? 'Elite Super Admin' : (user?.businessName || 'Elite POS');
 
   return (
-    <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-750 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
-      <div className="col-span-2 flex items-center gap-3">
+    <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
+      <div className="col-span-1 flex items-center">
         <button
           onClick={toggleSidebar}
           className="lg:hidden rounded-lg border border-border dark:border-zinc-700 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 cursor-pointer"
         >
           <Menu className="h-5 w-5 text-slate-650 dark:text-zinc-300" />
         </button>
-        <span className="font-extrabold text-xs sm:text-sm tracking-tight text-slate-800 dark:text-zinc-100 lg:block hidden truncate">
-          {businessName}
-        </span>
       </div>
 
-      <div className="col-span-6 flex items-center justify-center px-2">
+      <div className="col-span-7 flex items-center justify-center px-2">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
           <input 

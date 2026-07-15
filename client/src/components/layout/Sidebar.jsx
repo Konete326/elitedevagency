@@ -141,18 +141,18 @@ export const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-55 flex flex-col bg-white dark:bg-zinc-800 border-r border-border dark:border-zinc-750 text-foreground dark:text-zinc-100 transition-all duration-300 ease-in-out ${
+      className={`fixed inset-y-0 left-0 z-55 flex flex-col bg-white dark:bg-zinc-800 border-r border-border dark:border-zinc-700 text-foreground dark:text-zinc-100 transition-all duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}`}
     >
-      <div className={`relative flex h-16 items-center border-b border-border dark:border-zinc-750 shrink-0 ${
+      <div className={`relative flex h-16 items-center border-b border-border dark:border-zinc-700 shrink-0 ${
         sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-5 gap-3'
       }`}>
         <div className="flex items-center gap-3 overflow-hidden">
           {isSuperAdmin ? (
-            <Shield className="h-6 w-6 text-[var(--primary-accent)] shrink-0" />
+            <Shield className="h-6 w-6 text-[var(--primary-accent)] dark:text-white shrink-0" />
           ) : (
-            <Store className="h-6 w-6 text-[var(--primary-accent)] shrink-0" />
+            <Store className="h-6 w-6 text-[var(--primary-accent)] dark:text-white shrink-0" />
           )}
           {!sidebarCollapsed && (
             <span className="text-sm font-black tracking-tight text-foreground dark:text-white uppercase truncate">
@@ -165,9 +165,9 @@ export const Sidebar = () => {
           className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-60 hidden lg:flex h-7 w-7 items-center justify-center rounded-full border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 text-foreground dark:text-white cursor-pointer"
         >
           {sidebarCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4 text-slate-700 dark:text-zinc-300" />
           ) : (
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 text-slate-700 dark:text-zinc-300" />
           )}
         </button>
         <button
@@ -222,7 +222,7 @@ export const Sidebar = () => {
                 <div key={`group-${index}`} className="space-y-1">
                   <button
                     onClick={() => toggleGroup(link.key)}
-                    className="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white cursor-pointer"
+                    className="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:text-foreground dark:hover:text-white cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       <link.icon className={`h-4.5 w-4.5 shrink-0 ${hasActiveChild ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
@@ -247,7 +247,7 @@ export const Sidebar = () => {
                             className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all ${
                               isChildActive
                                 ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] dark:bg-white/10 dark:text-white'
-                                : 'text-slate-550 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white'
+                                : 'text-slate-550 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:text-foreground dark:hover:text-white'
                             }`}
                           >
                             <ChildIcon className={`h-4 w-4 shrink-0 ${isChildActive ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
@@ -273,7 +273,7 @@ export const Sidebar = () => {
                 } ${
                   isActive
                     ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] border-l-2 border-[var(--primary-accent)] dark:bg-white/10 dark:text-white dark:border-l-2 dark:border-[var(--primary-accent)]'
-                    : 'text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white'
+                    : 'text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-700/30 hover:text-foreground dark:hover:text-white'
                 }`}
               >
                 <Icon className={`${sidebarCollapsed ? 'h-3.5 w-3.5' : 'h-4.5 w-4.5'} shrink-0 ${isActive ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
@@ -284,7 +284,7 @@ export const Sidebar = () => {
         </nav>
       </div>
 
-      <div className="border-t border-border dark:border-zinc-750 p-4 bg-slate-50 dark:bg-zinc-900/40">
+      <div className="border-t border-border dark:border-zinc-700 p-4 bg-slate-50 dark:bg-zinc-900/40">
         <button
           onClick={handleSignOut}
           className={`flex w-full items-center justify-center gap-2.5 rounded-lg border border-border dark:border-zinc-700 hover:border-red-500/20 dark:hover:border-red-500/30 bg-white dark:bg-zinc-800 py-2.5 text-xs font-extrabold hover:bg-red-500/10 dark:hover:bg-red-950/20 text-slate-700 dark:text-zinc-300 hover:text-red-650 dark:hover:text-red-400 transition-all shadow-sm cursor-pointer ${
