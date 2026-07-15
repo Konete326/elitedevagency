@@ -47,7 +47,7 @@ export const TopNav = () => {
 
   return (
     <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-750 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
-      <div className="col-span-4 flex items-center gap-3">
+      <div className="col-span-3 flex items-center gap-3">
         <button
           onClick={toggleSidebar}
           className="lg:hidden rounded-lg border border-border dark:border-zinc-700 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 cursor-pointer"
@@ -71,7 +71,7 @@ export const TopNav = () => {
         </div>
       </div>
 
-      <div className="col-span-4 flex items-center justify-end gap-3 sm:gap-4">
+      <div className="col-span-5 flex items-center justify-end gap-3 sm:gap-4">
         <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold border transition-all ${
           isOnline 
             ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
@@ -110,13 +110,17 @@ export const TopNav = () => {
         <div className="relative">
           <button
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center gap-2 text-left focus:outline-none cursor-pointer"
+            className="flex items-center gap-2.5 text-left focus:outline-none cursor-pointer"
           >
             <div className="relative shrink-0">
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] flex items-center justify-center text-xs font-bold text-white shadow-xs border-2 border-white dark:border-zinc-800 hover:opacity-90 transition-opacity font-sans">
                 {user?.name ? user.name.substring(0, 2).toUpperCase() : 'US'}
               </div>
               <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 border border-white dark:border-zinc-800" />
+            </div>
+            <div className="hidden sm:flex flex-col min-w-0 leading-tight">
+              <span className="text-[10px] sm:text-xs font-bold truncate max-w-[100px] text-foreground dark:text-white">{user?.name || 'User'}</span>
+              <span className="text-[9px] sm:text-[10px] text-slate-500 dark:text-zinc-400 truncate max-w-[130px] font-medium">{user?.email || ''}</span>
             </div>
             <ChevronDown className="h-3.5 w-3.5 text-slate-500 dark:text-zinc-400 hidden sm:block shrink-0" />
           </button>
