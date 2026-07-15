@@ -47,10 +47,10 @@ export const TopNav = () => {
 
   return (
     <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-750 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
-      <div className="col-span-3 flex items-center gap-3">
+      <div className="col-span-4 flex items-center gap-3">
         <button
           onClick={toggleSidebar}
-          className="lg:hidden rounded-lg border border-border dark:border-zinc-700 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700"
+          className="lg:hidden rounded-lg border border-border dark:border-zinc-700 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 cursor-pointer"
         >
           <Menu className="h-5 w-5 text-slate-650 dark:text-zinc-300" />
         </button>
@@ -59,8 +59,8 @@ export const TopNav = () => {
         </span>
       </div>
 
-      <div className="col-span-3 flex items-center justify-center px-2">
-        <div className="relative w-full max-w-xs">
+      <div className="col-span-4 flex items-center justify-center px-2">
+        <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
           <input 
             type="text"
@@ -71,7 +71,7 @@ export const TopNav = () => {
         </div>
       </div>
 
-      <div className="col-span-3 flex items-center justify-center gap-1.5 px-2">
+      <div className="col-span-4 flex items-center justify-end gap-3 sm:gap-4">
         <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold border transition-all ${
           isOnline 
             ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
@@ -85,15 +85,13 @@ export const TopNav = () => {
         {isInstallable && (
           <button
             onClick={promptInstall}
-            className="flex items-center gap-1 px-2 py-1 rounded-md border border-border dark:border-zinc-700 bg-slate-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:opacity-90 font-bold text-[9px] transition-opacity shrink-0 shadow-xs"
+            className="flex items-center gap-1 px-2 py-1 rounded-md border border-border dark:border-zinc-700 bg-slate-950 dark:bg-zinc-100 text-white dark:text-zinc-950 hover:opacity-90 font-bold text-[9px] transition-opacity shrink-0 shadow-xs cursor-pointer"
           >
             <Download className="h-2.5 w-2.5" />
             <span>Install</span>
           </button>
         )}
-      </div>
 
-      <div className="col-span-1 flex items-center justify-center">
         <button 
           disabled
           className="relative rounded-lg border border-border dark:border-zinc-700 p-1.5 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-705 transition-colors cursor-not-allowed opacity-60"
@@ -101,22 +99,18 @@ export const TopNav = () => {
           <Bell className="h-4 w-4" />
           <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-red-500" />
         </button>
-      </div>
 
-      <div className="col-span-1 flex items-center justify-center">
         <button 
           onClick={() => setDarkMode(!darkMode)}
-          className="rounded-lg border border-border dark:border-zinc-700 p-1.5 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 transition-colors"
+          className="rounded-lg border border-border dark:border-zinc-700 p-1.5 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 transition-colors cursor-pointer"
         >
           {darkMode ? <Sun className="h-4 w-4 text-zinc-350" /> : <Moon className="h-4 w-4 text-slate-650" />}
         </button>
-      </div>
 
-      <div className="col-span-1 flex items-center justify-end">
         <div className="relative">
           <button
             onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-            className="flex items-center gap-2 text-left focus:outline-none"
+            className="flex items-center gap-2 text-left focus:outline-none cursor-pointer"
           >
             <div className="relative shrink-0">
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] flex items-center justify-center text-xs font-bold text-white shadow-xs border-2 border-white dark:border-zinc-800 hover:opacity-90 transition-opacity font-sans">
@@ -145,7 +139,7 @@ export const TopNav = () => {
                 <div className="h-px bg-border dark:bg-zinc-700 my-1" />
                  <button
                   onClick={handleSignOut}
-                  className="flex w-full items-center gap-2 p-2 rounded-md hover:bg-red-500/10 dark:hover:bg-red-955/20 text-sm font-bold text-red-500 hover:text-red-650 dark:hover:text-red-400 transition-colors"
+                  className="flex w-full items-center gap-2 p-2 rounded-md hover:bg-red-500/10 hover:text-red-600 dark:hover:text-red-400 text-sm font-bold transition-colors cursor-pointer text-left text-foreground dark:text-zinc-200"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Sign Out</span>

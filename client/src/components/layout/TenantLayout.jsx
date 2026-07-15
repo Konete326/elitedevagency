@@ -20,7 +20,7 @@ export const TenantLayout = ({ children }) => {
         sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'
       }`}>
         <TopNav />
-        <main className="flex-1 overflow-hidden flex flex-col">
+        <main className="flex-1 overflow-hidden flex flex-col p-[3px]">
           {children}
         </main>
       </div>
