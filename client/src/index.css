@@ -84,3 +84,22 @@ body {
   color: var(--foreground);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
+
+@utility scrollbar-thin {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, Trash2, Database, Plus, FolderPlus, Percent } from 'lucide-react';
+import { ArrowLeft, Trash2, Database, Plus, FolderPlus, Percent, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { compressImageToBase64 } from '../../../lib/imageUtils';
 import { CategoryManager } from '../components/CategoryManager';
@@ -13,6 +13,8 @@ export const ProductManager = () => {
   const { user } = useAuthStore();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
@@ -184,6 +186,12 @@ export const ProductManager = () => {
 
   const primaryCategories = categories.filter(c => !c.parentCategoryId);
   const subCategories = categories.filter(c => c.parentCategoryId === selectedPrimaryCategoryId);
+
+  const filteredProducts = products.filter(p => {
+    const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.sku.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !filterCategory || p.categoryId === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
@@ -452,9 +460,34 @@ export const ProductManager = () => {
               </div>
             </div>
 
+            <div className="grid grid-cols-12 gap-0 rounded-lg border border-border dark:border-zinc-700 bg-card mb-4 overflow-hidden divide-x divide-border dark:divide-zinc-700 shadow-xs shrink-0">
+              <div className="col-span-8 p-2 flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground/60 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
+                />
+              </div>
+              <div className="col-span-4 p-2 flex flex-col justify-center">
+                <select
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200 cursor-pointer"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(c => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
             <div className="overflow-x-auto w-full">
-              {products.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-8 text-center">No products found in database.</p>
+              {filteredProducts.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-8 text-center">No products found matching filters.</p>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -467,7 +500,7 @@ export const ProductManager = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border text-sm font-semibold">
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                       <tr key={product._id} className="hover:bg-muted/40 transition-colors">
                         <td className="py-4 px-4 font-mono text-xs text-muted-foreground">
                           <div className="flex items-center gap-1.5 font-semibold">

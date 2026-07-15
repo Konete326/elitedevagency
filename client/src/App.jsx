@@ -28,6 +28,7 @@ import { ProductManager } from './features/inventory/pages/ProductManager';
 import { DealsManager } from './features/inventory/pages/DealsManager';
 import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
+import { BusinessDashboard } from './features/analytics/pages/BusinessDashboard';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
 import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
 import { OrderHistory } from './features/billing/pages/OrderHistory';
@@ -511,6 +512,20 @@ function App() {
                 ) : (
                   <TenantLayout>
                     <OrderHistory />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/dashboard" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <Navigate to="/superadmin" replace />
+                ) : (
+                  <TenantLayout>
+                    <BusinessDashboard />
                   </TenantLayout>
                 )
               } 

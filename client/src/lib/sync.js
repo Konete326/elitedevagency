@@ -3,7 +3,41 @@ import { useAuthStore } from '../store/useAuthStore';
 import { toast } from 'sonner';
 
 let activeReplications = {};
-const lastSyncToastTime = new Map();
+let syncStatus = {};
+let syncErrors = {};
+let debounceTimeout = null;
+let unifiedToastId = null;
+
+const checkAllSyncComplete = () => {
+  if (debounceTimeout) clearTimeout(debounceTimeout);
+  
+  debounceTimeout = setTimeout(() => {
+    const collectionNames = Object.keys(syncStatus);
+    if (collectionNames.length === 0) return;
+    
+    const isAnySyncing = collectionNames.some(name => syncStatus[name] === 'syncing');
+    if (isAnySyncing) {
+      if (!unifiedToastId) {
+        unifiedToastId = toast.loading("Syncing business data...", { id: 'unified-sync-toast' });
+      }
+      return;
+    }
+    
+    const errors = [];
+    collectionNames.forEach(name => {
+      if (syncStatus[name] === 'error' && syncErrors[name]) {
+        errors.push(syncErrors[name]);
+      }
+    });
+    
+    if (errors.length > 0) {
+      toast.error(`Sync complete. (Warning: ${errors.join(', ')})`, { id: 'unified-sync-toast' });
+    } else {
+      toast.success("Sync complete! All business data is up to date.", { id: 'unified-sync-toast' });
+    }
+    unifiedToastId = null;
+  }, 1500);
+};
 
 export const startReplication = async (db, collectionName) => {
   const token = useAuthStore.getState().token;
@@ -88,48 +122,26 @@ export const startReplication = async (db, collectionName) => {
     }
   });
 
-  let toastId = null;
+  syncStatus[collectionName] = 'idle';
 
   replicationState.active$.subscribe((active) => {
     if (active) {
-      const msg = `Syncing ${collectionName}...`;
-      const now = Date.now();
-      const lastTime = lastSyncToastTime.get(msg);
-      if (!lastTime || now - lastTime >= 3600000) {
-        lastSyncToastTime.set(msg, now);
-        toastId = toast.loading(msg);
-      }
+      syncStatus[collectionName] = 'syncing';
+      delete syncErrors[collectionName];
     } else {
-      const successMsg = `${collectionName} sync complete`;
-      const now = Date.now();
-      const lastTime = lastSyncToastTime.get(successMsg);
-      if (toastId) {
-        toast.success(successMsg, { id: toastId });
-        lastSyncToastTime.set(successMsg, now);
-        toastId = null;
-      } else if (!lastTime || now - lastTime >= 3600000) {
-        toast.success(successMsg);
-        lastSyncToastTime.set(successMsg, now);
+      if (syncStatus[collectionName] !== 'error') {
+        syncStatus[collectionName] = 'idle';
       }
     }
+    checkAllSyncComplete();
   });
 
   replicationState.error$.subscribe((err) => {
-    const errorMsg = `${collectionName} sync error: ${err.message || err}`;
-    const now = Date.now();
-    const lastTime = lastSyncToastTime.get(errorMsg);
-    if (!lastTime || now - lastTime >= 3600000) {
-      lastSyncToastTime.set(errorMsg, now);
-      if (toastId) {
-        toast.error(errorMsg, { id: toastId });
-        toastId = null;
-      } else {
-        toast.error(errorMsg);
-      }
-    } else if (toastId) {
-      toast.dismiss(toastId);
-      toastId = null;
-    }
+    syncStatus[collectionName] = 'error';
+    const cleanMsg = err.message || err.toString() || 'connection timed out';
+    const displayName = collectionName.charAt(0).toUpperCase() + collectionName.slice(1);
+    syncErrors[collectionName] = `${displayName} ${cleanMsg.includes('timeout') || cleanMsg.includes('timed out') ? 'connection timed out' : cleanMsg}`;
+    checkAllSyncComplete();
   });
 
   activeReplications[collectionName] = replicationState;

@@ -32,7 +32,8 @@ export const Sidebar = () => {
     }
 
     const tenantLinks = [
-      { path: '/', label: 'POS Terminal', icon: LayoutDashboard }
+      { path: '/', label: 'POS Terminal', icon: Store },
+      { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard }
     ];
 
     const isOwnerOrManager = user?.role === 'OWNER' || user?.role === 'MANAGER';
@@ -119,7 +120,7 @@ export const Sidebar = () => {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-5 px-3 space-y-4 no-scrollbar">
+      <div className={`flex-1 py-5 px-3 space-y-4 ${!sidebarCollapsed ? 'overflow-y-auto scrollbar-thin' : 'overflow-hidden'}`}>
         <nav className="space-y-1">
           {links.map((link) => {
             const isActive = location.pathname === link.path;
@@ -131,11 +132,11 @@ export const Sidebar = () => {
                 to={link.path}
                 className={`flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all ${
                   isActive
-                    ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] border-l-2 border-[var(--primary-accent)]'
-                    : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/50 hover:text-foreground dark:hover:text-white'
+                    ? 'bg-[var(--primary-accent)]/10 text-[var(--primary-accent)] border-l-2 border-[var(--primary-accent)] dark:bg-white/10 dark:text-white dark:border-l-2 dark:border-[var(--primary-accent)]'
+                    : 'text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white'
                 }`}
               >
-                <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[var(--primary-accent)]' : 'text-slate-400 dark:text-zinc-500'}`} />
+                <Icon className={`h-4.5 w-4.5 shrink-0 ${isActive ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
                 {!sidebarCollapsed && <span className="truncate">{link.label}</span>}
               </Link>
             );

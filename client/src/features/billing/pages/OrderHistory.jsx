@@ -3,12 +3,13 @@ import { getDatabase } from '../../../db/database';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { printHardwareReceipt } from '../../../lib/device';
 import { toast } from 'sonner';
-import { ArrowLeft, Printer, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Printer, ShoppingBag, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const OrderHistory = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const { selectedPrinter } = useSettingsStore();
 
   useEffect(() => {
@@ -64,6 +65,12 @@ export const OrderHistory = () => {
     }
   };
 
+  const filteredOrders = orders.filter(o => 
+    o._id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    (o.paymentMode || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    o.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
       <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
@@ -72,17 +79,31 @@ export const OrderHistory = () => {
           <p className="text-xs text-muted-foreground">Browse and search all completed local order transactions</p>
         </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-fit">
-          <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
-            <ShoppingBag className="h-5 w-5 text-accent" />
-            <div>
-              <h2 className="text-lg font-bold tracking-tight">Recent Transactions</h2>
-              <p className="text-xs text-muted-foreground font-semibold font-mono">Offline-first local orders index</p>
+          <div className="mb-6 space-y-3">
+            <div className="flex items-center gap-2 border-b border-border pb-3">
+              <ShoppingBag className="h-5 w-5 text-accent" />
+              <div>
+                <h2 className="text-lg font-bold tracking-tight">Recent Transactions</h2>
+                <p className="text-xs text-muted-foreground font-semibold font-mono">Offline-first local orders index</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-12 gap-0 rounded-lg border border-border dark:border-zinc-700 bg-card overflow-hidden shadow-xs">
+              <div className="col-span-12 p-2 flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground/60 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search transactions by Order ID, item name, or payment mode..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
+                />
+              </div>
             </div>
           </div>
 
           <div className="overflow-x-auto w-full">
-            {orders.length === 0 ? (
-              <p className="text-xs text-muted-foreground py-8 text-center">No orders found in database.</p>
+            {filteredOrders.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-8 text-center">No orders found matching filters.</p>
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -96,7 +117,7 @@ export const OrderHistory = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border text-xs font-semibold">
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-muted/40 transition-colors">
                       <td className="py-3.5 px-4 font-mono text-[10px] text-muted-foreground">
                         #{order._id.slice(0, 8)}...

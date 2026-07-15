@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus, CircleDollarSign, Plus, X } from 'lucide-react';
+import { ArrowLeft, UserPlus, CircleDollarSign, Plus, X, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const Khata = () => {
@@ -13,6 +13,7 @@ export const Khata = () => {
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
   const [paymentAmount, setPaymentAmount] = useState('');
@@ -112,6 +113,10 @@ export const Khata = () => {
   };
 
   const debitCustomers = customers.filter(c => c.receivableBalance > 0);
+  const filteredDebitCustomers = debitCustomers.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.phone.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
@@ -130,11 +135,23 @@ export const Khata = () => {
           </button>
         </div>
         <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
-          <div className="p-5 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20">
+          <div className="p-5 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 space-y-3">
              <h3 className="text-base font-black tracking-tight text-foreground">Outstanding Credit Accounts</h3>
+             <div className="grid grid-cols-12 gap-0 rounded-lg border border-border dark:border-zinc-700 bg-card overflow-hidden shadow-xs">
+               <div className="col-span-12 p-2 flex items-center gap-2">
+                 <Search className="h-4 w-4 text-muted-foreground/60 shrink-0" />
+                 <input
+                   type="text"
+                   placeholder="Search ledger accounts by customer name or phone..."
+                   value={searchQuery}
+                   onChange={(e) => setSearchQuery(e.target.value)}
+                   className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
+                 />
+               </div>
+             </div>
           </div>
           <div className="overflow-x-auto">
-            {debitCustomers.length === 0 ? (
+            {filteredDebitCustomers.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-10 font-bold">No outstanding credit accounts currently.</p>
             ) : (
               <table className="w-full text-left border-collapse">
@@ -147,7 +164,7 @@ export const Khata = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border dark:divide-zinc-700 text-xs font-semibold">
-                  {debitCustomers.map((cust) => (
+                  {filteredDebitCustomers.map((cust) => (
                     <tr key={cust._id} className="hover:bg-muted/40 transition-colors">
                       <td className="py-3.5 px-4 font-black text-foreground">{cust.name}</td>
                       <td className="py-3.5 px-4 text-muted-foreground font-mono">{cust.phone}</td>

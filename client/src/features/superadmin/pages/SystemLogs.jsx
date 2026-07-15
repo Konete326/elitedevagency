@@ -133,16 +133,16 @@ export const SystemLogs = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 rounded-lg border border-border bg-card p-3 shadow-xs">
-        <div className="space-y-1">
-          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Tenant</label>
+      <div className="grid grid-cols-12 gap-0 rounded-lg border border-border dark:border-zinc-700 bg-card overflow-hidden divide-y divide-border md:divide-y-0 md:divide-x divide-border dark:divide-zinc-700 shadow-xs">
+        <div className="col-span-6 md:col-span-2 p-2 flex flex-col justify-center">
+          <label className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Tenant</label>
           <input
             list="tenants-list"
             type="text"
             placeholder="Tenant ID..."
             value={filters.tenantId}
             onChange={(e) => setFilters(prev => ({ ...prev, tenantId: e.target.value, page: 1 }))}
-            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
           />
           <datalist id="tenants-list">
             {tenantOptions.map(id => (
@@ -151,15 +151,15 @@ export const SystemLogs = () => {
           </datalist>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">User Email</label>
+        <div className="col-span-6 md:col-span-2 p-2 flex flex-col justify-center">
+          <label className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">User Email</label>
           <input
             list="emails-list"
             type="text"
             placeholder="User Email..."
             value={filters.userEmail}
             onChange={(e) => setFilters(prev => ({ ...prev, userEmail: e.target.value, page: 1 }))}
-            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
           />
           <datalist id="emails-list">
             {emailOptions.map(email => (
@@ -168,23 +168,23 @@ export const SystemLogs = () => {
           </datalist>
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Message</label>
+        <div className="col-span-12 md:col-span-3 p-2 flex flex-col justify-center">
+          <label className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Message</label>
           <input
             type="text"
             placeholder="Search Message..."
             value={filters.message}
             onChange={(e) => setFilters(prev => ({ ...prev, message: e.target.value, page: 1 }))}
-            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Log Type</label>
+        <div className="col-span-6 md:col-span-2 p-2 flex flex-col justify-center">
+          <label className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">Log Type</label>
           <select
             value={filters.type}
             onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value, page: 1 }))}
-            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-semibold"
+            className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200 cursor-pointer"
           >
             <option value="">All Logs</option>
             <option value="ERROR">Errors</option>
@@ -192,14 +192,14 @@ export const SystemLogs = () => {
           </select>
         </div>
 
-        <div className="space-y-1 col-span-2 md:col-span-1">
-          <label className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">URL Search</label>
+        <div className="col-span-6 md:col-span-3 p-2 flex flex-col justify-center">
+          <label className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5">URL Search</label>
           <input
             type="text"
             placeholder="Filter by page URL..."
             value={filters.url}
             onChange={(e) => setFilters(prev => ({ ...prev, url: e.target.value, page: 1 }))}
-            className="w-full rounded-md border border-border bg-background px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-ring font-medium"
+            className="w-full bg-transparent text-xs focus:outline-none font-semibold text-foreground dark:text-zinc-200"
           />
         </div>
       </div>
