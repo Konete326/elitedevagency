@@ -109,7 +109,7 @@ export const CategoryForm = () => {
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-2xl w-full mx-auto space-y-6">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 w-full space-y-6">
         <div className="flex items-center gap-4">
           <button
             type="button"

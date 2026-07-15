@@ -99,7 +99,9 @@ export const Sidebar = () => {
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       } lg:translate-x-0 ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'}`}
     >
-      <div className="flex h-16 items-center justify-between border-b border-border dark:border-zinc-750 px-5 gap-3 shrink-0">
+      <div className={`relative flex h-16 items-center border-b border-border dark:border-zinc-750 shrink-0 ${
+        sidebarCollapsed ? 'justify-center px-0' : 'justify-start px-5 gap-3'
+      }`}>
         <div className="flex items-center gap-3 overflow-hidden">
           {isSuperAdmin ? (
             <Shield className="h-6 w-6 text-[var(--primary-accent)] shrink-0" />
@@ -114,17 +116,17 @@ export const Sidebar = () => {
         </div>
         <button
           onClick={toggleSidebarCollapse}
-          className="hidden lg:flex p-1 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-md border border-transparent hover:border-border dark:hover:border-zinc-700 transition-colors"
+          className="absolute -right-3.5 top-1/2 -translate-y-1/2 z-60 hidden lg:flex h-7 w-7 items-center justify-center rounded-full border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm hover:bg-slate-50 dark:hover:bg-zinc-700 text-foreground dark:text-white cursor-pointer"
         >
           {sidebarCollapsed ? (
-            <ChevronRight className="h-4.5 w-4.5 text-foreground dark:text-white" />
+            <ChevronRight className="h-4 w-4" />
           ) : (
-            <ChevronLeft className="h-4.5 w-4.5 text-foreground dark:text-white" />
+            <ChevronLeft className="h-4 w-4" />
           )}
         </button>
         <button
           onClick={toggleSidebar}
-          className="lg:hidden p-1.5 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-md transition-colors border border-transparent hover:border-border dark:hover:border-zinc-700"
+          className="lg:hidden absolute right-3 p-1.5 hover:bg-slate-100 dark:hover:bg-zinc-700 rounded-md transition-colors border border-transparent hover:border-border dark:hover:border-zinc-700"
         >
           <Menu className="h-5 w-5 text-foreground dark:text-white" />
         </button>

@@ -20,7 +20,7 @@ export const SuperAdminLayout = ({ children }) => {
         sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'
       }`}>
         <TopNav />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 max-w-7xl w-full mx-auto space-y-4">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 w-full space-y-4">
           {children}
         </main>
       </div>
