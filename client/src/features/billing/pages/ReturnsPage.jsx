@@ -159,20 +159,12 @@ export const ReturnsPage = () => {
     : 0;
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors mr-2 text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="font-extrabold text-lg tracking-tight">Returns & Refunds</span>
-        </div>
-      </header>
-
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
       <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-4xl w-full mx-auto space-y-6">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Returns & Refunds</h1>
+          <p className="text-xs text-muted-foreground">Lookup customer order details to issue product return and store refund vouchers</p>
+        </div>
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

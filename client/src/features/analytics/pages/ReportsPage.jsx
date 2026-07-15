@@ -135,15 +135,13 @@ export const ReportsPage = () => {
     useOrderAnalytics(dateRange);
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
-      <ReportsHeader user={user} onBack={() => navigate('/')} />
-
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
       <main className="flex-1 overflow-y-auto p-6 md:p-8">
         <div className="max-w-4xl w-full mx-auto space-y-6">
           <div className="flex items-end justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-2xl font-black tracking-tight">Performance Overview</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <h1 className="text-xl font-bold tracking-tight">Sales Analytics & Reports</h1>
+              <p className="text-xs text-muted-foreground mt-1">
                 Calculated live from local offline data — syncs automatically when online.
               </p>
             </div>

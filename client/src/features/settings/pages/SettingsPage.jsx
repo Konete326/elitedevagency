@@ -32,25 +32,12 @@ export const SettingsPage = () => {
   }, [handleScan]);
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors mr-2 text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="font-extrabold text-lg tracking-tight">System Settings</span>
-        </div>
-
-        <div className="hidden sm:block text-right">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{user?.role}</p>
-          <p className="text-sm font-black">{user?.name}</p>
-        </div>
-      </header>
-
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
       <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-3xl w-full mx-auto space-y-6">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">System Settings</h1>
+          <p className="text-xs text-muted-foreground">Manage your hardware profiles, receipt templates, and device configurations</p>
+        </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm space-y-6">
           <div>
             <h2 className="text-xl font-bold tracking-tight">Hardware & Printers</h2>

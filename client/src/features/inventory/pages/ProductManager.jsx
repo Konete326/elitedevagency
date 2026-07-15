@@ -186,35 +186,22 @@ export const ProductManager = () => {
   const subCategories = categories.filter(c => c.parentCategoryId === selectedPrimaryCategoryId);
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors mr-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="font-extrabold text-lg tracking-tight">Inventory Manager</span>
-        </div>
-
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Inventory Manager</h1>
+            <p className="text-xs text-muted-foreground">Manage your store catalog and product variants</p>
+          </div>
           <button
             type="button"
             onClick={() => setCategoryManagerOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card hover:bg-muted text-xs font-bold transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-card hover:bg-muted text-xs font-bold transition-colors shadow-xs cursor-pointer"
           >
-            <FolderPlus className="h-4 w-4" />
+            <FolderPlus className="h-4 w-4 text-[var(--primary-accent)]" />
             <span>Categories</span>
           </button>
-          <div className="hidden sm:block text-right ml-4">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{user?.role}</p>
-            <p className="text-sm font-black">{user?.name}</p>
-          </div>
         </div>
-      </header>
-
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-8">
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-xl border border-border bg-card p-6 shadow-sm h-fit">
             <div className="mb-6">
@@ -306,11 +293,16 @@ export const ProductManager = () => {
                     onBlur={checkProfitability}
                     className={`w-full rounded-lg border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 transition-all ${
                       !isPriceValid || hasProfitConflict
-                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                        ? 'border-[#DC143C] focus:border-[#DC143C] focus:ring-[#DC143C]/20 bg-[#DC143C]/5'
                         : 'border-border focus:ring-ring'
                     }`}
                     placeholder="e.g. 29.99"
                   />
+                  {(!isPriceValid || hasProfitConflict) && (
+                    <p className="text-[10px] text-[#DC143C] font-bold mt-1">
+                      {!isPriceValid ? 'Invalid number format' : 'Must exceed cost price'}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -325,11 +317,16 @@ export const ProductManager = () => {
                     onBlur={checkProfitability}
                     className={`w-full rounded-lg border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 transition-all ${
                       !isCostPriceValid || hasProfitConflict
-                        ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+                        ? 'border-[#DC143C] focus:border-[#DC143C] focus:ring-[#DC143C]/20 bg-[#DC143C]/5'
                         : 'border-border focus:ring-ring'
                     }`}
                     placeholder="e.g. 10.00"
                   />
+                  {(!isCostPriceValid || hasProfitConflict) && (
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-1">
+                      {!isCostPriceValid ? 'Invalid format' : 'Must be below retail'}
+                    </p>
+                  )}
                 </div>
 
                 <div>

@@ -121,22 +121,13 @@ export const FloorMap = () => {
   const canManage = user?.role === 'OWNER' || user?.role === 'MANAGER';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <div className="flex flex-1 flex-col overflow-y-auto">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="flex items-center justify-center p-2 rounded-lg border border-border dark:border-zinc-700 hover:bg-muted transition-colors mr-2 text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
-            <span className="font-extrabold text-lg tracking-tight">Floor Map Management</span>
-          </div>
-        </header>
-
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 relative pb-24">
-          {tables.length === 0 ? (
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6 relative pb-24 overflow-y-auto">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Floor Map Management</h1>
+          <p className="text-xs text-muted-foreground">Setup tables, track reservation occupancy, and map restaurant seating zones</p>
+        </div>
+        {tables.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-96 border border-dashed border-border dark:border-zinc-700 rounded-2xl text-muted-foreground space-y-3 bg-white dark:bg-zinc-800">
               <Coffee className="h-12 w-12 text-muted-foreground/40" />
               <p className="text-sm font-semibold">No tables mapped. Click floating button to onboard.</p>
@@ -174,7 +165,6 @@ export const FloorMap = () => {
             </button>
           )}
         </main>
-      </div>
 
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4">

@@ -65,20 +65,12 @@ export const OrderHistory = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground transition-colors duration-300">
-      <header className="flex h-16 items-center justify-between border-b border-border bg-card px-6 shrink-0 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border hover:bg-muted transition-colors mr-2 text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="font-extrabold text-lg tracking-tight">Order History</span>
-        </div>
-      </header>
-
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
       <main className="flex-1 overflow-y-auto p-6 md:p-8 max-w-7xl w-full mx-auto space-y-6">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">Order History</h1>
+          <p className="text-xs text-muted-foreground">Browse and search all completed local order transactions</p>
+        </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col h-fit">
           <div className="mb-6 flex items-center gap-2 border-b border-border pb-3">
             <ShoppingBag className="h-5 w-5 text-accent" />

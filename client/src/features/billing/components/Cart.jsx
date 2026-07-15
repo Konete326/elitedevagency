@@ -601,16 +601,16 @@ export const Cart = () => {
               <>
                 <button
                   onClick={handleHold}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-muted text-foreground font-bold px-4 py-3.5 text-xs transition-colors"
                 >
                   <Inbox className="h-4 w-4" />
                   <span>Send to Kitchen (Hold)</span>
                 </button>
                 <button
                   onClick={handleCheckout}
-                  className="flex-1 inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm"
+                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white font-black px-4 py-3.5 text-sm hover:opacity-95 shadow-md transition-all active:scale-[0.99]"
                 >
-                  Checkout
+                  Checkout / Pay
                 </button>
               </>
             ) : (
@@ -618,7 +618,7 @@ export const Cart = () => {
                 {user?.niche === 'restaurant' && (
                   <button
                     onClick={handleKotClick}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-muted text-foreground font-bold px-4 py-3 text-sm transition-colors"
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-muted text-foreground font-bold px-4 py-3.5 text-xs transition-colors"
                   >
                     <Printer className="h-4 w-4" />
                     <span>Print KOT</span>
@@ -626,9 +626,9 @@ export const Cart = () => {
                 )}
                 <button
                   onClick={handleCheckout}
-                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold px-4 py-3 text-sm hover:opacity-90 transition-opacity shadow-sm`}
+                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white font-black px-6 py-4 text-base hover:opacity-95 shadow-md transition-all active:scale-[0.99]`}
                 >
-                  Complete Order
+                  Checkout / Pay
                 </button>
               </>
             )}

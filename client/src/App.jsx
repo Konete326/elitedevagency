@@ -12,6 +12,7 @@ import { useLicenseStore } from './store/useLicenseStore';
 import { useHeartbeat } from './hooks/useHeartbeat';
 import { LockScreen } from './components/LockScreen';
 import { SuperAdminLayout } from './components/layout/SuperAdminLayout';
+import { TenantLayout } from './components/layout/TenantLayout';
 import { Dashboard } from './features/superadmin/pages/Dashboard';
 import { TenantsPage } from './features/superadmin/pages/TenantsPage';
 import { HardwareApproval } from './features/superadmin/components/HardwareApproval';
@@ -220,7 +221,9 @@ function App() {
                 ) : user?.role === 'SUPER_ADMIN' ? (
                   <Navigate to="/superadmin" replace />
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -234,9 +237,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <ProductManager />
+                  <TenantLayout>
+                    <ProductManager />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -250,9 +257,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <DealsManager />
+                  <TenantLayout>
+                    <DealsManager />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -266,9 +277,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <PlanManager />
+                  <TenantLayout>
+                    <PlanManager />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -282,9 +297,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <MemberManager />
+                  <TenantLayout>
+                    <MemberManager />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -298,9 +317,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <PaymentGrid />
+                  <TenantLayout>
+                    <PaymentGrid />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -315,10 +338,14 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <FeatureGuard feature="Instructor Payroll">
-                    <TrainerPayroll />
+                    <TenantLayout>
+                      <TrainerPayroll />
+                    </TenantLayout>
                   </FeatureGuard>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -333,10 +360,14 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <FeatureGuard feature="BMI Tracker">
-                    <MeasurementTracker />
+                    <TenantLayout>
+                      <MeasurementTracker />
+                    </TenantLayout>
                   </FeatureGuard>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -350,7 +381,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : (
-                  <CashDrawer />
+                  <TenantLayout>
+                    <CashDrawer />
+                  </TenantLayout>
                 )
               } 
             />
@@ -364,7 +397,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : (
-                  <Khata />
+                  <TenantLayout>
+                    <Khata />
+                  </TenantLayout>
                 )
               } 
             />
@@ -378,9 +413,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <SettingsPage />
+                  <TenantLayout>
+                    <SettingsPage />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -390,9 +429,13 @@ function App() {
                 !isAuthenticated ? (
                   <LoginPage />
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <TenantLogs />
+                  <TenantLayout>
+                    <TenantLogs />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -406,9 +449,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <ReportsPage />
+                  <TenantLayout>
+                    <ReportsPage />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -422,9 +469,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <ReturnsPage />
+                  <TenantLayout>
+                    <ReturnsPage />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -438,9 +489,13 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
-                  <EmployeeManagement />
+                  <TenantLayout>
+                    <EmployeeManagement />
+                  </TenantLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -454,7 +509,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : (
-                  <OrderHistory />
+                  <TenantLayout>
+                    <OrderHistory />
+                  </TenantLayout>
                 )
               } 
             />
@@ -469,7 +526,9 @@ function App() {
                   </SuperAdminLayout>
                 ) : (
                   <FeatureGuard feature="Table Management">
-                    <FloorMap />
+                    <TenantLayout>
+                      <FloorMap />
+                    </TenantLayout>
                   </FeatureGuard>
                 )
               } 
@@ -484,7 +543,9 @@ function App() {
                     <Dashboard />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -498,7 +559,9 @@ function App() {
                     <TenantsPage />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -512,7 +575,9 @@ function App() {
                     <HardwareApproval />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -526,7 +591,9 @@ function App() {
                     <PricingTiersManager />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -540,7 +607,9 @@ function App() {
                     <DiagnosticsPanel />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -554,7 +623,9 @@ function App() {
                     <SystemLogs />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />
@@ -568,7 +639,9 @@ function App() {
                     <SubscriptionTracker />
                   </SuperAdminLayout>
                 ) : (
-                  <POSPage />
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
                 )
               } 
             />

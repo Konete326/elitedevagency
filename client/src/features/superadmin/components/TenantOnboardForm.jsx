@@ -492,7 +492,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     onChange={(e) => handleBusinessNameChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                       businessNameError
-                        ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                        ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                         : businessName && !businessNameError
                         ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                         : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
@@ -500,7 +500,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     placeholder="e.g. FitZone Club"
                   />
                   {businessNameError && (
-                    <p className="text-[9px] text-red-500 font-bold mt-0.5">{businessNameError}</p>
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{businessNameError}</p>
                   )}
                 </div>
 
@@ -512,14 +512,14 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     onChange={(e) => handleTrialDaysChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                       trialDaysError
-                        ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                        ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                         : trialDays && !trialDaysError
                         ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                         : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
                     }`}
                   />
                   {trialDaysError && (
-                    <p className="text-[9px] text-red-500 font-bold mt-0.5">{trialDaysError}</p>
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{trialDaysError}</p>
                   )}
                 </div>
               </div>
@@ -537,7 +537,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                         : isConnectionTested && isConnectionSuccessful
                         ? 'bg-green-500/10 border-green-500 text-green-600 dark:text-green-400 font-extrabold'
                         : isConnectionTested && !isConnectionSuccessful
-                        ? 'bg-red-500/10 border-red-500 text-red-650 dark:text-red-400 font-extrabold'
+                        ? 'bg-red-500/10 border-[#DC143C] text-[#DC143C] font-extrabold'
                         : 'bg-background hover:bg-muted border-border text-foreground cursor-pointer'
                     }`}
                   >
@@ -551,17 +551,17 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                   onChange={(e) => handleDbURIChange(e.target.value)}
                   className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-mono font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                     dbURIError
-                      ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                      ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                       : dbURI && isConnectionTested && isConnectionSuccessful
                       ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                       : dbURI && isConnectionTested && !isConnectionSuccessful
-                      ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                      ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                       : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
                   }`}
                   placeholder="mongodb+srv://username:password@cluster.mongodb.net/database"
                 />
                 {dbURIError && (
-                  <p className="text-[9px] text-red-500 font-bold mt-0.5">{dbURIError}</p>
+                  <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{dbURIError}</p>
                 )}
               </div>
 
@@ -577,7 +577,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     onChange={(e) => handleOwnerNameChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                       ownerNameError
-                        ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                        ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                         : ownerName && !ownerNameError
                         ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                         : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
@@ -585,7 +585,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     placeholder="e.g. John Doe"
                   />
                   {ownerNameError && (
-                    <p className="text-[9px] text-red-500 font-bold mt-0.5">{ownerNameError}</p>
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{ownerNameError}</p>
                   )}
                 </div>
 
@@ -600,7 +600,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     onChange={(e) => handleOwnerEmailChange(e.target.value)}
                     className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 px-3 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                       ownerEmailError
-                        ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                        ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                         : ownerEmail && !ownerEmailError
                         ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                         : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
@@ -608,7 +608,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     placeholder="owner@fitzone.com"
                   />
                   {ownerEmailError && (
-                    <p className="text-[9px] text-red-500 font-bold mt-0.5">{ownerEmailError}</p>
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{ownerEmailError}</p>
                   )}
                 </div>
               </div>
@@ -626,7 +626,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                       onChange={(e) => handleOwnerPasswordChange(e.target.value)}
                       className={`w-full rounded-lg border bg-slate-50/50 dark:bg-zinc-900/20 pl-3 pr-10 py-2 text-xs font-semibold text-foreground dark:text-zinc-200 focus:outline-none focus:ring-1 ${
                         ownerPasswordError
-                          ? 'border-red-500 focus:ring-red-500 bg-red-50/5'
+                          ? 'border-[#DC143C] focus:ring-[#DC143C] bg-[#DC143C]/5'
                           : ownerPassword && !ownerPasswordError
                           ? 'border-green-500 focus:ring-green-500 bg-green-50/5'
                           : 'border-border dark:border-zinc-700 focus:ring-[var(--accent)]'
@@ -646,7 +646,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
                     </button>
                   </div>
                   {ownerPasswordError && (
-                    <p className="text-[9px] text-red-500 font-bold mt-0.5">{ownerPasswordError}</p>
+                    <p className="text-[9px] text-[#DC143C] font-bold mt-0.5">{ownerPasswordError}</p>
                   )}
                 </div>
 

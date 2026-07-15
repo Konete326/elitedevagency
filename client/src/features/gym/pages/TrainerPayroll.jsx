@@ -154,27 +154,22 @@ export const TrainerPayroll = () => {
   const netSalary = Math.max(0, baseSalary - advanceBalance);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 max-w-7xl w-full mx-auto space-y-6 p-6 md:p-8 overflow-y-auto">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Trainer Payroll & Advance Management</h1>
+            <p className="text-xs text-muted-foreground">Manage salary, payouts, and advances for gym instructors</p>
+          </div>
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border dark:border-zinc-700 hover:bg-muted transition-colors mr-2 text-foreground"
+            onClick={() => setIsTrainerModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
+            <span>Onboard Trainer</span>
           </button>
-          <span className="font-extrabold text-lg tracking-tight">Trainer Payroll & Advance Management</span>
         </div>
-        <button
-          onClick={() => setIsTrainerModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold text-xs transition-colors shadow-sm"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Onboard Trainer</span>
-        </button>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-8 overflow-hidden items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         <div className="lg:col-span-1 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-sm flex flex-col min-h-0">
           <h3 className="text-base font-black tracking-tight mb-4 flex items-center gap-2">
             <Users className="h-5 w-5 text-accent" /> Gym Trainers
@@ -314,9 +309,9 @@ export const TrainerPayroll = () => {
             <div className="flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-xl bg-white dark:bg-zinc-800 text-muted-foreground p-8">
               <Landmark className="h-10 w-10 text-muted-foreground/30 mb-2" />
               <p className="text-xs font-bold text-foreground">Select a Trainer</p>
-              <p className="text-[10px] text-center max-w-xs text-muted-foreground mt-0.5">Pick a trainer from the left list to review base salary, post advance draws, or payout monthly salaries</p>
             </div>
           )}
+        </div>
         </div>
       </main>
 

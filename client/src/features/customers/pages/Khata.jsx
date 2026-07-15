@@ -114,27 +114,21 @@ export const Khata = () => {
   const debitCustomers = customers.filter(c => c.receivableBalance > 0);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 max-w-4xl w-full mx-auto space-y-6 p-6 md:p-8 overflow-y-auto">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Customer Credit Ledger</h1>
+            <p className="text-xs text-muted-foreground">Manage customer credit balances, receivables, and cash payments</p>
+          </div>
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border dark:border-zinc-700 hover:bg-muted transition-colors mr-2 text-foreground"
+            onClick={() => setIsCustomerModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <Plus className="h-4 w-4" />
+            <span>Add Credit Account</span>
           </button>
-          <span className="font-extrabold text-lg tracking-tight">Customer Credit Ledger</span>
         </div>
-        <button
-          onClick={() => setIsCustomerModalOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold text-xs transition-colors shadow-sm"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Credit Account</span>
-        </button>
-      </header>
-
-      <main className="flex-1 max-w-4xl w-full mx-auto p-6 md:p-8 overflow-y-auto">
         <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
           <div className="p-5 border-b border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20">
              <h3 className="text-base font-black tracking-tight text-foreground">Outstanding Credit Accounts</h3>

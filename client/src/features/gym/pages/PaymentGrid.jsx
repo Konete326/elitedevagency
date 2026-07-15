@@ -99,20 +99,13 @@ export const PaymentGrid = () => {
   const selectedMember = members.find(m => m._id === selectedMemberId);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border dark:border-zinc-700 hover:bg-muted transition-colors mr-2 text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <span className="font-extrabold text-lg tracking-tight">12-Month Fees Ledger</span>
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 max-w-7xl w-full mx-auto space-y-6 p-6 md:p-8 overflow-y-auto">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight">12-Month Fees Ledger</h1>
+          <p className="text-xs text-muted-foreground">Gym member monthly payment records and subscription ledger</p>
         </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 md:p-8 overflow-hidden items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         <div className="lg:col-span-1 rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-sm flex flex-col min-h-0">
           <h3 className="text-base font-black tracking-tight mb-4 flex items-center gap-2">
             <CircleDollarSign className="h-5 w-5 text-accent" /> Gym Members Catalog
@@ -252,6 +245,7 @@ export const PaymentGrid = () => {
               <p className="text-[10px] text-center max-w-xs text-muted-foreground mt-0.5">Please pick a member from the left panel to review and record monthly membership fee logs</p>
             </div>
           )}
+        </div>
         </div>
       </main>
     </div>

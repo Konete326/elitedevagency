@@ -108,33 +108,24 @@ export const PlanManager = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 dark:bg-zinc-900 text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-sm shrink-0">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="rounded-lg border border-border p-2 text-muted-foreground hover:bg-muted"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
+    <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
+      <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto space-y-6">
+        <div className="flex items-center justify-between gap-4">
           <div>
-            <h1 className="text-lg font-black tracking-tight text-foreground flex items-center gap-2">
-              <Award className="h-5 w-5 text-accent" />
+            <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
+              <Award className="h-5 w-5 text-[var(--primary-accent)]" />
               <span>Membership Plans</span>
             </h1>
-            <p className="text-[10px] text-muted-foreground font-semibold">Manage club subscription pricing bundles</p>
+            <p className="text-xs text-muted-foreground">Manage club subscription pricing bundles</p>
           </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition-opacity shadow-sm cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            <span>New Plan</span>
+          </button>
         </div>
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] px-4 py-2.5 text-xs font-bold text-white hover:opacity-90 transition-opacity shadow-sm"
-        >
-          <Plus className="h-4 w-4" />
-          <span>New Plan</span>
-        </button>
-      </header>
-
-      <main className="flex-1 p-6 overflow-y-auto max-w-7xl w-full mx-auto">
         {plans.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 border border-dashed border-border rounded-2xl text-muted-foreground bg-white dark:bg-zinc-800 p-8 space-y-3">
             <Award className="h-10 w-10 text-muted-foreground/40" />

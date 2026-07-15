@@ -23,7 +23,8 @@ const loginUser = async (email, password, deviceFingerprint) => {
         name: 'Super Admin',
         role: 'SUPER_ADMIN',
         email: process.env.SUPERADMIN_EMAIL,
-        tenantId: 'superadmin'
+        tenantId: 'superadmin',
+        businessName: 'Elite Super Admin'
       },
       tenant: { _id: 'superadmin', name: 'Elite Super Admin', dbURI: 'main' }
     };
@@ -105,6 +106,7 @@ const loginUser = async (email, password, deviceFingerprint) => {
       role: user.role,
       email: user.email,
       tenantId: user.tenantId,
+      businessName: tenant.businessName,
       niche: tenant.niche,
       customTheme: tenant.customTheme || null,
       blockMobileAccess: tenant.blockMobileAccess || false,
