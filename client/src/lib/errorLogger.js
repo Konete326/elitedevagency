@@ -31,11 +31,21 @@ async function sendLog(type, message, stack) {
     lowerMsg.includes('failed to fetch') ||
     lowerMsg.includes('networkerror') ||
     lowerMsg.includes('err_connection_refused') ||
+    lowerMsg.includes('permissions policy violation: unload') ||
+    lowerMsg.includes('dexie') ||
+    lowerMsg.includes('indexeddb') ||
+    lowerMsg.includes('storage locked') ||
+    lowerMsg.includes('database lock') ||
     lowerStack.includes('/api/heartbeat') ||
     lowerStack.includes('/api/logs') ||
     lowerStack.includes('failed to fetch') ||
     lowerStack.includes('networkerror') ||
     lowerStack.includes('err_connection_refused') ||
+    lowerStack.includes('permissions policy violation: unload') ||
+    lowerStack.includes('dexie') ||
+    lowerStack.includes('indexeddb') ||
+    lowerStack.includes('storage locked') ||
+    lowerStack.includes('database lock') ||
     lowerUrl.includes('/api/heartbeat') ||
     lowerUrl.includes('/api/logs');
 

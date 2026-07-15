@@ -371,6 +371,7 @@ const pricingTierSchema = {
 };
 
 let dbPromise = null;
+let currentDbName = 'pos_offline_db';
 
 export const getDatabase = async () => {
   if (dbPromise) return dbPromise;
@@ -384,13 +385,7 @@ export const getDatabase = async () => {
       storage = wrappedValidateAjvStorage({ storage });
     }
     
-    const db = await createRxDatabase({
-      name: 'pos_offline_db',
-      storage,
-      ignoreDuplicate: true
-    });
-    
-    await db.addCollections({
+    const collectionsConfig = {
       products: { schema: productSchema },
       orders: { schema: orderSchema },
       categories: { schema: categorySchema },
@@ -405,9 +400,30 @@ export const getDatabase = async () => {
       customers: { schema: customerSchema },
       cash_shifts: { schema: cashShiftSchema },
       pricing_tiers: { schema: pricingTierSchema }
-    });
+    };
     
-    return db;
+    try {
+      const db = await createRxDatabase({
+        name: currentDbName,
+        storage,
+        ignoreDuplicate: true
+      });
+      await db.addCollections(collectionsConfig);
+      return db;
+    } catch {
+      currentDbName = `pos_offline_db_${Date.now()}`;
+      try {
+        const db = await createRxDatabase({
+          name: currentDbName,
+          storage,
+          ignoreDuplicate: true
+        });
+        await db.addCollections(collectionsConfig);
+        return db;
+      } catch {
+        return null;
+      }
+    }
   })();
   
   return dbPromise;
