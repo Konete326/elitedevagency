@@ -89,33 +89,27 @@ export const startReplication = async (db, collectionName) => {
   });
 
   let toastId = null;
-  let isFirstSync = true;
 
   replicationState.active$.subscribe((active) => {
     if (active) {
-      if (isFirstSync) {
-        const msg = `Syncing ${collectionName}...`;
-        const now = Date.now();
-        const lastTime = lastSyncToastTime.get(msg);
-        if (!lastTime || now - lastTime >= 300000) {
-          lastSyncToastTime.set(msg, now);
-          toastId = toast.loading(msg);
-        }
+      const msg = `Syncing ${collectionName}...`;
+      const now = Date.now();
+      const lastTime = lastSyncToastTime.get(msg);
+      if (!lastTime || now - lastTime >= 3600000) {
+        lastSyncToastTime.set(msg, now);
+        toastId = toast.loading(msg);
       }
     } else {
-      if (isFirstSync) {
-        isFirstSync = false;
-        const successMsg = `${collectionName} sync complete`;
-        const now = Date.now();
-        const lastTime = lastSyncToastTime.get(successMsg);
-        if (toastId) {
-          toast.success(successMsg, { id: toastId });
-          lastSyncToastTime.set(successMsg, now);
-          toastId = null;
-        } else if (!lastTime || now - lastTime >= 300000) {
-          toast.success(successMsg);
-          lastSyncToastTime.set(successMsg, now);
-        }
+      const successMsg = `${collectionName} sync complete`;
+      const now = Date.now();
+      const lastTime = lastSyncToastTime.get(successMsg);
+      if (toastId) {
+        toast.success(successMsg, { id: toastId });
+        lastSyncToastTime.set(successMsg, now);
+        toastId = null;
+      } else if (!lastTime || now - lastTime >= 3600000) {
+        toast.success(successMsg);
+        lastSyncToastTime.set(successMsg, now);
       }
     }
   });
@@ -124,7 +118,7 @@ export const startReplication = async (db, collectionName) => {
     const errorMsg = `${collectionName} sync error: ${err.message || err}`;
     const now = Date.now();
     const lastTime = lastSyncToastTime.get(errorMsg);
-    if (!lastTime || now - lastTime >= 300000) {
+    if (!lastTime || now - lastTime >= 3600000) {
       lastSyncToastTime.set(errorMsg, now);
       if (toastId) {
         toast.error(errorMsg, { id: toastId });
