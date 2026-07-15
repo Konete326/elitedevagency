@@ -42,7 +42,6 @@ export const TopNav = () => {
     });
   };
 
-  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   return (
     <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
