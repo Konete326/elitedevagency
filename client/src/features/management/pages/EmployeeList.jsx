@@ -68,7 +68,7 @@ export const EmployeeList = () => {
           <button
             type="button"
             onClick={() => navigate('/employees/new')}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 text-xs font-bold transition-colors shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 text-xs font-bold transition-colors shadow-xs cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add Staff</span>
@@ -117,7 +117,12 @@ export const EmployeeList = () => {
                         <td className="py-3.5 px-4 text-right flex items-center justify-end gap-2">
                           <button
                             onClick={() => navigate(`/employees/edit/${emp._id}`)}
-                            className="rounded-lg bg-foreground/5 hover:bg-foreground/10 text-foreground p-1.5 transition-colors border border-border cursor-pointer"
+                            disabled={isSelf}
+                            className={`rounded-lg p-1.5 transition-colors border border-border ${
+                              isSelf 
+                                ? 'opacity-40 cursor-not-allowed text-foreground/50 bg-foreground/5' 
+                                : 'bg-foreground/5 hover:bg-foreground/10 text-foreground cursor-pointer'
+                            }`}
                           >
                             <Edit3 className="h-3.5 w-3.5" />
                           </button>

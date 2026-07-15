@@ -263,7 +263,7 @@ export const TrainerPayroll = () => {
                   </div>
                   <button
                     type="submit"
-                    className="sm:col-span-3 rounded-lg bg-foreground text-background font-bold py-3 text-xs shadow-sm hover:bg-foreground/90 transition-colors"
+                    className="sm:col-span-3 rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold py-3 text-xs shadow-sm transition-colors cursor-pointer"
                   >
                     Submit Ledger Entry
                   </button>
@@ -361,7 +361,7 @@ export const TrainerPayroll = () => {
               </div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-foreground text-background py-3 text-xs font-bold shadow-sm"
+                className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-3 text-xs font-bold shadow-sm cursor-pointer"
               >
                 Onboard Trainer
               </button>

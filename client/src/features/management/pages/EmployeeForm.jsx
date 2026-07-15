@@ -36,6 +36,11 @@ export const EmployeeForm = () => {
       if (res.ok && data.success) {
         const emp = data.data.find(e => e._id === id);
         if (emp) {
+          if (emp.email === user?.email || emp._id === user?._id) {
+            toast.error('You cannot edit your own profile credentials');
+            navigate('/employees');
+            return;
+          }
           setName(emp.name || '');
           setEmail(emp.email || '');
           setRole(emp.role || 'CASHIER');
@@ -46,13 +51,20 @@ export const EmployeeForm = () => {
     } catch {
       toast.error('Failed to load employee details');
     }
-  }, [id, token]);
+  }, [id, token, user, navigate]);
 
   useEffect(() => {
+    if (isEdit && id && user) {
+      if (id === user._id) {
+        toast.error('You cannot edit your own profile credentials');
+        navigate('/employees');
+        return;
+      }
+    }
     if (isEdit && token) {
       fetchEmployeeData();
     }
-  }, [isEdit, token, fetchEmployeeData]);
+  }, [isEdit, id, user, token, fetchEmployeeData, navigate]);
 
   const handlePermissionToggle = (perm) => {
     setSelectedPermissions((prev) =>
@@ -129,70 +141,72 @@ export const EmployeeForm = () => {
 
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold mb-1">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="e.g. John Doe"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1">Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="e.g. john@retail.com"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1">Password {isEdit && '(Leave blank to keep current)'}</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder={isEdit ? 'New password (optional)' : 'Min 6 characters'}
-                required={!isEdit}
-              />
-            </div>
-
-            <div className="grid gap-2 grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold mb-1">Role</label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
-                >
-                  <option value="MANAGER">Manager</option>
-                  <option value="CASHIER">Cashier</option>
-                </select>
+                <label className="block text-xs font-bold mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="e.g. John Doe"
+                  required
+                />
               </div>
+
               <div>
-                <label className="block text-xs font-bold mb-1">Data Visibility</label>
-                <select
-                  value={dataVisibility}
-                  onChange={(e) => setDataVisibility(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
-                >
-                  <option value="ALL">All Stores</option>
-                  <option value="RESTRICTED">Restricted</option>
-                </select>
+                <label className="block text-xs font-bold mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="e.g. john@retail.com"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold mb-1">Password {isEdit && '(Leave blank to keep current)'}</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder={isEdit ? 'New password (optional)' : 'Min 6 characters'}
+                  required={!isEdit}
+                />
+              </div>
+
+              <div className="grid gap-2 grid-cols-2">
+                <div>
+                  <label className="block text-xs font-bold mb-1">Role</label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
+                  >
+                    <option value="MANAGER">Manager</option>
+                    <option value="CASHIER">Cashier</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold mb-1">Data Visibility</label>
+                  <select
+                    value={dataVisibility}
+                    onChange={(e) => setDataVisibility(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
+                  >
+                    <option value="ALL">All Stores</option>
+                    <option value="RESTRICTED">Restricted</option>
+                  </select>
+                </div>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold mb-1.5">Grant Permissions</label>
-              <div className="grid gap-2 grid-cols-2 max-h-[160px] overflow-y-auto border border-border rounded-lg p-3 bg-muted/20">
+              <div className="grid gap-2 grid-cols-2 max-h-[120px] overflow-y-auto border border-border rounded-lg p-3 bg-muted/20">
                 {AVAILABLE_PERMISSIONS.map((perm) => (
                   <label key={perm.key} className="flex items-center gap-1.5 text-[10px] font-semibold cursor-pointer select-none">
                     <input
@@ -218,7 +232,7 @@ export const EmployeeForm = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-2.5 text-xs transition-colors cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold px-4 py-2.5 text-xs transition-colors cursor-pointer"
               >
                 <span>{loading ? 'Saving...' : isEdit ? 'Save Employee' : 'Register Employee'}</span>
               </button>

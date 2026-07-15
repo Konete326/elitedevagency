@@ -463,7 +463,7 @@ export const ProductForm = () => {
               </button>
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-foreground text-background hover:bg-foreground/90 font-bold px-4 py-3 text-sm transition-colors cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold px-4 py-3 text-sm transition-colors cursor-pointer"
               >
                 <span>{isEdit ? 'Save Changes' : 'Create Product'}</span>
               </button>

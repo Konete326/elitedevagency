@@ -57,7 +57,7 @@ export const CategoryList = () => {
           <button
             type="button"
             onClick={() => navigate('/inventory/categories/new')}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-foreground text-background hover:bg-foreground/90 text-xs font-bold transition-colors shadow-xs cursor-pointer"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 text-xs font-bold transition-colors shadow-xs cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add Category</span>

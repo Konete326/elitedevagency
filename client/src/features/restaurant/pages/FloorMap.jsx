@@ -159,7 +159,7 @@ export const FloorMap = () => {
           {canManage && (
             <button
               onClick={() => setIsAddOpen(true)}
-              className="fixed bottom-8 right-8 flex items-center justify-center h-14 w-14 rounded-full bg-foreground text-background shadow-lg hover:scale-105 active:scale-95 transition-all"
+              className="fixed bottom-8 right-8 flex items-center justify-center h-14 w-14 rounded-full bg-[var(--primary-accent)] text-white shadow-lg hover:scale-105 active:scale-95 transition-all hover:opacity-95 cursor-pointer"
             >
               <Plus className="h-6 w-6" />
             </button>
@@ -196,7 +196,7 @@ export const FloorMap = () => {
                   placeholder="e.g. 4"
                 />
               </div>
-              <button type="submit" className="w-full rounded-lg bg-foreground text-background py-3 text-xs font-bold shadow-sm">
+              <button type="submit" className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-3 text-xs font-bold shadow-sm cursor-pointer">
                 Save Table
               </button>
             </form>
