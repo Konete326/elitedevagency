@@ -14,7 +14,19 @@ export const Sidebar = () => {
   const { user, logout } = useAuthStore();
   const { openModal } = useModalStore();
   const location = useLocation();
-  const [inventoryExpanded, setInventoryExpanded] = useState(true);
+  const [expandedGroups, setExpandedGroups] = useState({
+    billing: true,
+    inventory: true,
+    gym: true,
+    admin: false
+  });
+
+  const toggleGroup = (groupKey) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupKey]: !prev[groupKey]
+    }));
+  };
 
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const features = user?.features || [];
@@ -34,15 +46,33 @@ export const Sidebar = () => {
     }
 
     const tenantLinks = [
-      { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard },
-      { path: '/pos', label: 'POS Terminal', icon: Store }
+      { path: '/dashboard', label: 'Business Dashboard', icon: LayoutDashboard }
     ];
 
     const isOwnerOrManager = user?.role === 'OWNER' || user?.role === 'MANAGER';
 
+    const billingChildren = [
+      { path: '/pos', label: 'POS Terminal', icon: Store }
+    ];
+    if (isOwnerOrManager) {
+      billingChildren.push({ path: '/returns', label: 'Returns Manager', icon: RotateCcw });
+    }
+    billingChildren.push({ path: '/orders', label: 'Order History', icon: History });
+    billingChildren.push({ path: '/galla', label: 'Cash Drawer', icon: Coins });
+    billingChildren.push({ path: '/khata', label: 'Credit Ledger', icon: Wallet });
+
+    tenantLinks.push({
+      key: 'billing',
+      label: 'Sales & Billing',
+      icon: Store,
+      isGroup: true,
+      children: billingChildren
+    });
+
     if (isOwnerOrManager) {
       tenantLinks.push({
-        label: 'Inventory',
+        key: 'inventory',
+        label: 'Inventory Hub',
         icon: Package,
         isGroup: true,
         children: [
@@ -51,32 +81,48 @@ export const Sidebar = () => {
           { path: '/deals', label: 'Deals Catalog', icon: Tag }
         ]
       });
-
-      if (niche === 'GYM') {
-        tenantLinks.push({ path: '/plans', label: 'Membership Plans', icon: Award });
-        tenantLinks.push({ path: '/members', label: 'Members List', icon: UserCheck });
-        tenantLinks.push({ path: '/payments', label: '12-Mo Fees', icon: CircleDollarSign });
-        if (features.includes('Instructor Payroll')) {
-          tenantLinks.push({ path: '/trainers', label: 'Trainer Payroll', icon: Users });
-        }
-        if (features.includes('BMI Tracker')) {
-          tenantLinks.push({ path: '/measurements', label: 'BMI Metrics', icon: Activity });
-        }
-      }
-
-      if (niche === 'RESTAURANT' && features.includes('Table Management')) {
-        tenantLinks.push({ path: '/floor-map', label: 'Table Layout', icon: LayoutGrid });
-      }
-
-      tenantLinks.push({ path: '/returns', label: 'Returns Manager', icon: RotateCcw });
-      tenantLinks.push({ path: '/employees', label: 'Employees List', icon: Users });
-      tenantLinks.push({ path: '/reports', label: 'Reports Hub', icon: TrendingUp });
-      tenantLinks.push({ path: '/settings', label: 'System Settings', icon: Settings });
     }
 
-    tenantLinks.push({ path: '/orders', label: 'Order History', icon: History });
-    tenantLinks.push({ path: '/galla', label: 'Cash Drawer', icon: Coins });
-    tenantLinks.push({ path: '/khata', label: 'Credit Ledger', icon: Wallet });
+    if (isOwnerOrManager && niche === 'GYM') {
+      const gymChildren = [
+        { path: '/plans', label: 'Membership Plans', icon: Award },
+        { path: '/members', label: 'Members List', icon: UserCheck },
+        { path: '/payments', label: '12-Mo Fees', icon: CircleDollarSign }
+      ];
+      if (features.includes('Instructor Payroll')) {
+        gymChildren.push({ path: '/trainers', label: 'Trainer Payroll', icon: Users });
+      }
+      if (features.includes('BMI Tracker')) {
+        gymChildren.push({ path: '/measurements', label: 'BMI Metrics', icon: Activity });
+      }
+
+      tenantLinks.push({
+        key: 'gym',
+        label: 'Gym Management',
+        icon: Award,
+        isGroup: true,
+        children: gymChildren
+      });
+    }
+
+    if (isOwnerOrManager) {
+      const adminChildren = [
+        { path: '/employees', label: 'Employees List', icon: Users },
+        { path: '/reports', label: 'Reports Hub', icon: TrendingUp }
+      ];
+      if (niche === 'RESTAURANT' && features.includes('Table Management')) {
+        adminChildren.push({ path: '/floor-map', label: 'Table Layout', icon: LayoutGrid });
+      }
+      adminChildren.push({ path: '/settings', label: 'System Settings', icon: Settings });
+
+      tenantLinks.push({
+        key: 'admin',
+        label: 'Administration',
+        icon: Settings,
+        isGroup: true,
+        children: adminChildren
+      });
+    }
 
     return tenantLinks;
   };
@@ -138,7 +184,11 @@ export const Sidebar = () => {
             if (link.isGroup) {
               if (sidebarCollapsed) {
                 return link.children.map((child) => {
-                  const isChildActive = location.pathname === child.path || (child.path === '/inventory' && location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories'));
+                  const isChildActive = child.path === '/inventory' 
+                    ? (location.pathname === '/inventory' || (location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories')))
+                    : child.path === '/employees'
+                    ? location.pathname.startsWith('/employees')
+                    : location.pathname === child.path;
                   const ChildIcon = child.icon;
                   return (
                     <Link
@@ -160,27 +210,34 @@ export const Sidebar = () => {
                 if (child.path === '/inventory') {
                   return location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories');
                 }
-                return location.pathname.startsWith(child.path);
+                if (child.path === '/employees') {
+                  return location.pathname.startsWith('/employees');
+                }
+                return location.pathname === child.path;
               });
+
+              const isExpanded = expandedGroups[link.key];
 
               return (
                 <div key={`group-${index}`} className="space-y-1">
                   <button
-                    onClick={() => setInventoryExpanded(!inventoryExpanded)}
+                    onClick={() => toggleGroup(link.key)}
                     className="flex w-full items-center justify-between rounded-lg px-3.5 py-2.5 text-xs font-bold transition-all text-slate-650 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:text-foreground dark:hover:text-white cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
                       <link.icon className={`h-4.5 w-4.5 shrink-0 ${hasActiveChild ? 'text-[var(--primary-accent)] dark:text-white' : 'text-slate-400 dark:text-zinc-500'}`} />
                       <span>{link.label}</span>
                     </div>
-                    <ChevronRight className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${inventoryExpanded ? 'rotate-90' : ''}`} />
+                    <ChevronRight className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
                   </button>
-                  {inventoryExpanded && (
+                  {isExpanded && (
                     <div className="pl-4 space-y-1 ml-5 border-l border-slate-200 dark:border-zinc-700">
                       {link.children.map((child) => {
                         const isChildActive = child.path === '/inventory'
                           ? (location.pathname === '/inventory' || (location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories')))
-                          : location.pathname.startsWith(child.path);
+                          : child.path === '/employees'
+                          ? location.pathname.startsWith('/employees')
+                          : location.pathname === child.path;
                         const ChildIcon = child.icon;
 
                         return (
