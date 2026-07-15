@@ -143,7 +143,10 @@ export const BusinessDashboard = () => {
       {niche === 'GYM' ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate('/members')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Active Memberships
@@ -160,7 +163,10 @@ export const BusinessDashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate(features.includes('Instructor Payroll') ? '/trainers' : '/employees')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Trainer Payroll Liability
@@ -177,7 +183,10 @@ export const BusinessDashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate('/members')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Today's Check-ins
@@ -244,7 +253,10 @@ export const BusinessDashboard = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate('/orders')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Gross Sales
@@ -261,7 +273,10 @@ export const BusinessDashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate('/orders')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Average Bill Size
@@ -278,13 +293,16 @@ export const BusinessDashboard = () => {
               </div>
             </div>
 
-            <div className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-colors">
+            <div 
+              onClick={() => navigate('/inventory/categories')}
+              className="rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-sm flex items-center justify-between transition-all hover:scale-[1.01] hover:bg-slate-50 dark:hover:bg-zinc-750/30 hover:shadow-xs cursor-pointer"
+            >
               <div className="space-y-1">
                 <p className="text-[10px] font-bold text-slate-500 dark:text-slate-455 uppercase tracking-wider">
                   Top Performing Category
                 </p>
                 <p className="text-xl font-black tracking-tight text-foreground dark:text-white truncate max-w-[170px]">
-                  {topCategories[0] ? topCategories[0][0] : 'N/A'}
+                  {topCategories[0] ? topCategories[0][0] : 'None'}
                 </p>
                 <p className="text-[9px] text-amber-600 dark:text-amber-400 font-extrabold">
                   {topCategories[0] ? `${topCategories[0][1]} items sold` : 'No items recorded'}

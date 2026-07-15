@@ -105,7 +105,7 @@ export const TenantManager = ({ onEdit }) => {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return 'N/A';
+    if (!dateStr) return 'None';
     return new Date(dateStr).toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'short',
