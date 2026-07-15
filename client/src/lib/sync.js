@@ -16,8 +16,13 @@ const checkAllSyncComplete = () => {
     if (collectionNames.length === 0) return;
     
     const isAnySyncing = collectionNames.some(name => syncStatus[name] === 'syncing');
+    
+    const now = Date.now();
+    const lastSuccess = localStorage.getItem('last_sync_success_time');
+    const isWithinHour = lastSuccess && (now - Number(lastSuccess) < 3600000);
+
     if (isAnySyncing) {
-      if (!unifiedToastId) {
+      if (!unifiedToastId && !isWithinHour) {
         unifiedToastId = toast.loading("Syncing business data...", { id: 'unified-sync-toast' });
       }
       return;
@@ -33,7 +38,12 @@ const checkAllSyncComplete = () => {
     if (errors.length > 0) {
       toast.error(`Sync complete. (Warning: ${errors.join(', ')})`, { id: 'unified-sync-toast' });
     } else {
-      toast.success("Sync complete! All business data is up to date.", { id: 'unified-sync-toast' });
+      if (!isWithinHour) {
+        toast.success("Sync complete! All business data is up to date.", { id: 'unified-sync-toast' });
+        localStorage.setItem('last_sync_success_time', String(now));
+      } else {
+        toast.dismiss('unified-sync-toast');
+      }
     }
     unifiedToastId = null;
   }, 1500);

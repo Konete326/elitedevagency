@@ -33,7 +33,8 @@ import { SettingsPage } from './features/settings/pages/SettingsPage';
 import { ReportsPage } from './features/analytics/pages/ReportsPage';
 import { BusinessDashboard } from './features/analytics/pages/BusinessDashboard';
 import { ReturnsPage } from './features/billing/pages/ReturnsPage';
-import { EmployeeManagement } from './features/management/pages/EmployeeManagement';
+import { EmployeeList } from './features/management/pages/EmployeeList';
+import { EmployeeForm } from './features/management/pages/EmployeeForm';
 import { OrderHistory } from './features/billing/pages/OrderHistory';
 import { FloorMap } from './features/restaurant/pages/FloorMap';
 import { PlanManager } from './features/gym/pages/PlanManager';
@@ -597,7 +598,7 @@ function App() {
                 )
               } 
             />
-            <Route 
+             <Route 
               path="/employees" 
               element={
                 !isAuthenticated ? (
@@ -608,7 +609,47 @@ function App() {
                   </SuperAdminLayout>
                 ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
                   <TenantLayout>
-                    <EmployeeManagement />
+                    <EmployeeList />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/employees/new" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <EmployeeForm />
+                  </TenantLayout>
+                ) : (
+                  <TenantLayout>
+                    <POSPage />
+                  </TenantLayout>
+                )
+              } 
+            />
+            <Route 
+              path="/employees/edit/:id" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : user?.role === 'OWNER' || user?.role === 'MANAGER' ? (
+                  <TenantLayout>
+                    <EmployeeForm />
                   </TenantLayout>
                 ) : (
                   <TenantLayout>

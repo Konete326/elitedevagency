@@ -47,7 +47,7 @@ export const TopNav = () => {
 
   return (
     <header className="sticky top-0 z-35 grid grid-cols-12 h-16 items-center border-b border-border dark:border-zinc-750 bg-white dark:bg-zinc-800 px-6 shadow-xs shrink-0 text-foreground dark:text-white gap-0">
-      <div className="col-span-3 flex items-center gap-3">
+      <div className="col-span-2 flex items-center gap-3">
         <button
           onClick={toggleSidebar}
           className="lg:hidden rounded-lg border border-border dark:border-zinc-700 p-2 text-muted-foreground hover:bg-muted dark:hover:bg-zinc-700 cursor-pointer"
@@ -59,7 +59,7 @@ export const TopNav = () => {
         </span>
       </div>
 
-      <div className="col-span-4 flex items-center justify-center px-2">
+      <div className="col-span-6 flex items-center justify-center px-2">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground/60" />
           <input 
@@ -71,7 +71,7 @@ export const TopNav = () => {
         </div>
       </div>
 
-      <div className="col-span-5 flex items-center justify-end gap-3 sm:gap-4">
+      <div className="col-span-4 flex items-center justify-end gap-3 sm:gap-4">
         <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold border transition-all ${
           isOnline 
             ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400' 
