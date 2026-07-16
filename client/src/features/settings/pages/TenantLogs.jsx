@@ -13,7 +13,15 @@ export const TenantLogs = () => {
     limit: 10
   });
 
-  const { data, isLoading, refetch } = useTenantLogs(filters);
+  const { data, isLoading, isFetching, refetch } = useTenantLogs(filters);
+
+  const handleRefresh = () => {
+    toast.promise(refetch(), {
+      loading: 'Refreshing system logs...',
+      success: 'System logs updated successfully.',
+      error: 'Failed to refresh logs.'
+    });
+  };
 
   const copyToClipboard = (log) => {
     const text = `Type: ${log.type}\nMessage: ${log.message}\nStack: ${log.stack || 'No stack trace available'}\nURL: ${log.url}\nBrowser: ${log.browserInfo}`;
@@ -46,10 +54,10 @@ export const TenantLogs = () => {
         </div>
 
         <button
-          onClick={() => refetch()}
-          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card hover:bg-muted px-3 py-2 text-xs font-bold transition-colors text-foreground"
+          onClick={handleRefresh}
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card hover:bg-muted px-3 py-2 text-xs font-bold transition-colors text-foreground cursor-pointer"
         >
-          <RefreshCw className="h-3.5 w-3.5" />
+          <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? 'animate-spin' : ''}`} />
           <span>Refresh</span>
         </button>
       </div>
