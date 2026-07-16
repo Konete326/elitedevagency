@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { getSystemPrinters } from '../../../lib/device';
-import { Printer, RefreshCw, Terminal, Save, Wallet } from 'lucide-react';
+import { Printer, RefreshCw, Save } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const SettingsPage = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { user } = useAuthStore();
   const { selectedPrinter, setSelectedPrinter } = useSettingsStore();
 
@@ -87,58 +86,17 @@ export const SettingsPage = () => {
     }
   };
 
-  const handleTabChange = (tabName) => {
-    setSearchParams({ tab: tabName });
-  };
+
 
   return (
     <div className="flex flex-col h-full w-full bg-background text-foreground transition-colors duration-300">
-      <main className="flex-1 p-4 md:p-6 max-w-6xl w-full mx-auto flex flex-col md:flex-row gap-6">
-        
-        <div className="w-full md:w-1/4 flex flex-col gap-2 shrink-0">
-          <div className="mb-4">
-            <h1 className="text-base font-bold tracking-tight">System Settings</h1>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Configure system modules</p>
-          </div>
-
-          <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
-            <button
-              onClick={() => handleTabChange('printer')}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                activeTab === 'printer'
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'hover:bg-muted text-muted-foreground'
-              }`}
-            >
-              <Printer className="h-4 w-4" />
-              <span>Printer Setup</span>
-            </button>
-
-            {user?.niche === 'RESTAURANT' && (
-              <button
-                onClick={() => handleTabChange('wallet')}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === 'wallet'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'hover:bg-muted text-muted-foreground'
-              }`}
-              >
-                <Wallet className="h-4 w-4" />
-                <span>Wallet Setup</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => navigate('/settings/logs')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all hover:bg-muted text-muted-foreground cursor-pointer whitespace-nowrap"
-            >
-              <Terminal className="h-4 w-4" />
-              <span>System Logs</span>
-            </button>
-          </nav>
+      <main className="flex-1 p-4 md:p-6 max-w-4xl w-full mx-auto space-y-4">
+        <div>
+          <h1 className="text-base font-bold tracking-tight">System Settings</h1>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Configure system modules</p>
         </div>
 
-        <div className="flex-1 rounded-xl border border-border bg-card p-5 shadow-sm min-h-[400px]">
+        <div className="rounded-xl border border-border bg-card p-5 shadow-sm min-h-[400px]">
           {activeTab === 'printer' && (
             <div className="space-y-6">
               <div>
