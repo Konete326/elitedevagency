@@ -86,8 +86,8 @@ export const TableMenu = () => {
           setPaymentConfig(res.data);
           const active = (res.data.paymentMethods || []).filter(m => m.isActive);
           if (active.length > 0) {
-            setSelectedMethodId(active[0]._id);
-            setPaymentMethod(active[0].customName);
+            setSelectedMethodId(active[0].id);
+            setPaymentMethod(active[0].displayName);
           }
         }
       })
@@ -661,21 +661,21 @@ export const TableMenu = () => {
               {(paymentConfig?.paymentMethods || []).filter(m => m.isActive).length > 0 ? (
                 (paymentConfig.paymentMethods || []).filter(m => m.isActive).map((method) => (
                   <button
-                    key={method._id}
+                    key={method.id}
                     type="button"
                     onClick={() => {
-                      setSelectedMethodId(method._id);
-                      setPaymentMethod(method.customName);
+                      setSelectedMethodId(method.id);
+                      setPaymentMethod(method.displayName);
                     }}
                     className={`p-3 rounded-lg border text-left flex items-center justify-between transition-all cursor-pointer ${
-                      selectedMethodId === method._id
+                      selectedMethodId === method.id
                         ? 'border-primary bg-slate-850 shadow-sm'
                         : 'border-slate-800 bg-slate-950 hover:bg-slate-900'
                     }`}
                   >
                     <div>
                       <div className="font-bold text-white uppercase tracking-wider text-[10px]">{method.type}</div>
-                      <div className="font-black text-slate-200 text-xs mt-0.5">{method.customName}</div>
+                      <div className="font-black text-slate-200 text-xs mt-0.5">{method.displayName}</div>
                       <div className="text-[10px] text-slate-400 mt-1">Title: <span className="font-bold text-slate-200">{method.accountTitle}</span></div>
                       {method.accountNumber && (
                         <div className="text-[10px] text-slate-400">Account #: <span className="font-bold text-slate-200 font-mono">{method.accountNumber}</span></div>
@@ -685,9 +685,9 @@ export const TableMenu = () => {
                       )}
                     </div>
                     
-                    {method.logo && (
+                    {method.logoPreset && (
                       <span className="px-2 py-1 rounded bg-slate-850 text-[9px] font-bold text-primary uppercase">
-                        {method.logo}
+                        {method.logoPreset}
                       </span>
                     )}
                   </button>

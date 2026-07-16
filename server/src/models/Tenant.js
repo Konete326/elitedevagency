@@ -36,13 +36,14 @@ const tenantSchema = new mongoose.Schema({
   bankName: { type: String, default: "" },
   bankIban: { type: String, default: "" },
   paymentMethods: [{
-    type: { type: String, enum: ['EASYPAISA', 'JAZZCASH', 'BANK', 'OTHER'], default: 'EASYPAISA' },
-    customName: { type: String, required: true },
-    accountTitle: { type: String, required: true },
-    accountNumber: { type: String, required: true },
-    iban: { type: String, default: "" },
-    isActive: { type: Boolean, default: true },
-    logo: { type: String, default: "" }
+    id: { type: String, required: true },
+    type: { type: String, enum: ['EASYPAISA', 'JAZZCASH', 'BANK', 'OTHER'] },
+    displayName: { type: String },
+    accountTitle: { type: String },
+    accountNumber: { type: String },
+    iban: { type: String },
+    logoPreset: { type: String },
+    isActive: { type: Boolean, default: true }
   }]
 }, { timestamps: true });
 
