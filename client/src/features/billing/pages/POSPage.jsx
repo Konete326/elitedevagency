@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { ProductGrid } from '../components/ProductGrid';
 import { Cart } from '../components/Cart';
 import { useAuthStore } from '../../../store/useAuthStore';
@@ -14,6 +14,8 @@ export const POSPage = () => {
   const [activeAlert, setActiveAlert] = useState(null);
   const [isTrayOpen, setIsTrayOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  
+  const playedPaymentsRef = useRef([]);
 
   const fetchPayments = useCallback(async () => {
     if (user?.role === 'SUPER_ADMIN') return;
@@ -24,6 +26,10 @@ export const POSPage = () => {
         setPayments(data.data);
         const pending = data.data.find(p => p.status === 'PENDING');
         if (pending) {
+          if (!playedPaymentsRef.current.includes(pending._id)) {
+            playedPaymentsRef.current.push(pending._id);
+            new Audio('/assets/sounds/notification.mp3').play().catch(() => {});
+          }
           setActiveAlert(pending);
         } else {
           setActiveAlert(null);

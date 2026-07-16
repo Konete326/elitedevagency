@@ -265,6 +265,8 @@ const confirmPayment = async (req, res, next) => {
       status: 'COMPLETED',
       paymentStatus: 'PAID',
       tableId: session.tableId,
+      tableNo: payment.tableNo,
+      orderSource: 'TABLE_QR',
       isDeleted: false
     });
     await order.save();

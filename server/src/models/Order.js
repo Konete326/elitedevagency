@@ -24,6 +24,8 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, enum: ['DRAFT', 'COMPLETED'], default: 'COMPLETED' },
   paymentStatus: { type: String, enum: ['PAID', 'UNPAID'], default: 'PAID' },
   tableId: { type: String },
+  tableNo: { type: String },
+  orderSource: { type: String, default: 'COUNTER' },
   isDeleted: { type: Boolean, default: false }
 }, {
   timestamps: true

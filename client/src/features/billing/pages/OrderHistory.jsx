@@ -109,6 +109,7 @@ export const OrderHistory = () => {
                     <th className="py-3 px-4 font-bold">Order ID</th>
                     <th className="py-3 px-4 font-bold">Date</th>
                     <th className="py-3 px-4 font-bold">Method</th>
+                    <th className="py-3 px-4 font-bold">Source</th>
                     <th className="py-3 px-4 font-bold">Return Status</th>
                     <th className="py-3 px-4 font-bold">Total Amount</th>
                     <th className="py-3 px-4 text-right font-bold">Actions</th>
@@ -125,6 +126,17 @@ export const OrderHistory = () => {
                       </td>
                       <td className="py-3.5 px-4 font-mono text-[10px] text-muted-foreground">
                         {order.paymentMode || 'CASH'}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                          order.orderSource === 'TABLE_QR'
+                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                            : 'bg-slate-500/10 border-slate-500/20 text-slate-600 dark:text-slate-400'
+                        }`}>
+                          {order.orderSource === 'TABLE_QR'
+                            ? `QR Order - Table ${order.tableNo || '?'}`
+                            : 'Walk-In Counter'}
+                        </span>
                       </td>
                       <td className="py-3.5 px-4">
                         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ${
