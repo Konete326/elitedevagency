@@ -23,7 +23,7 @@ const checkHeartbeat = async (tenantId, deviceFingerprint) => {
     return { status: 'locked', reason: 'This hardware device is not approved' };
   }
   
-  return { status: 'active', blockMobileAccess: tenant.blockMobileAccess || false, features: tenant.features || [], isSuspended: tenant.isSuspended || false, suspensionTitle: tenant.suspensionTitle || "", suspensionDescription: tenant.suspensionDescription || "" };
+  return { status: 'active', blockMobileAccess: tenant.blockMobileAccess || false, features: tenant.features || [], isSuspended: tenant.isSuspended || false, suspensionTitle: tenant.suspensionTitle || "", suspensionDescription: tenant.suspensionDescription || "", customTheme: tenant.customTheme || null };
 };
 
 module.exports = {

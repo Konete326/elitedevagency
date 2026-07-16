@@ -44,6 +44,8 @@ import { TrainerPayroll } from './features/gym/pages/TrainerPayroll';
 import { MeasurementTracker } from './features/gym/pages/MeasurementTracker';
 import { CashDrawer } from './features/billing/pages/CashDrawer';
 import { Khata } from './features/customers/pages/Khata';
+import { TableQrManager } from './features/restaurant/pages/TableQrManager';
+import { TableMenu } from './features/restaurant/pages/TableMenu';
 
 const queryClient = new QueryClient();
 
@@ -61,7 +63,8 @@ function MobileBlockerGuard({ children }) {
 
   const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  if (isAuthenticated && user?.role !== 'SUPER_ADMIN' && user?.blockMobileAccess && (isTooNarrow || isMobileUA)) {
+  const isCustomerRoute = /^\/menu\/[^/]+\/[^/]+/.test(window.location.pathname);
+  if (!isCustomerRoute && isAuthenticated && user?.role !== 'SUPER_ADMIN' && user?.blockMobileAccess && (isTooNarrow || isMobileUA)) {
     return (
       <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center select-none">
         <div className="max-w-md space-y-4">
@@ -817,6 +820,28 @@ function App() {
                   </TenantLayout>
                 )
               } 
+            />
+            <Route 
+              path="/table-qr" 
+              element={
+                !isAuthenticated ? (
+                  <LoginPage />
+                ) : user?.role === 'SUPER_ADMIN' ? (
+                  <SuperAdminLayout>
+                    <Dashboard />
+                  </SuperAdminLayout>
+                ) : (
+                  <FeatureGuard feature="Table Management">
+                    <TenantLayout>
+                      <TableQrManager />
+                    </TenantLayout>
+                  </FeatureGuard>
+                )
+              } 
+            />
+            <Route 
+              path="/menu/:tenantId/:tableId" 
+              element={<TableMenu />} 
             />
             </Routes>
           </SuspensionGuard>

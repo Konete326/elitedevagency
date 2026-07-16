@@ -608,7 +608,7 @@ export const Cart = () => {
                 </button>
                 <button
                   onClick={handleCheckout}
-                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white font-black px-4 py-3.5 text-sm hover:opacity-95 shadow-md transition-all active:scale-[0.99]"
+                  className="flex-1 inline-flex items-center justify-center rounded-xl bg-[var(--primary-accent)] text-white font-black px-4 py-3.5 text-sm hover:opacity-95 shadow-md transition-all active:scale-[0.99]"
                 >
                   Checkout / Pay
                 </button>
@@ -626,7 +626,7 @@ export const Cart = () => {
                 )}
                 <button
                   onClick={handleCheckout}
-                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white font-black px-6 py-4 text-base hover:opacity-95 shadow-md transition-all active:scale-[0.99]`}
+                  className={`${user?.niche === 'restaurant' ? 'flex-1' : 'w-full'} inline-flex items-center justify-center rounded-xl bg-[var(--primary-accent)] text-white font-black px-6 py-4 text-base hover:opacity-95 shadow-md transition-all active:scale-[0.99]`}
                 >
                   Checkout / Pay
                 </button>

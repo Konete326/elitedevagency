@@ -307,7 +307,7 @@ export const PricingTiersManager = () => {
                               onClick={() => handleFeatureToggle(feat)}
                               className={`flex items-center justify-between p-2 rounded-lg border cursor-pointer select-none transition-colors ${
                                 isChecked
-                                  ? 'bg-gradient-to-r from-[var(--accent)]/5 to-[var(--accent-secondary)]/5 border-[var(--accent)] text-foreground dark:text-zinc-200'
+                                  ? 'bg-[var(--accent)]/5 border-[var(--accent)] text-foreground dark:text-zinc-200'
                                   : 'bg-slate-50/30 dark:bg-zinc-900/10 border-border dark:border-zinc-700 text-slate-655 dark:text-zinc-350 hover:bg-slate-50/80 dark:hover:bg-zinc-800/80'
                               }`}
                             >
@@ -341,7 +341,7 @@ export const PricingTiersManager = () => {
                 <button
                   type="submit"
                   disabled={!!nameError || !!priceError || !name || price === ''}
-                  className="px-5 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2 bg-[var(--accent)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {editingId ? 'Update Tier' : 'Save Plan'}
                 </button>
@@ -369,7 +369,7 @@ export const PricingTiersManager = () => {
                 setPriceError('');
                 setIsFormOpen(true);
               }}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md select-none cursor-pointer"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-[var(--accent)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md select-none cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               <span>Add Pricing Tier</span>
@@ -400,7 +400,7 @@ export const PricingTiersManager = () => {
                       </p>
                     )}
                   </div>
-                  <span className="inline-flex items-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white px-2 py-0.5 text-[10px] font-black tracking-wide shrink-0">
+                  <span className="inline-flex items-center rounded-full bg-[var(--accent)] text-white px-2 py-0.5 text-[10px] font-black tracking-wide shrink-0">
                     Rs. {tier.price.toFixed(2)}/mo
                   </span>
                 </div>

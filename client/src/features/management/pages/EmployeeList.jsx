@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { toast } from 'sonner';
-import { Users, ToggleLeft, ToggleRight, Edit3, Plus } from 'lucide-react';
+import { ToggleLeft, ToggleRight, Edit3, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const EmployeeList = () => {

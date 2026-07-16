@@ -295,7 +295,7 @@ export const SubscriptionTracker = () => {
                             </button>
                             <button
                               onClick={() => handleOpenSubscription(tenant)}
-                              className="px-2.5 py-1 rounded bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white text-[10px] font-bold hover:opacity-90 transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer"
+                              className="px-2.5 py-1 rounded bg-[var(--accent)] text-white text-[10px] font-bold hover:opacity-90 transition-all shadow-xs inline-flex items-center gap-1 cursor-pointer"
                             >
                               <Calendar className="h-3 w-3" />
                               <span>Subscription</span>
@@ -410,7 +410,7 @@ export const SubscriptionTracker = () => {
               <button
                 onClick={handleSaveFeatures}
                 disabled={updateFeaturesMutation.isPending}
-                className="px-5 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2 bg-[var(--accent)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 cursor-pointer"
               >
                 Save Permissions
               </button>
@@ -473,7 +473,7 @@ export const SubscriptionTracker = () => {
               <button
                 onClick={handleSaveSubscription}
                 disabled={updateSubscriptionMutation.isPending}
-                className="px-5 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2 bg-[var(--accent)] text-white font-bold text-xs rounded-lg hover:opacity-90 transition-opacity shadow-md disabled:opacity-50 cursor-pointer"
               >
                 Save Subscription
               </button>

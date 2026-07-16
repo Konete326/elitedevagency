@@ -27,7 +27,7 @@ export const TenantsPage = () => {
             </div>
             <button
               onClick={() => setSearchParams({ new: 'true' })}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 px-3 py-2 text-xs font-bold transition-opacity shadow-sm"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--accent)] text-white hover:opacity-90 px-3 py-2 text-xs font-bold transition-opacity shadow-sm"
             >
               <UserPlus className="h-4 w-4" />
               <span>Add Tenant</span>

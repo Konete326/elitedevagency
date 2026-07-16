@@ -793,7 +793,7 @@ export const TenantOnboardForm = ({ onSuccess, hideHeader, editingTenant }) => {
           <button
             type="submit"
             disabled={onboardTenantMutation.isPending || updateTenantMutation.isPending || (editingTenant ? false : (hasAnyErrors || !isConnectionTested || !isConnectionSuccessful))}
-            className="w-full inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 font-bold px-4 py-2.5 text-xs transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center rounded-lg bg-[var(--accent)] text-white hover:opacity-90 font-bold px-4 py-2.5 text-xs transition-opacity shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {onboardTenantMutation.isPending || updateTenantMutation.isPending ? (
               <span className="flex items-center gap-2">

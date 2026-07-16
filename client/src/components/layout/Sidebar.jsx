@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUiStore } from '../../store/useUiStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Link, useLocation } from 'react-router-dom';
@@ -6,7 +6,7 @@ import { useModalStore } from '../../store/useModalStore';
 import { 
   LayoutDashboard, LogOut, Menu, Shield, Cpu, Activity, Layers, Terminal, Clock, UserPlus,
   Package, Tag, RotateCcw, Users, TrendingUp, Settings, History, LayoutGrid, Award, UserCheck, 
-  CircleDollarSign, Coins, Wallet, ChevronLeft, ChevronRight, Store
+  CircleDollarSign, Coins, Wallet, ChevronLeft, ChevronRight, Store, QrCode, Printer
 } from 'lucide-react';
 
 export const Sidebar = () => {
@@ -14,12 +14,33 @@ export const Sidebar = () => {
   const { user, logout } = useAuthStore();
   const { openModal } = useModalStore();
   const location = useLocation();
-  const [expandedGroups, setExpandedGroups] = useState({
-    billing: true,
-    inventory: true,
-    gym: true,
-    admin: false
+
+  const [expandedGroups, setExpandedGroups] = useState(() => {
+    const path = window.location.pathname;
+    return {
+      billing: ['/pos', '/returns', '/orders', '/galla', '/khata'].some(p => path === p || path.startsWith(p + '/')),
+      inventory: ['/inventory', '/deals'].some(p => path === p || path.startsWith(p + '/')),
+      gym: ['/plans', '/members', '/payments', '/trainers', '/measurements'].some(p => path === p || path.startsWith(p + '/')),
+      admin: ['/employees', '/reports', '/floor-map', '/settings'].some(p => path === p || path.startsWith(p + '/'))
+    };
   });
+
+  useEffect(() => {
+    const path = location.pathname;
+    const isBillingActive = ['/pos', '/returns', '/orders', '/galla', '/khata'].some(p => path === p || path.startsWith(p + '/'));
+    const isInventoryActive = ['/inventory', '/deals'].some(p => path === p || path.startsWith(p + '/'));
+    const isGymActive = ['/plans', '/members', '/payments', '/trainers', '/measurements'].some(p => path === p || path.startsWith(p + '/'));
+    const isAdminActive = ['/employees', '/reports', '/floor-map', '/settings'].some(p => path === p || path.startsWith(p + '/'));
+
+    setExpandedGroups(prev => {
+      const nextState = { ...prev };
+      if (isBillingActive) nextState.billing = true;
+      if (isInventoryActive) nextState.inventory = true;
+      if (isGymActive) nextState.gym = true;
+      if (isAdminActive) nextState.admin = true;
+      return nextState;
+    });
+  }, [location.pathname]);
 
   const toggleGroup = (groupKey) => {
     setExpandedGroups(prev => ({
@@ -112,15 +133,31 @@ export const Sidebar = () => {
       ];
       if (niche === 'RESTAURANT' && features.includes('Table Management')) {
         adminChildren.push({ path: '/floor-map', label: 'Table Layout', icon: LayoutGrid });
+        adminChildren.push({ path: '/table-qr', label: 'Table QRs', icon: QrCode });
       }
-      adminChildren.push({ path: '/settings', label: 'System Settings', icon: Settings });
 
       tenantLinks.push({
         key: 'admin',
         label: 'Administration',
-        icon: Settings,
+        icon: Shield,
         isGroup: true,
         children: adminChildren
+      });
+
+      const settingsChildren = [
+        { path: '/settings?tab=printer', label: 'Printer Setup', icon: Printer }
+      ];
+      if (niche === 'RESTAURANT') {
+        settingsChildren.push({ path: '/settings?tab=wallet', label: 'Wallet Setup', icon: Wallet });
+      }
+      settingsChildren.push({ path: '/settings/logs', label: 'System Logs', icon: Terminal });
+
+      tenantLinks.push({
+        key: 'settings_group',
+        label: 'System Settings',
+        icon: Settings,
+        isGroup: true,
+        children: settingsChildren
       });
     }
 
@@ -188,7 +225,7 @@ export const Sidebar = () => {
                     ? (location.pathname === '/inventory' || (location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories')))
                     : child.path === '/employees'
                     ? location.pathname.startsWith('/employees')
-                    : location.pathname === child.path;
+                    : (location.pathname + location.search) === child.path;
                   const ChildIcon = child.icon;
                   return (
                     <Link
@@ -210,10 +247,10 @@ export const Sidebar = () => {
                 if (child.path === '/inventory') {
                   return location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories');
                 }
-                if (child.path === '/employees') {
+                 if (child.path === '/employees') {
                   return location.pathname.startsWith('/employees');
                 }
-                return location.pathname === child.path;
+                return (location.pathname + location.search) === child.path;
               });
 
               const isExpanded = expandedGroups[link.key];
@@ -235,9 +272,9 @@ export const Sidebar = () => {
                       {link.children.map((child) => {
                         const isChildActive = child.path === '/inventory'
                           ? (location.pathname === '/inventory' || (location.pathname.startsWith('/inventory') && !location.pathname.startsWith('/inventory/categories')))
-                          : child.path === '/employees'
+                           : child.path === '/employees'
                           ? location.pathname.startsWith('/employees')
-                          : location.pathname === child.path;
+                          : (location.pathname + location.search) === child.path;
                         const ChildIcon = child.icon;
 
                         return (

@@ -12,6 +12,19 @@ export const CategoryForm = () => {
   const isEdit = !!id;
   const { user } = useAuthStore();
 
+  const placeholders = {
+    name: user?.niche === 'restaurant'
+      ? 'e.g. Beverages'
+      : user?.niche === 'gym'
+        ? 'e.g. Supplements'
+        : 'e.g. Shirts',
+    desc: user?.niche === 'restaurant'
+      ? 'e.g. Cold drinks, juices and hot teas'
+      : user?.niche === 'gym'
+        ? 'e.g. High protein shakes and dietary products'
+        : 'e.g. Seasonal apparel and tops',
+  };
+
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -109,96 +122,110 @@ export const CategoryForm = () => {
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 w-full space-y-6">
-        <div className="flex items-center gap-4">
+      <main className="flex-1 overflow-y-auto p-4 md:p-5 w-full space-y-4">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => navigate('/inventory/categories')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            className="flex items-center justify-center p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
           >
-            <ArrowLeft className="h-4.5 w-4.5" />
+            <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">{isEdit ? 'Edit Category' : 'Create Category'}</h1>
-            <p className="text-xs text-muted-foreground">{isEdit ? 'Modify category properties' : 'Create a new primary or sub-category classification'}</p>
+            <h1 className="text-base font-bold tracking-tight leading-none">{isEdit ? 'Edit Category' : 'Create Category'}</h1>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{isEdit ? 'Modify category properties' : 'Create a new primary or sub-category classification'}</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold mb-1">Category Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="e.g. Shirts"
-                required
-              />
-            </div>
+        <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Category Name *</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  placeholder={placeholders.name}
+                  required
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs font-bold mb-1">Description</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring h-24 resize-none"
-                placeholder="e.g. Seasonal apparel and tops"
-              />
-            </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Parent Category (Optional)</label>
+                <select
+                  value={parentCategoryId}
+                  onChange={(e) => setParentCategoryId(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
+                >
+                  <option value="">None (Primary Category)</option>
+                  {parentCategories.map(c => (
+                    <option key={c._id} value={c._id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div>
-              <label className="block text-xs font-bold mb-1">Parent Category (Optional)</label>
-              <select
-                value={parentCategoryId}
-                onChange={(e) => setParentCategoryId(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring cursor-pointer"
-              >
-                <option value="">None (Primary Category)</option>
-                {parentCategories.map(c => (
-                  <option key={c._id} value={c._id}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold mb-1">Category Banner Image</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[10px] file:font-semibold file:bg-muted file:text-foreground cursor-pointer"
-                disabled={compressing}
-              />
-              {compressing && <p className="text-[10px] text-muted-foreground mt-1">Compressing banner...</p>}
-              {image && (
-                <div className="mt-2 relative inline-block">
-                  <img src={image} alt="Preview" className="h-16 w-28 object-cover rounded-lg border border-border" />
-                  <button
-                    type="button"
-                    onClick={() => setImage('')}
-                    className="absolute -top-1.5 -right-1.5 bg-destructive text-destructive-foreground rounded-full p-0.5 hover:bg-destructive/90 shadow-sm"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Category Banner Image (Optional)</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="flex-1 rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2 py-1 text-[10px] font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all file:mr-2 file:py-0.5 file:px-2 file:rounded file:border-0 file:text-[9px] file:font-bold file:bg-muted file:text-foreground cursor-pointer"
+                    disabled={compressing}
+                  />
+                  {image && (
+                    <div className="relative shrink-0">
+                      <img src={image} alt="Preview" className="h-8 w-12 object-cover rounded-md border border-border" />
+                      <button
+                        type="button"
+                        onClick={() => setImage('')}
+                        className="absolute -top-1 -right-1 bg-rose-600 text-white rounded-full p-0.5 hover:bg-rose-700 shadow-sm border border-white"
+                      >
+                        <X className="h-2 w-2" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
+                {compressing && <p className="text-[9px] text-muted-foreground mt-0.5">Compressing banner...</p>}
+                <div className="mt-1 flex items-center">
+                  {image ? (
+                    <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/20 px-1.5 py-0.5 rounded border border-emerald-200 dark:border-emerald-900 truncate max-w-full">
+                      Active Image: {image.startsWith('http') ? image : 'Local Image File'}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-slate-400 font-semibold">No category image uploaded</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="col-span-1 md:col-span-3">
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Description (Optional)</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring h-14 resize-none"
+                  placeholder={placeholders.desc}
+                />
+              </div>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex justify-end gap-3 pt-2.5 border-t border-border dark:border-zinc-700">
               <button
                 type="button"
                 onClick={() => navigate('/inventory/categories')}
-                className="flex-1 inline-flex items-center justify-center rounded-lg border border-border hover:bg-muted font-bold px-4 py-2.5 text-sm transition-colors cursor-pointer"
+                className="px-4 py-2 border border-slate-200 dark:border-zinc-650 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-250 text-xs font-bold rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold px-4 py-2.5 text-sm transition-colors cursor-pointer"
+                disabled={compressing}
+                className="px-4 py-2 bg-[var(--primary-accent)] text-white hover:opacity-95 disabled:opacity-50 disabled:cursor-not-allowed text-xs font-bold rounded-lg transition-opacity shadow-sm cursor-pointer"
               >
-                <span>{isEdit ? 'Save Changes' : 'Create Category'}</span>
+                <span>{compressing ? 'Compressing...' : (isEdit ? 'Save Changes' : 'Create Category')}</span>
               </button>
             </div>
           </form>

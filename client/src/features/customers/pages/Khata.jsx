@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus, CircleDollarSign, Plus, X, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { UserPlus, CircleDollarSign, Plus, X, Search } from 'lucide-react';
 
 export const Khata = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const [customers, setCustomers] = useState([]);
@@ -128,7 +126,7 @@ export const Khata = () => {
           </div>
           <button
             onClick={() => setIsCustomerModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Add Credit Account</span>
@@ -175,7 +173,7 @@ export const Khata = () => {
                             setSelectedCustomerId(cust._id);
                             setIsPaymentModalOpen(true);
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold text-[10px] hover:opacity-90 shadow-sm transition-opacity"
+                          className="px-3 py-1.5 rounded-lg bg-[var(--accent)] text-white font-bold text-[10px] hover:opacity-90 shadow-sm transition-opacity"
                         >
                           Receive Payment
                         </button>
@@ -191,39 +189,39 @@ export const Khata = () => {
 
       {isCustomerModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
             <button onClick={() => setIsCustomerModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5 text-foreground">
-              <UserPlus className="h-5 w-5 text-emerald-500" /> Create Credit Ledger Account
+            <h3 className="text-base font-black tracking-tight mb-3 flex items-center gap-1.5 text-foreground">
+              <UserPlus className="h-4 w-4 text-[var(--primary-accent)]" /> Create Credit Ledger Account
             </h3>
-            <form onSubmit={handleCreateCustomer} className="space-y-4">
+            <form onSubmit={handleCreateCustomer} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Customer Name *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Customer Name *</label>
                 <input
                   type="text"
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. Asif Khan"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Phone Number *</label>
                 <input
                   type="tel"
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. 0300-1234567"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-foreground text-background py-3 text-xs font-bold shadow-sm"
+                className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-2 text-xs font-bold shadow-sm transition-opacity cursor-pointer"
               >
                 Register Customer
               </button>
@@ -234,16 +232,16 @@ export const Khata = () => {
 
       {isPaymentModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
             <button onClick={() => setIsPaymentModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5 text-foreground">
-              <CircleDollarSign className="h-5 w-5 text-emerald-500" /> Receive Credit Payment
+            <h3 className="text-base font-black tracking-tight mb-3 flex items-center gap-1.5 text-foreground">
+              <CircleDollarSign className="h-4 w-4 text-[var(--primary-accent)]" /> Receive Credit Payment
             </h3>
-            <form onSubmit={handleReceivePayment} className="space-y-4">
+            <form onSubmit={handleReceivePayment} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Amount Received (Rs) *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Amount Received (Rs) *</label>
                 <input
                   type="number"
                   required
@@ -251,13 +249,13 @@ export const Khata = () => {
                   step="0.01"
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. 1000"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white font-bold py-3 text-xs shadow-sm hover:opacity-90 transition-opacity"
+                className="w-full rounded-lg bg-[var(--accent)] text-white font-bold py-2 text-xs shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
               >
                 Submit Payment Entry
               </button>

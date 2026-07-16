@@ -15,6 +15,8 @@ const Measurement = require('../models/Measurement');
 const Customer = require('../models/Customer');
 const CashShift = require('../models/CashShift');
 const PricingTier = require('../models/PricingTier');
+const TableSession = require('../models/TableSession');
+const RestaurantPayment = require('../models/RestaurantPayment');
 
 const TENANT_SCHEMAS = {
   User: User.schema,
@@ -31,7 +33,9 @@ const TENANT_SCHEMAS = {
   Measurement: Measurement.schema,
   Customer: Customer.schema,
   CashShift: CashShift.schema,
-  PricingTier: PricingTier.schema
+  PricingTier: PricingTier.schema,
+  TableSession: TableSession.schema,
+  RestaurantPayment: RestaurantPayment.schema
 };
 
 const connectionCache = {};

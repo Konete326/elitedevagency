@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { Search, RotateCcw, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, RotateCcw } from 'lucide-react';
 
 export const ReturnsPage = () => {
-  const navigate = useNavigate();
   const [searchId, setSearchId] = useState('');
   const [order, setOrder] = useState(null);
   const [selectedItems, setSelectedItems] = useState({});

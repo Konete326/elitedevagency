@@ -67,7 +67,11 @@ export const TopNav = () => {
       </div>
 
       <div className="col-span-4 flex items-center justify-end gap-3 sm:gap-4">
-        <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold border transition-all bg-white/15 border-white/10 text-white`}>
+        <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-extrabold border transition-all ${
+          isOnline 
+            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-100' 
+            : 'bg-red-500/20 border-red-500/30 text-red-200 animate-pulse'
+        }`}>
           {isOnline ? <Wifi className="h-3 w-3 shrink-0" /> : <WifiOff className="h-3 w-3 shrink-0" />}
           <span className="hidden sm:inline">{isOnline ? 'ONLINE' : 'OFFLINE'}</span>
           {!isOnline && <span className="sm:hidden">OFF</span>}
@@ -107,7 +111,9 @@ export const TopNav = () => {
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-white/15 to-white/25 flex items-center justify-center text-xs font-bold text-white shadow-xs border-2 border-white hover:opacity-90 transition-opacity font-sans">
                 {user?.name ? user.name.substring(0, 2).toUpperCase() : 'US'}
               </div>
-              <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 border border-white" />
+              <span className={`absolute bottom-0 right-0 h-2 w-2 rounded-full border border-white transition-colors ${
+                isOnline ? 'bg-emerald-500' : 'bg-red-500'
+              }`} />
             </div>
             <div className="hidden sm:flex flex-col min-w-0 leading-tight">
               <span className="text-[10px] sm:text-xs font-bold truncate max-w-[100px] text-white">{user?.name || 'User'}</span>

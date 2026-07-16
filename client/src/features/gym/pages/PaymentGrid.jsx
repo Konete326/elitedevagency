@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, CreditCard, Landmark, CircleDollarSign, CheckCircle2, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { CreditCard, Landmark, CircleDollarSign, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -11,7 +10,6 @@ const MONTHS = [
 ];
 
 export const PaymentGrid = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const [members, setMembers] = useState([]);

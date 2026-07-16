@@ -1,14 +1,14 @@
 export const StatCard = ({ label, value, sub, icon: Icon }) => (
-  <div className="group rounded-2xl border border-border bg-card p-6 shadow-sm flex items-start gap-4 transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:-translate-y-0.5">
-    <div className="p-3 bg-accent/10 border border-accent/20 text-accent rounded-xl flex-shrink-0 transition-colors duration-300 group-hover:bg-accent/20">
-      <Icon className="h-5 w-5" />
+  <div className="group rounded-xl border border-border bg-card p-3 shadow-xs flex items-center gap-3 transition-colors hover:border-accent/30">
+    <div className="p-2 bg-accent/10 border border-accent/15 text-accent rounded-lg flex-shrink-0">
+      <Icon className="h-4 w-4" />
     </div>
     <div className="min-w-0">
-      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">
+      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">
         {label}
       </p>
-      <p className="text-3xl font-black text-foreground tracking-tight">{value}</p>
-      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+      <p className="text-lg font-black text-foreground tracking-tight leading-none">{value}</p>
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5 font-medium leading-none">{sub}</p>}
     </div>
   </div>
 );

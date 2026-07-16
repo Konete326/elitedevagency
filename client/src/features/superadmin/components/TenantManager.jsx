@@ -461,7 +461,7 @@ export const TenantManager = ({ onEdit }) => {
                   setSelectedTenantForView(null);
                   setSearchParams({});
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
+                className="px-4 py-2 bg-[var(--accent)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
               >
                 Close
               </button>
@@ -585,7 +585,7 @@ export const TenantManager = ({ onEdit }) => {
                   );
                 }}
                 disabled={updateFeaturesMutation.isPending}
-                className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity disabled:opacity-50 shadow-sm"
+                className="px-4 py-2 bg-[var(--accent)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity disabled:opacity-50 shadow-sm"
               >
                 {updateFeaturesMutation.isPending ? 'Saving...' : 'Save Features'}
               </button>
@@ -692,7 +692,7 @@ export const TenantManager = ({ onEdit }) => {
                   });
                 }}
                 disabled={toggleSuspensionMutation.isPending}
-                className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity disabled:opacity-50 shadow-sm"
+                className="px-4 py-2 bg-[var(--accent)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity disabled:opacity-50 shadow-sm"
               >
                 {toggleSuspensionMutation.isPending ? 'Saving...' : 'Save Settings'}
               </button>

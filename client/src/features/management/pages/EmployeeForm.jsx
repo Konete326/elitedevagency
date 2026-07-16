@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const AVAILABLE_PERMISSIONS = [
@@ -124,78 +124,78 @@ export const EmployeeForm = () => {
 
   return (
     <div className="flex flex-col h-full w-full overflow-hidden bg-background text-foreground transition-colors duration-300">
-      <main className="flex-1 overflow-y-auto p-6 md:p-8 w-full space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center gap-4">
+      <main className="flex-1 overflow-y-auto p-4 md:p-5 w-full space-y-4">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={() => navigate('/employees')}
-            className="flex items-center justify-center p-2 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
+            className="flex items-center justify-center p-1.5 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground transition-colors cursor-pointer"
           >
-            <ArrowLeft className="h-4.5 w-4.5" />
+            <ArrowLeft className="h-4 w-4" />
           </button>
           <div>
-            <h1 className="text-xl font-bold tracking-tight">{isEdit ? 'Edit Staff Account' : 'Add Staff Account'}</h1>
-            <p className="text-xs text-muted-foreground">{isEdit ? 'Modify access settings and visibility policies' : 'Onboard store employees and grant credentials'}</p>
+            <h1 className="text-base font-bold tracking-tight leading-none">{isEdit ? 'Edit Staff Account' : 'Add Staff Account'}</h1>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{isEdit ? 'Modify access settings and visibility policies' : 'Onboard store employees and grant credentials'}</p>
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="rounded-xl border border-border bg-card p-3 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold mb-1">Full Name</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Full Name *</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder="e.g. John Doe"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold mb-1">Email Address</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Email Address *</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="e.g. john@retail.com"
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="e.g. john@business.com"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold mb-1">Password {isEdit && '(Leave blank to keep current)'}</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Password {isEdit && '(Leave blank to keep current)'}</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   placeholder={isEdit ? 'New password (optional)' : 'Min 6 characters'}
                   required={!isEdit}
                 />
               </div>
 
-              <div className="grid gap-2 grid-cols-2">
+              <div className="grid gap-3 grid-cols-2">
                 <div>
-                  <label className="block text-xs font-bold mb-1">Role</label>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Role</label>
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
+                    className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none cursor-pointer"
                   >
                     <option value="MANAGER">Manager</option>
                     <option value="CASHIER">Cashier</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1">Data Visibility</label>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-0.5">Data Visibility</label>
                   <select
                     value={dataVisibility}
                     onChange={(e) => setDataVisibility(e.target.value)}
-                    className="w-full rounded-lg border border-border bg-background px-2.5 py-2 text-xs focus:outline-none cursor-pointer"
+                    className="w-full rounded-lg border border-border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none cursor-pointer"
                   >
                     <option value="ALL">All Stores</option>
                     <option value="RESTRICTED">Restricted</option>
@@ -205,15 +205,15 @@ export const EmployeeForm = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold mb-1.5">Grant Permissions</label>
-              <div className="grid gap-2 grid-cols-2 max-h-[120px] overflow-y-auto border border-border rounded-lg p-3 bg-muted/20">
+              <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Grant Permissions</label>
+              <div className="grid gap-2 grid-cols-2 max-h-[120px] overflow-y-auto border border-border rounded-lg p-2.5 bg-muted/20">
                 {AVAILABLE_PERMISSIONS.map((perm) => (
                   <label key={perm.key} className="flex items-center gap-1.5 text-[10px] font-semibold cursor-pointer select-none">
                     <input
                       type="checkbox"
                       checked={selectedPermissions.includes(perm.key)}
                       onChange={() => handlePermissionToggle(perm.key)}
-                      className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                      className="rounded border-border text-[var(--primary-accent)] focus:ring-[var(--primary-accent)] h-3.5 w-3.5"
                     />
                     <span>{perm.label}</span>
                   </label>
@@ -221,18 +221,18 @@ export const EmployeeForm = () => {
               </div>
             </div>
 
-            <div className="flex gap-4 pt-4">
+            <div className="flex justify-end gap-3 pt-2.5 border-t border-border dark:border-zinc-700">
               <button
                 type="button"
                 onClick={() => navigate('/employees')}
-                className="flex-1 inline-flex items-center justify-center rounded-lg border border-border hover:bg-muted font-bold px-4 py-2.5 text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 border border-slate-200 dark:border-zinc-650 hover:bg-slate-50 dark:hover:bg-zinc-750 text-slate-700 dark:text-zinc-250 text-xs font-bold rounded-lg transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold px-4 py-2.5 text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 bg-[var(--primary-accent)] text-white hover:opacity-95 text-xs font-bold rounded-lg transition-opacity shadow-sm cursor-pointer"
               >
                 <span>{loading ? 'Saving...' : isEdit ? 'Save Employee' : 'Register Employee'}</span>
               </button>

@@ -3,7 +3,7 @@ import { getDatabase } from '../../../db/database';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useCartStore } from '../../../store/useCartStore';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, X, Coffee, Users, Layers } from 'lucide-react';
+import { Plus, X, Coffee, Users, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export const FloorMap = () => {

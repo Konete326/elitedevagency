@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, Landmark, Ruler, Activity, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Landmark, Ruler, Activity, Trash2 } from 'lucide-react';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const MeasurementTracker = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { openModal } = useModalStore();
 
   const [members, setMembers] = useState([]);
   const [selectedMemberId, setSelectedMemberId] = useState('');
@@ -113,21 +113,29 @@ export const MeasurementTracker = () => {
     }
   };
 
-  const handleDeleteLog = async (logId) => {
-    try {
-      const db = await getDatabase();
-      const doc = await db.measurements.findOne(logId).exec();
-      if (doc) {
-        await doc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Metrics log deleted');
+  const handleDeleteLog = (logId) => {
+    openModal({
+      title: 'Delete Metrics Log',
+      message: 'Are you sure you want to delete this body metrics log? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const doc = await db.measurements.findOne(logId).exec();
+          if (doc) {
+            await doc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Metrics log deleted');
+          }
+        } catch {
+          toast.error('Failed to delete metrics record');
+        }
       }
-    } catch {
-      toast.error('Failed to delete metrics record');
-    }
+    });
   };
 
   const selectedMember = members.find(m => m._id === selectedMemberId);

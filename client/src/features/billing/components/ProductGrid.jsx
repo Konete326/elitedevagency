@@ -5,6 +5,7 @@ import { getDatabase } from '../../../db/database';
 import { Plus, Tag, Inbox, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CardSkeleton } from '../../../components/ui/CardSkeleton';
+import { NicheImage } from '../../../components/common/NicheImage';
 
 export const ProductGrid = () => {
   const { user } = useAuthStore();
@@ -173,15 +174,7 @@ export const ProductGrid = () => {
               )}
 
               <div className="space-y-2">
-                {product.image && (
-                  <div className="w-full h-32 overflow-hidden rounded-lg border border-border mb-2 shrink-0">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-250 ease-out"
-                    />
-                  </div>
-                )}
+                <NicheImage src={product.image} alt={product.name} className="w-full h-32 mb-2 shrink-0" />
                 <div className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   <Tag className="h-3 w-3" />
                   <span>{product.category}</span>

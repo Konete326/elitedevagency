@@ -48,8 +48,13 @@ export const useHeartbeat = () => {
               const suspensionChanged = currentUser.isSuspended !== result.data.isSuspended ||
                 currentUser.suspensionTitle !== result.data.suspensionTitle ||
                 currentUser.suspensionDescription !== result.data.suspensionDescription;
+
+              const currentTheme = currentUser.customTheme || {};
+              const nextTheme = result.data.customTheme || {};
+              const themeChanged = currentTheme.lightPrimary !== nextTheme.lightPrimary ||
+                currentTheme.darkPrimary !== nextTheme.darkPrimary;
               
-              if (currentUser.blockMobileAccess !== result.data.blockMobileAccess || featuresChanged || suspensionChanged) {
+              if (currentUser.blockMobileAccess !== result.data.blockMobileAccess || featuresChanged || suspensionChanged || themeChanged) {
                 useAuthStore.setState({
                   user: {
                     ...currentUser,
@@ -57,7 +62,8 @@ export const useHeartbeat = () => {
                     features: nextFeatures,
                     isSuspended: result.data.isSuspended,
                     suspensionTitle: result.data.suspensionTitle,
-                    suspensionDescription: result.data.suspensionDescription
+                    suspensionDescription: result.data.suspensionDescription,
+                    customTheme: result.data.customTheme || null
                   }
                 });
               }

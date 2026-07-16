@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, Trash2, Plus, X, Award, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Trash2, Plus, X, Award, Shield } from 'lucide-react';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const PlanManager = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { openModal } = useModalStore();
 
   const [plans, setPlans] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,20 +91,28 @@ export const PlanManager = () => {
   };
 
   const handleDeletePlan = async (planId) => {
-    try {
-      const db = await getDatabase();
-      const doc = await db.plans.findOne(planId).exec();
-      if (doc) {
-        await doc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Membership plan deleted successfully');
+    openModal({
+      title: 'Delete Membership Plan',
+      message: 'Are you sure you want to delete this membership plan? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const doc = await db.plans.findOne(planId).exec();
+          if (doc) {
+            await doc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Membership plan deleted successfully');
+          }
+        } catch {
+          toast.error('Failed to delete membership plan');
+        }
       }
-    } catch {
-      toast.error('Failed to delete membership plan');
-    }
+    });
   };
 
   return (
@@ -120,7 +128,7 @@ export const PlanManager = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition-opacity shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl bg-[var(--primary-accent)] px-4 py-2.5 text-xs font-bold text-white hover:opacity-95 transition-opacity shadow-sm cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>New Plan</span>
@@ -147,7 +155,7 @@ export const PlanManager = () => {
                       <h3 className="text-base font-black text-foreground uppercase tracking-wide">{plan.name}</h3>
                       <p className="text-xs text-muted-foreground mt-1 min-h-[2rem] line-clamp-2">{plan.description}</p>
                     </div>
-                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] px-3 py-1 text-xs font-black text-white">
+                    <span className="inline-flex items-center rounded-full bg-[var(--accent)] px-3 py-1 text-xs font-black text-white">
                       Rs. {plan.price.toFixed(2)}
                     </span>
                   </div>
@@ -177,55 +185,55 @@ export const PlanManager = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 font-semibold">
-          <div className="w-full max-w-md rounded-2xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative overflow-hidden flex flex-col">
+          <div className="w-full max-w-md rounded-2xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-xl relative overflow-hidden flex flex-col">
             <button
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 p-1 text-muted-foreground hover:text-foreground rounded-lg transition-colors"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-6 flex items-center gap-1.5 text-foreground">
-              <Award className="h-5 w-5 text-accent" /> Create Membership Plan
+            <h3 className="text-base font-black tracking-tight mb-3 flex items-center gap-1.5 text-foreground">
+              <Award className="h-4 w-4 text-accent" /> Create Membership Plan
             </h3>
 
-            <form onSubmit={handleCreatePlan} className="space-y-4">
+            <form onSubmit={handleCreatePlan} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Plan Name *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Plan Name *</label>
                 <input
                   type="text"
                   required
                   value={planName}
                   onChange={(e) => setPlanName(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                   placeholder="e.g. Monthly Standard"
                 />
               </div>
 
-              <div className="grid gap-4 grid-cols-2">
+              <div className="grid gap-3 grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Price (Rs) *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Price (Rs) *</label>
                   <input
                     type="number"
-                    step="0.01"
+                    step="any"
                     required
                     value={planPrice}
                     onChange={(e) => setPlanPrice(e.target.value)}
-                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
+                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
                       isPriceValid 
                         ? 'border-border dark:border-zinc-700 focus:ring-ring' 
                         : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
                     }`}
-                    placeholder="e.g. 49.99"
+                    placeholder="e.g. 2999.00"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Duration (Days) *</label>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Duration (Days) *</label>
                   <input
                     type="number"
                     required
                     value={planDuration}
                     onChange={(e) => setPlanDuration(e.target.value)}
-                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
+                    className={`w-full rounded-lg border bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 transition-all ${
                       isDurationValid 
                         ? 'border-border dark:border-zinc-700 focus:ring-ring' 
                         : 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
@@ -236,18 +244,18 @@ export const PlanManager = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Description</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Description (Optional)</label>
                 <textarea
                   value={planDesc}
                   onChange={(e) => setPlanDesc(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all h-24 resize-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all h-16 resize-none"
                   placeholder="Details about plan privileges..."
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full rounded-lg bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white py-3 text-xs font-bold shadow-sm hover:opacity-90 transition-opacity"
+                className="w-full rounded-lg bg-[var(--accent)] text-white py-2 text-xs font-bold shadow-sm hover:opacity-90 transition-opacity cursor-pointer"
               >
                 Save Plan
               </button>

@@ -3,11 +3,9 @@ import { getDatabase } from '../../../db/database';
 import { useSettingsStore } from '../../../store/useSettingsStore';
 import { printHardwareReceipt } from '../../../lib/device';
 import { toast } from 'sonner';
-import { ArrowLeft, Printer, ShoppingBag, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Printer, ShoppingBag, Search } from 'lucide-react';
 
 export const OrderHistory = () => {
-  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { selectedPrinter } = useSettingsStore();

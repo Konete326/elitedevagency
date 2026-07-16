@@ -3,9 +3,12 @@ import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
 import { Trash2, Edit3, Database, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { NicheImage } from '../../../components/common/NicheImage';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const ProductList = () => {
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,21 +36,29 @@ export const ProductList = () => {
     };
   }, []);
 
-  const handleSoftDelete = async (id) => {
-    try {
-      const db = await getDatabase();
-      const productDoc = await db.products.findOne(id).exec();
-      if (productDoc) {
-        await productDoc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Product deleted successfully');
+  const handleSoftDelete = (id) => {
+    openModal({
+      title: 'Delete Product',
+      message: 'Are you sure you want to delete this product? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const productDoc = await db.products.findOne(id).exec();
+          if (productDoc) {
+            await productDoc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Product deleted successfully');
+          }
+        } catch {
+          toast.error('Failed to delete product');
+        }
       }
-    } catch {
-      toast.error('Failed to delete product');
-    }
+    });
   };
 
   const filteredProducts = products.filter(p => {
@@ -125,13 +136,7 @@ export const ProductList = () => {
                       </td>
                       <td className="py-4 px-4 font-bold truncate max-w-[200px]">
                         <div className="flex items-center gap-3">
-                          {product.image && (
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="h-10 w-10 object-cover rounded-lg border border-border shrink-0"
-                            />
-                          )}
+                          <NicheImage src={product.image} alt={product.name} className="h-10 w-10 shrink-0" />
                           <div>
                             <span>{product.name}</span>
                             {product.variants && product.variants.length > 0 && (

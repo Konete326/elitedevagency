@@ -328,7 +328,7 @@ export const DiagnosticsPanel = () => {
             <div className="p-4 border-t border-border dark:border-zinc-700 bg-slate-50/50 dark:bg-zinc-800/20 flex justify-end">
               <button
                 onClick={() => setSelectedTenant(null)}
-                className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
+                className="px-4 py-2 bg-[var(--accent)] text-white hover:opacity-90 text-xs font-bold rounded-lg transition-opacity shadow-sm"
               >
                 Close
               </button>
@@ -468,7 +468,7 @@ export const DiagnosticsPanel = () => {
                 <button
                   type="submit"
                   disabled={updateTenantMutation.isPending}
-                  className="px-4 py-2 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-secondary)] text-white hover:opacity-90 disabled:opacity-50 text-xs font-bold rounded-lg transition-opacity shadow-sm"
+                  className="px-4 py-2 bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-50 text-xs font-bold rounded-lg transition-opacity shadow-sm"
                 >
                   {updateTenantMutation.isPending ? 'Saving...' : 'Save Changes'}
                 </button>

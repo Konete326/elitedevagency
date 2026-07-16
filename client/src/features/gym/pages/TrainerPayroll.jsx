@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, UserPlus, Banknote, Landmark, Plus, X, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { UserPlus, Banknote, Landmark, Plus, X, Users } from 'lucide-react';
 
 export const TrainerPayroll = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
 
   const [trainers, setTrainers] = useState([]);
@@ -163,7 +161,7 @@ export const TrainerPayroll = () => {
           </div>
           <button
             onClick={() => setIsTrainerModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Onboard Trainer</span>
@@ -317,51 +315,51 @@ export const TrainerPayroll = () => {
 
       {isTrainerModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
             <button onClick={() => setIsTrainerModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <UserPlus className="h-5 w-5 text-accent" /> Onboard Gym Trainer
+            <h3 className="text-base font-black tracking-tight mb-3 flex items-center gap-1.5">
+              <UserPlus className="h-4 w-4 text-accent" /> Onboard Gym Trainer
             </h3>
-            <form onSubmit={handleCreateTrainer} className="space-y-4">
+            <form onSubmit={handleCreateTrainer} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Trainer Name *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Trainer Name *</label>
                 <input
                   type="text"
                   required
                   value={trainerName}
                   onChange={(e) => setTrainerName(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. Bruce Wayne"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Phone Number *</label>
                 <input
                   type="tel"
                   required
                   value={trainerPhone}
                   onChange={(e) => setTrainerPhone(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. +1 555-0100"
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Base Salary (Rs) *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Base Salary (Rs) *</label>
                 <input
                   type="number"
                   step="0.01"
                   required
                   value={trainerSalary}
                   onChange={(e) => setTrainerSalary(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none"
                   placeholder="e.g. 1500"
                 />
               </div>
               <button
                 type="submit"
-                className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-3 text-xs font-bold shadow-sm cursor-pointer"
+                className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-2 text-xs font-bold shadow-sm cursor-pointer transition-opacity"
               >
                 Onboard Trainer
               </button>

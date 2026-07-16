@@ -28,7 +28,13 @@ const tenantSchema = new mongoose.Schema({
   suspensionTitle: { type: String, default: "" },
   suspensionDescription: { type: String, default: "" },
   ownerName: { type: String },
-  ownerEmail: { type: String }
+  ownerEmail: { type: String },
+  easyPaisaName: { type: String, default: "" },
+  easyPaisaNumber: { type: String, default: "" },
+  jazzCashName: { type: String, default: "" },
+  jazzCashNumber: { type: String, default: "" },
+  bankName: { type: String, default: "" },
+  bankIban: { type: String, default: "" }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { ArrowLeft, Trash2, X, Users, UserPlus, CreditCard } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Trash2, X, Users, UserPlus, CreditCard } from 'lucide-react';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const MemberManager = () => {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
+  const { openModal } = useModalStore();
 
   const [members, setMembers] = useState([]);
   const [plans, setPlans] = useState([]);
@@ -86,21 +86,29 @@ export const MemberManager = () => {
     }
   };
 
-  const handleDeleteMember = async (memberId) => {
-    try {
-      const db = await getDatabase();
-      const doc = await db.members.findOne(memberId).exec();
-      if (doc) {
-        await doc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Member record deleted');
+  const handleDeleteMember = (memberId) => {
+    openModal({
+      title: 'Delete Gym Member',
+      message: 'Are you sure you want to delete this gym member? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const doc = await db.members.findOne(memberId).exec();
+          if (doc) {
+            await doc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Member record deleted');
+          }
+        } catch {
+          toast.error('Failed to delete member');
+        }
       }
-    } catch {
-      toast.error('Failed to delete member');
-    }
+    });
   };
 
   return (
@@ -113,7 +121,7 @@ export const MemberManager = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold text-xs transition-colors shadow-sm cursor-pointer"
           >
             <UserPlus className="h-4 w-4" />
             <span>Register Member</span>
@@ -189,56 +197,56 @@ export const MemberManager = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/60 backdrop-blur-sm p-4 overflow-y-auto">
-          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-md rounded-xl border border-border dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4 shadow-xl relative animate-in fade-in zoom-in-95 duration-200">
             <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
               <X className="h-4 w-4" />
             </button>
-            <h3 className="text-lg font-black tracking-tight mb-4 flex items-center gap-1.5">
-              <UserPlus className="h-5 w-5 text-accent" /> Register Gym Member
+            <h3 className="text-base font-black tracking-tight mb-3 flex items-center gap-1.5 text-foreground">
+              <UserPlus className="h-4 w-4 text-accent" /> Register Gym Member
             </h3>
-            <form onSubmit={handleRegisterMember} className="space-y-4">
+            <form onSubmit={handleRegisterMember} className="space-y-3">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Member Name *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Member Name *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                   placeholder="e.g. Clark Kent"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Phone Number *</label>
                 <input
                   type="tel"
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                   placeholder="e.g. +1 555-0199"
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">RFID / Card Number (Optional)</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">RFID / Card Number (Optional)</label>
                 <input
                   type="text"
                   value={rfidCard}
                   onChange={(e) => setRfidCard(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                   placeholder="RFID Card scanning identifier..."
                 />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Select Membership Plan *</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Select Membership Plan *</label>
                 <select
                   required
                   value={selectedPlanId}
                   onChange={(e) => setSelectedPlanId(e.target.value)}
-                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-3.5 py-2.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
+                  className="w-full rounded-lg border border-border dark:border-zinc-700 bg-slate-50 dark:bg-zinc-900/50 px-2.5 py-1.5 text-xs font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all cursor-pointer"
                 >
                   <option value="">Select a membership plan...</option>
                   {plans.map(p => (
@@ -249,7 +257,7 @@ export const MemberManager = () => {
 
               <button
                 type="submit"
-                className="w-full rounded-lg bg-foreground text-background py-3 text-xs font-bold shadow-sm"
+                className="w-full rounded-lg bg-[var(--primary-accent)] text-white hover:opacity-95 py-2 text-xs font-bold shadow-sm transition-opacity cursor-pointer"
               >
                 Register Member
               </button>

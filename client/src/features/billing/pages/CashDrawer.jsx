@@ -3,8 +3,10 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
 import { Wallet, Plus, Coins, ShieldAlert, X, Edit3, Trash2, FileText } from 'lucide-react';
+import { useModalStore } from '../../../store/useModalStore';
 export const CashDrawer = () => {
   const { user } = useAuthStore();
+  const { openModal } = useModalStore();
 
   const [shifts, setShifts] = useState([]);
   const [activeShift, setActiveShift] = useState(null);
@@ -192,22 +194,29 @@ export const CashDrawer = () => {
     }
   };
 
-  const handleDeleteShift = async (shiftId) => {
-    if (!confirm('Are you sure you want to delete this shift record?')) return;
-    try {
-      const db = await getDatabase();
-      const doc = await db.cash_shifts.findOne(shiftId).exec();
-      if (doc) {
-        await doc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Shift record deleted');
+  const handleDeleteShift = (shiftId) => {
+    openModal({
+      title: 'Delete Shift Record',
+      message: 'Are you sure you want to delete this shift record? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const doc = await db.cash_shifts.findOne(shiftId).exec();
+          if (doc) {
+            await doc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Shift record deleted');
+          }
+        } catch {
+          toast.error('Failed to delete shift record');
+        }
       }
-    } catch {
-      toast.error('Failed to delete shift record');
-    }
+    });
   };
 
   const expectedCash = activeShift
@@ -229,7 +238,7 @@ export const CashDrawer = () => {
                   setOpenedByInput(user?.name || user?.email || '');
                   setIsAddOpen(true);
                 }}
-                className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white hover:opacity-95 font-bold text-xs px-4 py-2.5 transition-colors shadow-sm cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-[var(--primary-accent)] text-white hover:opacity-95 font-bold text-xs px-4 py-2.5 transition-colors shadow-sm cursor-pointer"
               >
                 <Plus className="h-4 w-4" />
                 <span>Open New Shift</span>
@@ -409,7 +418,7 @@ export const CashDrawer = () => {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 rounded-lg bg-gradient-to-r from-[var(--primary-accent)] to-[var(--secondary-accent)] text-white font-bold text-xs shadow-sm hover:opacity-95 transition-opacity"
+                className="w-full py-3 rounded-lg bg-[var(--primary-accent)] text-white font-bold text-xs shadow-sm hover:opacity-95 transition-opacity"
               >
                 Start Active Cash Shift
               </button>

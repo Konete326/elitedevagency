@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getDatabase } from '../../../db/database';
 import { toast } from 'sonner';
-import { Trash2, Edit3, Database, Plus, Search } from 'lucide-react';
+import { Trash2, Edit3, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { NicheImage } from '../../../components/common/NicheImage';
+import { useModalStore } from '../../../store/useModalStore';
 
 export const CategoryList = () => {
   const navigate = useNavigate();
+  const { openModal } = useModalStore();
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -24,21 +27,29 @@ export const CategoryList = () => {
     };
   }, []);
 
-  const handleDelete = async (id) => {
-    try {
-      const db = await getDatabase();
-      const doc = await db.categories.findOne(id).exec();
-      if (doc) {
-        await doc.patch({
-          isDeleted: true,
-          isSynced: false,
-          updatedAt: new Date().toISOString()
-        });
-        toast.success('Category deleted successfully');
+  const handleDelete = (id) => {
+    openModal({
+      title: 'Delete Category',
+      message: 'Are you sure you want to delete this category? This action cannot be undone.',
+      type: 'danger',
+      confirmText: 'Delete',
+      onConfirm: async () => {
+        try {
+          const db = await getDatabase();
+          const doc = await db.categories.findOne(id).exec();
+          if (doc) {
+            await doc.patch({
+              isDeleted: true,
+              isSynced: false,
+              updatedAt: new Date().toISOString()
+            });
+            toast.success('Category deleted successfully');
+          }
+        } catch {
+          toast.error('Failed to delete category');
+        }
       }
-    } catch {
-      toast.error('Failed to delete category');
-    }
+    });
   };
 
   const filteredCategories = categories.filter(c => 
@@ -98,17 +109,7 @@ export const CategoryList = () => {
                     return (
                       <tr key={category._id} className="hover:bg-muted/40 transition-colors">
                         <td className="py-4 px-4">
-                          {category.image ? (
-                            <img
-                              src={category.image}
-                              alt={category.name}
-                              className="h-10 w-16 object-cover rounded border border-border"
-                            />
-                          ) : (
-                            <div className="h-10 w-16 bg-muted rounded border border-border flex items-center justify-center">
-                              <Database className="h-4 w-4 text-muted-foreground/40" />
-                            </div>
-                          )}
+                          <NicheImage src={category.image} alt={category.name} className="h-10 w-16 shrink-0" />
                         </td>
                         <td className="py-4 px-4 font-bold truncate max-w-[200px]">
                           <span>{category.name}</span>
