@@ -33,7 +33,7 @@ const getPublicTenantSettings = async (req, res, next) => {
   try {
     const { tenantId } = req.params;
     const tenant = await Tenant.findById(tenantId)
-      .select('easyPaisaName easyPaisaNumber jazzCashName jazzCashNumber bankName bankIban businessName')
+      .select('easyPaisaName easyPaisaNumber jazzCashName jazzCashNumber bankName bankIban businessName paymentMethods')
       .lean();
     if (!tenant) {
       return res.status(404).json({ success: false, error: 'Tenant not found' });

@@ -4,7 +4,7 @@ const getTenantSettings = async (req, res, next) => {
   try {
     const { tenantId } = req.user;
     const tenant = await Tenant.findById(tenantId)
-      .select('easyPaisaName easyPaisaNumber jazzCashName jazzCashNumber bankName bankIban businessName')
+      .select('easyPaisaName easyPaisaNumber jazzCashName jazzCashNumber bankName bankIban businessName paymentMethods')
       .lean();
     if (!tenant) {
       return res.status(404).json({ success: false, error: 'Tenant not found' });
@@ -18,7 +18,7 @@ const getTenantSettings = async (req, res, next) => {
 const updateTenantSettings = async (req, res, next) => {
   try {
     const { tenantId } = req.user;
-    const { easyPaisaName, easyPaisaNumber, jazzCashName, jazzCashNumber, bankName, bankIban } = req.body;
+    const { easyPaisaName, easyPaisaNumber, jazzCashName, jazzCashNumber, bankName, bankIban, paymentMethods } = req.body;
 
     const tenant = await Tenant.findByIdAndUpdate(
       tenantId,
@@ -28,7 +28,8 @@ const updateTenantSettings = async (req, res, next) => {
         jazzCashName: jazzCashName || "",
         jazzCashNumber: jazzCashNumber || "",
         bankName: bankName || "",
-        bankIban: bankIban || ""
+        bankIban: bankIban || "",
+        paymentMethods: paymentMethods || []
       },
       { new: true, runValidators: true }
     );

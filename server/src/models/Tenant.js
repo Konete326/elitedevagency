@@ -34,7 +34,16 @@ const tenantSchema = new mongoose.Schema({
   jazzCashName: { type: String, default: "" },
   jazzCashNumber: { type: String, default: "" },
   bankName: { type: String, default: "" },
-  bankIban: { type: String, default: "" }
+  bankIban: { type: String, default: "" },
+  paymentMethods: [{
+    type: { type: String, enum: ['EASYPAISA', 'JAZZCASH', 'BANK', 'OTHER'], default: 'EASYPAISA' },
+    customName: { type: String, required: true },
+    accountTitle: { type: String, required: true },
+    accountNumber: { type: String, required: true },
+    iban: { type: String, default: "" },
+    isActive: { type: Boolean, default: true },
+    logo: { type: String, default: "" }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Tenant', tenantSchema);

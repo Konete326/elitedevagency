@@ -19,6 +19,7 @@ export const TableMenu = () => {
   
   const [businessName, setBusinessName] = useState('');
   const [paymentConfig, setPaymentConfig] = useState(null);
+  const [selectedMethodId, setSelectedMethodId] = useState(null);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -83,6 +84,11 @@ export const TableMenu = () => {
         if (res.success && res.data) {
           setBusinessName(res.data.businessName || 'Elite Restaurant');
           setPaymentConfig(res.data);
+          const active = (res.data.paymentMethods || []).filter(m => m.isActive);
+          if (active.length > 0) {
+            setSelectedMethodId(active[0]._id);
+            setPaymentMethod(active[0].customName);
+          }
         }
       })
       .catch(() => {});
@@ -652,32 +658,70 @@ export const TableMenu = () => {
             <h4 className="text-xs font-black uppercase text-white tracking-wider">Merchant Wallet Info</h4>
             
             <div className="grid grid-cols-1 gap-3 text-xs">
-              {paymentConfig?.easyPaisaNumber && (
-                <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950">
-                  <div>
-                    <div className="font-bold text-slate-200">EasyPaisa Account</div>
-                    <div className="text-[10px] text-slate-400">{paymentConfig.easyPaisaName}</div>
-                  </div>
-                  <div className="font-mono font-bold text-primary">{paymentConfig.easyPaisaNumber}</div>
-                </div>
-              )}
-              {paymentConfig?.jazzCashNumber && (
-                <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950">
-                  <div>
-                    <div className="font-bold text-slate-200">JazzCash Account</div>
-                    <div className="text-[10px] text-slate-400">{paymentConfig.jazzCashName}</div>
-                  </div>
-                  <div className="font-mono font-bold text-primary">{paymentConfig.jazzCashNumber}</div>
-                </div>
-              )}
-              {paymentConfig?.bankIban && (
-                <div className="p-3 rounded-lg border border-slate-800 bg-slate-950 space-y-1">
-                  <div className="flex justify-between">
-                    <span className="font-bold text-slate-200">Bank Transfer</span>
-                    <span className="text-[10px] text-slate-400">{paymentConfig.bankName}</span>
-                  </div>
-                  <div className="font-mono font-bold text-primary text-[10px] break-all">{paymentConfig.bankIban}</div>
-                </div>
+              {(paymentConfig?.paymentMethods || []).filter(m => m.isActive).length > 0 ? (
+                (paymentConfig.paymentMethods || []).filter(m => m.isActive).map((method) => (
+                  <button
+                    key={method._id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedMethodId(method._id);
+                      setPaymentMethod(method.customName);
+                    }}
+                    className={`p-3 rounded-lg border text-left flex items-center justify-between transition-all cursor-pointer ${
+                      selectedMethodId === method._id
+                        ? 'border-primary bg-slate-850 shadow-sm'
+                        : 'border-slate-800 bg-slate-950 hover:bg-slate-900'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-bold text-white uppercase tracking-wider text-[10px]">{method.type}</div>
+                      <div className="font-black text-slate-200 text-xs mt-0.5">{method.customName}</div>
+                      <div className="text-[10px] text-slate-400 mt-1">Title: <span className="font-bold text-slate-200">{method.accountTitle}</span></div>
+                      {method.accountNumber && (
+                        <div className="text-[10px] text-slate-400">Account #: <span className="font-bold text-slate-200 font-mono">{method.accountNumber}</span></div>
+                      )}
+                      {method.iban && (
+                        <div className="text-[9px] text-slate-400 truncate">IBAN: <span className="font-bold text-slate-200 font-mono">{method.iban}</span></div>
+                      )}
+                    </div>
+                    
+                    {method.logo && (
+                      <span className="px-2 py-1 rounded bg-slate-850 text-[9px] font-bold text-primary uppercase">
+                        {method.logo}
+                      </span>
+                    )}
+                  </button>
+                ))
+              ) : (
+                <>
+                  {paymentConfig?.easyPaisaNumber && (
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950">
+                      <div>
+                        <div className="font-bold text-slate-200">EasyPaisa Account</div>
+                        <div className="text-[10px] text-slate-400">{paymentConfig.easyPaisaName}</div>
+                      </div>
+                      <div className="font-mono font-bold text-primary">{paymentConfig.easyPaisaNumber}</div>
+                    </div>
+                  )}
+                  {paymentConfig?.jazzCashNumber && (
+                    <div className="flex items-center justify-between p-3 rounded-lg border border-slate-800 bg-slate-950">
+                      <div>
+                        <div className="font-bold text-slate-200">JazzCash Account</div>
+                        <div className="text-[10px] text-slate-400">{paymentConfig.jazzCashName}</div>
+                      </div>
+                      <div className="font-mono font-bold text-primary">{paymentConfig.jazzCashNumber}</div>
+                    </div>
+                  )}
+                  {paymentConfig?.bankIban && (
+                    <div className="p-3 rounded-lg border border-slate-800 bg-slate-950 space-y-1">
+                      <div className="flex justify-between">
+                        <span className="font-bold text-slate-200">Bank Transfer</span>
+                        <span className="text-[10px] text-slate-400">{paymentConfig.bankName}</span>
+                      </div>
+                      <div className="font-mono font-bold text-primary text-[10px] break-all">{paymentConfig.bankIban}</div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -686,18 +730,20 @@ export const TableMenu = () => {
             <h4 className="text-xs font-black uppercase text-white tracking-wider">Submit Transfer Proof</h4>
 
             <div className="space-y-3 text-xs">
-              <div className="space-y-1">
-                <label className="block font-bold text-slate-400">Payment Option</label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="EasyPaisa">EasyPaisa</option>
-                  <option value="JazzCash">JazzCash</option>
-                  <option value="Bank">Bank Transfer</option>
-                </select>
-              </div>
+              {(paymentConfig?.paymentMethods || []).filter(m => m.isActive).length === 0 && (
+                <div className="space-y-1">
+                  <label className="block font-bold text-slate-400">Payment Option</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="w-full rounded-lg border border-slate-800 bg-slate-950 px-3 py-2 text-white focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="EasyPaisa">EasyPaisa</option>
+                    <option value="JazzCash">JazzCash</option>
+                    <option value="Bank">Bank Transfer</option>
+                  </select>
+                </div>
+              )}
 
               <div className="space-y-1">
                 <label className="block font-bold text-slate-400">Account Name Paid From</label>
